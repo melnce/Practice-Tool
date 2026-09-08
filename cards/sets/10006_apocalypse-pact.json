@@ -1014,7 +1014,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "exclude_self": true,
         "attack": 1,
         "defense": 1
       }
@@ -1893,7 +1892,6 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "distribution": "all",
         "amount": "{self.cost}"
       }
     ],
@@ -2352,7 +2350,7 @@
       {
         "op": "attacks_per_turn",
         "target": "self",
-        "amount": 3
+        "value": 3
       }
     ],
     "keywords": ["Aura", "cant_be_destroyed"],
@@ -2445,7 +2443,8 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Prostrating Coward"
+                "name": "Prostrating Coward",
+                "count": 1
               }
             ]
           }
@@ -2596,7 +2595,8 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Venerating Dyer"
+                "name": "Venerating Dyer",
+                "count": 1
               }
             ]
           }
@@ -2734,7 +2734,8 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Worshipful Crusader"
+                "name": "Worshipful Crusader",
+                "count": 1
               }
             ]
           }
@@ -2869,8 +2870,7 @@
               {
                 "op": "damage",
                 "target": "enemy:follower",
-                "amount": 3,
-                "distribution": "all"
+                "amount": 3
               }
             ]
           }

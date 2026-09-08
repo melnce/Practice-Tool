@@ -22,9 +22,7 @@ export type KeywordName =
   | "spellboost"
   | "counter"
   | "skybound_art"
-  | "pixie_enter"
   | "bleed"
-  | "ally_enter"
   | "cant_attack"
   | "max_damage_cap"
   | string;
@@ -34,8 +32,6 @@ export const KEYWORD_ALIASES: Record<string, KeywordName> = {
   lastwords: "last_words",
   "last words": "last_words",
   "skybound art": "skybound_art",
-  pixieenter: "pixie_enter",
-  allyenter: "ally_enter",
   maxdamagecap: "max_damage_cap",
   ignoresward: "ignores_ward",
   "ignores ward": "ignores_ward",

@@ -16,7 +16,7 @@
  * - trigger, rally, fanfare, strike, engage (event)
  * - enhance, spellboost (cost)
  * - counter, skybound_art (special)
- * - pixie_enter, bleed, ally_enter (class-specific)
+ * - bleed (class-specific)
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
@@ -326,48 +326,6 @@ describe("Mechanic Contract: all keywords", () => {
   // ===========================================================================
 
   describe("class-specific keywords", () => {
-    it("pixie_enter keyword triggers on fairy enter", () => {
-      givenGameState({ seed: 1 })
-        .withFirstBoard([
-          {
-            name: "PixieWatcher",
-            type: "Follower",
-            attack: 2,
-            defense: 2,
-            keywordState: {
-              hasPixieEnter: true,
-              pixieEnterEffects: [{ op: "draw", source: "deck", count: 1 }],
-            },
-          },
-        ])
-        .build();
-
-      const card = findOnBoard("first", "PixieWatcher");
-      expect(card!.keywordState?.hasPixieEnter).toBe(true);
-    });
-
-    it("ally_enter keyword triggers on ally summon", () => {
-      givenGameState({ seed: 1 })
-        .withFirstBoard([
-          {
-            name: "AllyWatcher",
-            type: "Follower",
-            attack: 2,
-            defense: 2,
-            keywordState: {
-              hasAllyEnter: true,
-              allyEnterEffects: [
-                { op: "stat", action: "give", target: "self", attack: 1 },
-              ],
-            },
-          },
-        ])
-        .build();
-
-      const card = findOnBoard("first", "AllyWatcher");
-      expect(card!.keywordState?.hasAllyEnter).toBe(true);
-    });
-
     it("bleed keyword deals damage on attack", () => {
       givenGameState({ seed: 1 })
         .withFirstBoard([

@@ -960,9 +960,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "attack": 1,
         "defense": 1
       }
@@ -2220,9 +2217,6 @@
         "action": "grant",
         "select": 1,
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "keywords": [
           {
             "name": "Storm"
@@ -2236,9 +2230,6 @@
         "action": "grant",
         "select": 1,
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "keywords": [
           {
             "name": "Bane"
@@ -2763,11 +2754,11 @@
         "op": "summon",
         "source": "deck",
         "count": 3,
-        "filters": {
+        "unique_names": true,
+        "filter": {
           "type": "follower",
           "cost_lte": 3
-        },
-        "unique_names": true
+        }
       }
     ],
     "superevolve": [
@@ -2775,9 +2766,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "attack": 0,
         "defense": 2
       },
@@ -2785,9 +2773,6 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "keywords": ["Aura"]
       }
     ],
@@ -2888,7 +2873,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Striker Artifact"
+        "name": "Striker Artifact",
+        "count": 1
       },
       {
         "op": "add_to_hand",

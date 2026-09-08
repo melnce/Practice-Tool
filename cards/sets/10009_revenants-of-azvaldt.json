@@ -122,9 +122,6 @@
         "action": "give",
         "target": "ally:follower",
         "select": 2,
-        "condition": {
-          "not_self": true
-        },
         "attack": 3,
         "defense": 3
       }
@@ -534,9 +531,6 @@
         "action": "give",
         "target": "ally:follower",
         "select": 1,
-        "condition": {
-          "not_self": true
-        },
         "attack": 1,
         "defense": 1,
         "keywords": ["Rush"]
@@ -1774,7 +1768,6 @@
         "action": "give",
         "target": "ally:follower",
         "select": 1,
-        "exclude_self": true,
         "attack": 3,
         "defense": 3
       }
@@ -2164,7 +2157,8 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Void Colonel"
+                "name": "Void Colonel",
+                "count": 1
               }
             ]
           }
@@ -2747,7 +2741,8 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Miraculous Al-mi'raj"
+                "name": "Miraculous Al-mi'raj",
+                "count": 1
               }
             ]
           },

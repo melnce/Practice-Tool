@@ -977,9 +977,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "attack": 3,
         "defense": 3
       }
@@ -1594,9 +1591,6 @@
         "op": "transform",
         "target": "any:follower",
         "select": 1,
-        "condition": {
-          "not_self": true
-        },
         "into": "Regal Falcon"
       }
     ],
@@ -2321,10 +2315,7 @@
       {
         "op": "damage",
         "target": "all:follower",
-        "amount": 1,
-        "condition": {
-          "not_self": true
-        }
+        "amount": 1
       }
     ],
     "superevolve": [],
@@ -2559,8 +2550,7 @@
               {
                 "op": "damage",
                 "target": "enemy:any",
-                "amount": 4,
-                "distribution": "all"
+                "amount": 4
               }
             ]
           }
@@ -2755,8 +2745,7 @@
           {
             "op": "damage",
             "target": "enemy:follower",
-            "amount": 1,
-            "distribution": "all"
+            "amount": 1
           }
         ]
       }
@@ -2936,9 +2925,6 @@
                 "op": "stat",
                 "action": "give",
                 "target": "all:follower",
-                "condition": {
-                  "not_self": true
-                },
                 "attack": -1,
                 "defense": -1
               }
@@ -2974,8 +2960,7 @@
                 "mode": "random",
                 "condition": {
                   "unevolved": true,
-                  "has_keyword": "ward",
-                  "not_self": true
+                  "has_keyword": "ward"
                 },
                 "effects": [
                   {

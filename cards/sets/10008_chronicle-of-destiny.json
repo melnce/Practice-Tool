@@ -581,7 +581,7 @@
         "source": "deck",
         "count": 2,
         "distinct_by": "name",
-        "filters": {
+        "filter": {
           "type": "Follower",
           "cost_lte": 2
         }
@@ -624,7 +624,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "exclude_self": true,
         "attack": 1,
         "defense": 1
       }
@@ -901,8 +900,8 @@
         "defense": -10,
         "distribution": "highest",
         "stat": "attack",
-        "pick": "random",
-        "select": 1
+        "select": 1,
+        "select_mode": "random"
       }
     ],
     "fanfare": []
@@ -2976,7 +2975,7 @@
         "op": "summon",
         "source": "deck",
         "count": 1,
-        "filters": {
+        "filter": {
           "type": "Follower",
           "cost_lte": 2
         }

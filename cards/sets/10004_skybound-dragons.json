@@ -132,7 +132,6 @@
         "op": "mode",
         "options": [
           {
-            "name": "Deal 5 damage to a random enemy follower",
             "effects": [
               {
                 "op": "damage",
@@ -141,10 +140,10 @@
                 "distribution": "random_hits",
                 "count": 1
               }
-            ]
+            ],
+            "label": "Deal 5 damage to a random enemy follower"
           },
           {
-            "name": "Draw 2 followers",
             "effects": [
               {
                 "op": "search",
@@ -153,7 +152,8 @@
                   "type": "Follower"
                 }
               }
-            ]
+            ],
+            "label": "Draw 2 followers"
           }
         ],
         "select": 1
@@ -662,7 +662,6 @@
             "op": "mode",
             "options": [
               {
-                "name": "Draw a card. Restore 1 defense to your leader.",
                 "effects": [
                   {
                     "op": "draw",
@@ -675,10 +674,10 @@
                     "player": "self",
                     "amount": 1
                   }
-                ]
+                ],
+                "label": "Draw a card. Restore 1 defense to your leader."
               },
               {
-                "name": "Give all allied followers +1/+0 and Rush.",
                 "effects": [
                   {
                     "op": "stat",
@@ -687,10 +686,10 @@
                     "attack": 1,
                     "keywords": ["Rush"]
                   }
-                ]
+                ],
+                "label": "Give all allied followers +1/+0 and Rush."
               },
               {
-                "name": "Give all allied followers +0/+1 and Ward.",
                 "effects": [
                   {
                     "op": "stat",
@@ -699,7 +698,8 @@
                     "defense": 1,
                     "keywords": ["Ward"]
                   }
-                ]
+                ],
+                "label": "Give all allied followers +0/+1 and Ward."
               }
             ],
             "select": 1
@@ -854,7 +854,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Mordred, Illusory Lion"
+        "name": "Mordred, Illusory Lion",
+        "count": 1
       }
     ],
     "superevolve": [],
@@ -881,7 +882,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Arthur, Staunch Dragon"
+        "name": "Arthur, Staunch Dragon",
+        "count": 1
       }
     ],
     "superevolve": [],
@@ -1002,27 +1004,26 @@
         "op": "mode",
         "options": [
           {
-            "name": "Super-Evolve",
             "effects": [
               {
                 "op": "evolve",
                 "target": "self",
                 "mode": "super"
               }
-            ]
+            ],
+            "label": "Super-Evolve"
           },
           {
-            "name": "Deal 4 to all enemy followers",
             "effects": [
               {
                 "op": "damage",
                 "target": "enemy:follower",
                 "amount": 4
               }
-            ]
+            ],
+            "label": "Deal 4 to all enemy followers"
           },
           {
-            "name": "Restore 4 to leader",
             "effects": [
               {
                 "op": "restore",
@@ -1030,7 +1031,8 @@
                 "player": "self",
                 "amount": 4
               }
-            ]
+            ],
+            "label": "Restore 4 to leader"
           }
         ],
         "select": 1
@@ -1060,7 +1062,6 @@
         "op": "mode",
         "options": [
           {
-            "name": "Give the leftmost allied Swordcraft follower \"Can attack 2 times per turn\"",
             "effects": [
               {
                 "op": "stat",
@@ -1072,10 +1073,10 @@
                 },
                 "attacks_per_turn": 2
               }
-            ]
+            ],
+            "label": "Give the leftmost allied Swordcraft follower \"Can attack 2 times per turn\""
           },
           {
-            "name": "Give all allied Swordcraft followers +1/+1 and Barrier",
             "effects": [
               {
                 "op": "stat",
@@ -1088,10 +1089,10 @@
                 "defense": 1,
                 "keywords": ["Barrier"]
               }
-            ]
+            ],
+            "label": "Give all allied Swordcraft followers +1/+1 and Barrier"
           },
           {
-            "name": "Recover 2 play points and 1 evolution point",
             "effects": [
               {
                 "op": "pp",
@@ -1103,17 +1104,19 @@
                 "action": "recover",
                 "amount": 1
               }
-            ]
+            ],
+            "label": "Recover 2 play points and 1 evolution point"
           },
           {
-            "name": "Restore 6 defense to your leader",
             "effects": [
               {
                 "op": "restore",
                 "target": "leader",
-                "amount": 6
+                "amount": 6,
+                "player": "self"
               }
-            ]
+            ],
+            "label": "Restore 6 defense to your leader"
           }
         ],
         "select": 1
@@ -1164,7 +1167,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Zeta & Bea, Crimson and Blue"
+        "name": "Zeta & Bea, Crimson and Blue",
+        "count": 1
       }
     ],
     "evolve": [],
@@ -1314,7 +1318,8 @@
       {
         "op": "restore",
         "target": "leader",
-        "amount": 3
+        "amount": 3,
+        "player": "self"
       }
     ],
     "evolve": [],
@@ -1375,7 +1380,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Mireille & Risette, Penitent Duo"
+        "name": "Mireille & Risette, Penitent Duo",
+        "count": 1
       },
       {
         "op": "earth_rite",
@@ -1417,7 +1423,6 @@
         "op": "mode",
         "options": [
           {
-            "name": "Draw a card. Deal 4 damage to a random enemy follower.",
             "effects": [
               {
                 "op": "draw",
@@ -1431,10 +1436,10 @@
                 "distribution": "random_hits",
                 "count": 1
               }
-            ]
+            ],
+            "label": "Draw a card. Deal 4 damage to a random enemy follower."
           },
           {
-            "name": "Draw 2 cards. Deal 4 damage to 2 random enemy followers and 2 damage to your leader.",
             "effects": [
               {
                 "op": "draw",
@@ -1453,7 +1458,8 @@
                 "target": "ally:leader",
                 "amount": 2
               }
-            ]
+            ],
+            "label": "Draw 2 cards. Deal 4 damage to 2 random enemy followers and 2 damage to your leader."
           }
         ],
         "select": 1
@@ -1609,21 +1615,17 @@
         "op": "mode",
         "options": [
           {
-            "name": "Give all other allied followers on the field Barrier.",
             "effects": [
               {
                 "op": "stat",
                 "action": "give",
                 "target": "ally:follower",
-                "filter": {
-                  "not_self": true
-                },
                 "keywords": ["Barrier"]
               }
-            ]
+            ],
+            "label": "Give all other allied followers on the field Barrier."
           },
           {
-            "name": "Deal X damage split between all enemy followers. X is this follower's attack.",
             "effects": [
               {
                 "op": "damage",
@@ -1632,7 +1634,8 @@
                 "spill_to_leader": true,
                 "target": "enemy:follower"
               }
-            ]
+            ],
+            "label": "Deal X damage split between all enemy followers. X is this follower's attack."
           }
         ]
       }
@@ -2243,7 +2246,8 @@
           {
             "op": "summon",
             "source": "named",
-            "name": "Vaseraga, Unyielding Scythe"
+            "name": "Vaseraga, Unyielding Scythe",
+            "count": 1
           },
           {
             "op": "damage",
@@ -2298,7 +2302,8 @@
               },
               {
                 "op": "restore",
-                "target": "ally:leader",
+                "target": "leader",
+                "player": "self",
                 "amount": 1
               }
             ],
@@ -2420,7 +2425,6 @@
         "op": "mode",
         "options": [
           {
-            "name": "Give this follower and another random allied follower on the field +1/+1",
             "effects": [
               {
                 "op": "stat",
@@ -2436,15 +2440,12 @@
                 "action": "give",
                 "attack": 1,
                 "defense": 1,
-                "filter": {
-                  "not_self": true
-                },
                 "select_mode": "random"
               }
-            ]
+            ],
+            "label": "Give this follower and another random allied follower on the field +1/+1"
           },
           {
-            "name": "Deal 3 damage to a random enemy follower",
             "effects": [
               {
                 "op": "damage",
@@ -2453,7 +2454,8 @@
                 "distribution": "random_hits",
                 "count": 1
               }
-            ]
+            ],
+            "label": "Deal 3 damage to a random enemy follower"
           }
         ],
         "select": 1
@@ -2916,10 +2918,7 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "keywords": ["Barrier"],
-        "filter": {
-          "not_self": true
-        }
+        "keywords": ["Barrier"]
       }
     ],
     "keywords": [],

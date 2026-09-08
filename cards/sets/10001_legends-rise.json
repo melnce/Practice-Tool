@@ -334,9 +334,6 @@
             "op": "stat",
             "action": "give",
             "target": "ally:follower",
-            "condition": {
-              "not_self": true
-            },
             "attack": 1,
             "defense": 1
           }
@@ -409,7 +406,8 @@
       },
       {
         "op": "restore",
-        "target": "ally:leader",
+        "target": "leader",
+        "player": "self",
         "amount_source": "hand_size"
       }
     ],
@@ -1037,13 +1035,15 @@
         "filter": {
           "tribe": "Pixie"
         },
-        "effect": {
-          "op": "damage",
-          "amount": 1,
-          "target": "enemy:follower",
-          "distribution": "random_hits",
-          "count": 1
-        }
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 1,
+            "target": "enemy:follower",
+            "distribution": "random_hits",
+            "count": 1
+          }
+        ]
       }
     ],
     "superevolve": [],
@@ -1120,9 +1120,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "attack": 1,
         "defense": 1
       }
@@ -1152,7 +1149,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Steelclad Knight"
+        "name": "Steelclad Knight",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -1470,12 +1468,14 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Steelclad Knight"
+                "name": "Steelclad Knight",
+                "count": 1
               },
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Knight"
+                "name": "Knight",
+                "count": 1
               }
             ]
           },
@@ -1618,9 +1618,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "attack": 1,
         "defense": 1
       }
@@ -1844,7 +1841,8 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Kagemitsu, Enduring Warrior"
+                "name": "Kagemitsu, Enduring Warrior",
+                "count": 1
               }
             ]
           }
@@ -1935,7 +1933,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Magic Sediment"
+        "name": "Magic Sediment",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -1969,7 +1968,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Magic Sediment"
+        "name": "Magic Sediment",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -2142,7 +2142,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Clay Golem"
+        "name": "Clay Golem",
+        "count": 1
       },
       {
         "op": "damage",
@@ -2356,7 +2357,8 @@
                   {
                     "op": "summon",
                     "source": "named",
-                    "name": "Guardian Golem"
+                    "name": "Guardian Golem",
+                    "count": 1
                   }
                 ]
               }
@@ -2540,7 +2542,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Demonic Shikigami"
+        "name": "Demonic Shikigami",
+        "count": 1
       }
     ],
     "keywords": [
@@ -2933,7 +2936,8 @@
           {
             "op": "summon",
             "source": "named",
-            "name": "Otohime's Bodyguard"
+            "name": "Otohime's Bodyguard",
+            "count": 1
           },
           {
             "op": "discard",
@@ -2973,7 +2977,7 @@
         "attack": 1,
         "defense": 0,
         "select": 1,
-        "distribution": "random"
+        "select_mode": "random"
       }
     ],
     "triggers": []
@@ -3034,9 +3038,6 @@
         "action": "grant",
         "select": 1,
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "keywords": [
           {
             "name": "Storm"
@@ -3326,7 +3327,6 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "distribution": "all",
         "amount": "{last_discarded_cost}"
       }
     ],
@@ -3398,12 +3398,14 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Supreme Golden Dragon"
+        "name": "Supreme Golden Dragon",
+        "count": 1
       },
       {
         "op": "summon",
         "source": "named",
-        "name": "Supreme Silver Dragon"
+        "name": "Supreme Silver Dragon",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -3431,7 +3433,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Bat"
+        "name": "Bat",
+        "count": 1
       }
     ],
     "triggers": [
@@ -4120,9 +4123,6 @@
             "op": "stat",
             "action": "give",
             "target": "ally:follower",
-            "condition": {
-              "not_self": true
-            },
             "attack": 2,
             "defense": 0
           }
@@ -4233,10 +4233,10 @@
         "select": 1,
         "mode": "reduce",
         "amount": 1,
-        "minCost": 0,
         "filter": {
           "type": "Amulet"
-        }
+        },
+        "min_cost": 0
       }
     ],
     "superevolve": [],
@@ -4410,7 +4410,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Holy Falcon"
+        "name": "Holy Falcon",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -4647,7 +4648,6 @@
       },
       {
         "op": "damage",
-        "distribution": "all",
         "target": "enemy:any",
         "amount_source": "context.destroy_count"
       }
@@ -4716,7 +4716,8 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Lapis, Shining Seraph"
+                "name": "Lapis, Shining Seraph",
+                "count": 1
               },
               {
                 "op": "stat",
@@ -4768,7 +4769,8 @@
           {
             "op": "summon",
             "source": "named",
-            "name": "Holyflame Tiger"
+            "name": "Holyflame Tiger",
+            "count": 1
           }
         ]
       },
@@ -4860,7 +4862,7 @@
         "source": "deck",
         "count": 3,
         "distinct_by": "name",
-        "filters": {
+        "filter": {
           "type": "Amulet",
           "cost_lte": 3
         }
@@ -4896,9 +4898,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "attack": 2,
         "defense": 4
       }
@@ -5594,7 +5593,8 @@
                 "else_effects": [
                   {
                     "op": "restore",
-                    "target": "ally:leader",
+                    "target": "leader",
+                    "player": "self",
                     "amount": 1
                   }
                 ]
@@ -5649,7 +5649,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Lloyd"
+        "name": "Lloyd",
+        "count": 1
       }
     ],
     "keywords": [],

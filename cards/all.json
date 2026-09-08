@@ -53,7 +53,6 @@
       {
         "op": "draw",
         "source": "deck",
-        "player": "self",
         "count": 1
       }
     ],
@@ -67,7 +66,6 @@
           {
             "op": "draw",
             "source": "deck",
-            "player": "self",
             "count": 1
           }
         ]
@@ -364,9 +362,15 @@
       {
         "name": "Countdown",
         "turns": 2
-      },
+      }
+    ],
+    "triggers": [
       {
-        "name": "PixieEnter",
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Pixie"
+        },
         "effects": [
           {
             "op": "damage",
@@ -377,8 +381,7 @@
           }
         ]
       }
-    ],
-    "triggers": []
+    ]
   },
   {
     "id": "10012110",
@@ -675,21 +678,23 @@
       {
         "name": "Countdown",
         "turns": 4
-      },
+      }
+    ],
+    "triggers": [
       {
-        "name": "AllyEnter",
+        "event": "ally_follower_enter",
+        "source": "board",
         "effects": [
           {
             "op": "stat",
             "action": "give",
-            "target": "trigger",
+            "target": "entering_follower",
             "attack": 1,
             "defense": 1
           }
         ]
       }
-    ],
-    "triggers": []
+    ]
   },
   {
     "id": "10031110",
@@ -843,7 +848,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Clay Golem"
+        "name": "Clay Golem",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -1542,7 +1548,8 @@
           {
             "op": "summon",
             "source": "named",
-            "name": "Regal Falcon"
+            "name": "Regal Falcon",
+            "count": 1
           }
         ]
       },
@@ -1671,7 +1678,8 @@
           {
             "op": "summon",
             "source": "named",
-            "name": "Holy Falcon"
+            "name": "Holy Falcon",
+            "count": 1
           }
         ]
       },
@@ -2247,9 +2255,6 @@
             "op": "stat",
             "action": "give",
             "target": "ally:follower",
-            "condition": {
-              "not_self": true
-            },
             "attack": 1,
             "defense": 1
           }
@@ -2322,7 +2327,8 @@
       },
       {
         "op": "restore",
-        "target": "ally:leader",
+        "target": "leader",
+        "player": "self",
         "amount_source": "hand_size"
       }
     ],
@@ -2950,13 +2956,15 @@
         "filter": {
           "tribe": "Pixie"
         },
-        "effect": {
-          "op": "damage",
-          "amount": 1,
-          "target": "enemy:follower",
-          "distribution": "random_hits",
-          "count": 1
-        }
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 1,
+            "target": "enemy:follower",
+            "distribution": "random_hits",
+            "count": 1
+          }
+        ]
       }
     ],
     "superevolve": [],
@@ -3033,9 +3041,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "attack": 1,
         "defense": 1
       }
@@ -3065,7 +3070,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Steelclad Knight"
+        "name": "Steelclad Knight",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -3383,12 +3389,14 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Steelclad Knight"
+                "name": "Steelclad Knight",
+                "count": 1
               },
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Knight"
+                "name": "Knight",
+                "count": 1
               }
             ]
           },
@@ -3531,9 +3539,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "attack": 1,
         "defense": 1
       }
@@ -3757,7 +3762,8 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Kagemitsu, Enduring Warrior"
+                "name": "Kagemitsu, Enduring Warrior",
+                "count": 1
               }
             ]
           }
@@ -3848,7 +3854,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Magic Sediment"
+        "name": "Magic Sediment",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -3882,7 +3889,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Magic Sediment"
+        "name": "Magic Sediment",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -4055,7 +4063,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Clay Golem"
+        "name": "Clay Golem",
+        "count": 1
       },
       {
         "op": "damage",
@@ -4269,7 +4278,8 @@
                   {
                     "op": "summon",
                     "source": "named",
-                    "name": "Guardian Golem"
+                    "name": "Guardian Golem",
+                    "count": 1
                   }
                 ]
               }
@@ -4453,7 +4463,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Demonic Shikigami"
+        "name": "Demonic Shikigami",
+        "count": 1
       }
     ],
     "keywords": [
@@ -4846,7 +4857,8 @@
           {
             "op": "summon",
             "source": "named",
-            "name": "Otohime's Bodyguard"
+            "name": "Otohime's Bodyguard",
+            "count": 1
           },
           {
             "op": "discard",
@@ -4886,7 +4898,7 @@
         "attack": 1,
         "defense": 0,
         "select": 1,
-        "distribution": "random"
+        "select_mode": "random"
       }
     ],
     "triggers": []
@@ -4947,9 +4959,6 @@
         "action": "grant",
         "select": 1,
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "keywords": [
           {
             "name": "Storm"
@@ -5239,7 +5248,6 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "distribution": "all",
         "amount": "{last_discarded_cost}"
       }
     ],
@@ -5311,12 +5319,14 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Supreme Golden Dragon"
+        "name": "Supreme Golden Dragon",
+        "count": 1
       },
       {
         "op": "summon",
         "source": "named",
-        "name": "Supreme Silver Dragon"
+        "name": "Supreme Silver Dragon",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -5344,7 +5354,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Bat"
+        "name": "Bat",
+        "count": 1
       }
     ],
     "triggers": [
@@ -6033,9 +6044,6 @@
             "op": "stat",
             "action": "give",
             "target": "ally:follower",
-            "condition": {
-              "not_self": true
-            },
             "attack": 2,
             "defense": 0
           }
@@ -6146,10 +6154,10 @@
         "select": 1,
         "mode": "reduce",
         "amount": 1,
-        "minCost": 0,
         "filter": {
           "type": "Amulet"
-        }
+        },
+        "min_cost": 0
       }
     ],
     "superevolve": [],
@@ -6323,7 +6331,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Holy Falcon"
+        "name": "Holy Falcon",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -6560,7 +6569,6 @@
       },
       {
         "op": "damage",
-        "distribution": "all",
         "target": "enemy:any",
         "amount_source": "context.destroy_count"
       }
@@ -6629,7 +6637,8 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Lapis, Shining Seraph"
+                "name": "Lapis, Shining Seraph",
+                "count": 1
               },
               {
                 "op": "stat",
@@ -6681,7 +6690,8 @@
           {
             "op": "summon",
             "source": "named",
-            "name": "Holyflame Tiger"
+            "name": "Holyflame Tiger",
+            "count": 1
           }
         ]
       },
@@ -6773,7 +6783,7 @@
         "source": "deck",
         "count": 3,
         "distinct_by": "name",
-        "filters": {
+        "filter": {
           "type": "Amulet",
           "cost_lte": 3
         }
@@ -6809,9 +6819,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "attack": 2,
         "defense": 4
       }
@@ -7507,7 +7514,8 @@
                 "else_effects": [
                   {
                     "op": "restore",
-                    "target": "ally:leader",
+                    "target": "leader",
+                    "player": "self",
                     "amount": 1
                   }
                 ]
@@ -7562,7 +7570,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Lloyd"
+        "name": "Lloyd",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -8590,9 +8599,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "attack": 1,
         "defense": 1
       }
@@ -9850,9 +9856,6 @@
         "action": "grant",
         "select": 1,
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "keywords": [
           {
             "name": "Storm"
@@ -9866,9 +9869,6 @@
         "action": "grant",
         "select": 1,
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "keywords": [
           {
             "name": "Bane"
@@ -10393,11 +10393,11 @@
         "op": "summon",
         "source": "deck",
         "count": 3,
-        "filters": {
+        "unique_names": true,
+        "filter": {
           "type": "follower",
           "cost_lte": 3
-        },
-        "unique_names": true
+        }
       }
     ],
     "superevolve": [
@@ -10405,9 +10405,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "attack": 0,
         "defense": 2
       },
@@ -10415,9 +10412,6 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "keywords": ["Aura"]
       }
     ],
@@ -10518,7 +10512,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Striker Artifact"
+        "name": "Striker Artifact",
+        "count": 1
       },
       {
         "op": "add_to_hand",
@@ -10925,9 +10920,6 @@
         "op": "stat",
         "action": "give",
         "target": "all:follower",
-        "condition": {
-          "not_self": true
-        },
         "select": 1,
         "attack": 4,
         "defense": -4
@@ -11514,9 +11506,9 @@
             "action": "give",
             "target": "enemy:follower",
             "select": 1,
-            "distribution": "random",
             "attack": 0,
-            "defense": -1
+            "defense": -1,
+            "select_mode": "random"
           }
         ]
       }
@@ -11589,7 +11581,8 @@
           {
             "op": "restore",
             "target": "leader",
-            "amount": 1
+            "amount": 1,
+            "player": "self"
           }
         ]
       }
@@ -11810,9 +11803,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "attack": 2,
         "defense": 2,
         "select": 1
@@ -11824,7 +11814,7 @@
         "op": "summon",
         "source": "deck",
         "count": 1,
-        "filters": {
+        "filter": {
           "type": "Follower",
           "class": "Swordcraft",
           "cost_lte": 3
@@ -12191,7 +12181,8 @@
           {
             "op": "restore",
             "target": "leader",
-            "amount": 3
+            "amount": 3,
+            "player": "self"
           }
         ]
       }
@@ -12501,9 +12492,9 @@
         "effects": [
           {
             "op": "cost",
-            "action": "increase",
             "amount": 1,
-            "target": "selected:follower"
+            "target": "selected:follower",
+            "mode": "increase"
           },
           {
             "op": "destroy",
@@ -12750,7 +12741,8 @@
           },
           {
             "op": "restore",
-            "target": "ally:leader",
+            "target": "leader",
+            "player": "self",
             "amount_source": "context.restore_amount"
           }
         ],
@@ -13388,7 +13380,7 @@
                 "attack": 1,
                 "defense": 1,
                 "select": 1,
-                "distribution": "random"
+                "select_mode": "random"
               }
             ]
           }
@@ -13424,7 +13416,7 @@
                     "attack": 1,
                     "defense": 1,
                     "select": 1,
-                    "distribution": "random"
+                    "select_mode": "random"
                   }
                 ]
               }
@@ -13463,7 +13455,8 @@
                 "op": "summon",
                 "source": "named",
                 "name": "Congregant of Entwining",
-                "keywords": ["Rush"]
+                "keywords": ["Rush"],
+                "count": 1
               },
               {
                 "op": "stat",
@@ -13480,7 +13473,8 @@
                 "op": "summon",
                 "source": "named",
                 "name": "Congregant of Entwining",
-                "keywords": ["Ward"]
+                "keywords": ["Ward"],
+                "count": 1
               },
               {
                 "op": "stat",
@@ -13524,7 +13518,8 @@
                 "op": "summon",
                 "source": "named",
                 "name": "Congregant of Entwining",
-                "keywords": ["Rush"]
+                "keywords": ["Rush"],
+                "count": 1
               },
               {
                 "op": "stat",
@@ -13541,7 +13536,8 @@
                 "op": "summon",
                 "source": "named",
                 "name": "Congregant of Entwining",
-                "keywords": ["Ward"]
+                "keywords": ["Ward"],
+                "count": 1
               },
               {
                 "op": "stat",
@@ -13798,11 +13794,11 @@
                     "op": "stat",
                     "action": "give",
                     "target": "ally:follower",
-                    "random": true,
-                    "count": 1,
                     "attack": -2,
                     "defense": 0,
-                    "keywords": ["Ward"]
+                    "keywords": ["Ward"],
+                    "select": 1,
+                    "select_mode": "random"
                   }
                 ]
               }
@@ -13882,7 +13878,6 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "distribution": "all",
         "amount": 3
       }
     ],
@@ -13942,7 +13937,8 @@
                   {
                     "op": "restore",
                     "target": "leader",
-                    "amount": 1
+                    "amount": 1,
+                    "player": "self"
                   }
                 ]
               }
@@ -13995,7 +13991,8 @@
           {
             "op": "restore",
             "target": "leader",
-            "amount": 2
+            "amount": 2,
+            "player": "self"
           },
           {
             "op": "keyword",
@@ -14048,12 +14045,14 @@
           {
             "op": "summon",
             "source": "named",
-            "name": "Holy Falcon"
+            "name": "Holy Falcon",
+            "count": 1
           },
           {
             "op": "summon",
             "source": "named",
-            "name": "Holyflame Tiger"
+            "name": "Holyflame Tiger",
+            "count": 1
           }
         ]
       },
@@ -14238,44 +14237,46 @@
                   {
                     "op": "repeat_effect",
                     "count_source": "crest_count",
-                    "effect": {
-                      "op": "select",
-                      "mode": "random",
-                      "target": "enemy:follower",
-                      "condition": {
-                        "attack_lte": 4,
-                        "exclude_keyword": "cant_attack"
-                      },
-                      "effects": [
-                        {
-                          "op": "stat",
-                          "action": "give",
-                          "keywords": ["Can't Attack"],
-                          "duration": "opponent_turn_end",
-                          "target": "selected:follower"
+                    "effects": [
+                      {
+                        "op": "select",
+                        "mode": "random",
+                        "target": "enemy:follower",
+                        "condition": {
+                          "attack_lte": 4,
+                          "exclude_keyword": "cant_attack"
                         },
-                        {
-                          "op": "keyword",
-                          "action": "grant_trigger",
-                          "triggers": [
-                            {
-                              "effects": [
-                                {
-                                  "op": "banish",
-                                  "scope": "self",
-                                  "target": "selected:follower"
+                        "effects": [
+                          {
+                            "op": "stat",
+                            "action": "give",
+                            "keywords": ["Can't Attack"],
+                            "duration": "opponent_turn_end",
+                            "target": "selected:follower"
+                          },
+                          {
+                            "op": "keyword",
+                            "action": "grant_trigger",
+                            "triggers": [
+                              {
+                                "effects": [
+                                  {
+                                    "op": "banish",
+                                    "scope": "self",
+                                    "target": "selected:follower"
+                                  }
+                                ],
+                                "event": "end_of_turn",
+                                "condition": {
+                                  "whose_turn": "owner"
                                 }
-                              ],
-                              "event": "end_of_turn",
-                              "condition": {
-                                "whose_turn": "owner"
                               }
-                            }
-                          ],
-                          "target": "selected:follower"
-                        }
-                      ]
-                    }
+                            ],
+                            "target": "selected:follower"
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ],
                 "else_effects": []
@@ -14395,10 +14396,7 @@
       {
         "op": "destroy",
         "distribution": "all",
-        "target": "ally:any",
-        "condition": {
-          "not_self": true
-        }
+        "target": "ally:any"
       }
     ],
     "keywords": ["Ward"],
@@ -14437,7 +14435,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Ominous Artifact γ"
+        "name": "Ominous Artifact γ",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -14662,7 +14661,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "White Psalm, New Revelation"
+        "name": "White Psalm, New Revelation",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -14722,7 +14722,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "White Psalm, New Revelation"
+        "name": "White Psalm, New Revelation",
+        "count": 1
       }
     ],
     "superevolve": [],
@@ -14869,7 +14870,6 @@
         "op": "mode",
         "options": [
           {
-            "name": "Deal 5 damage to a random enemy follower",
             "effects": [
               {
                 "op": "damage",
@@ -14878,10 +14878,10 @@
                 "distribution": "random_hits",
                 "count": 1
               }
-            ]
+            ],
+            "label": "Deal 5 damage to a random enemy follower"
           },
           {
-            "name": "Draw 2 followers",
             "effects": [
               {
                 "op": "search",
@@ -14890,7 +14890,8 @@
                   "type": "Follower"
                 }
               }
-            ]
+            ],
+            "label": "Draw 2 followers"
           }
         ],
         "select": 1
@@ -15399,7 +15400,6 @@
             "op": "mode",
             "options": [
               {
-                "name": "Draw a card. Restore 1 defense to your leader.",
                 "effects": [
                   {
                     "op": "draw",
@@ -15412,10 +15412,10 @@
                     "player": "self",
                     "amount": 1
                   }
-                ]
+                ],
+                "label": "Draw a card. Restore 1 defense to your leader."
               },
               {
-                "name": "Give all allied followers +1/+0 and Rush.",
                 "effects": [
                   {
                     "op": "stat",
@@ -15424,10 +15424,10 @@
                     "attack": 1,
                     "keywords": ["Rush"]
                   }
-                ]
+                ],
+                "label": "Give all allied followers +1/+0 and Rush."
               },
               {
-                "name": "Give all allied followers +0/+1 and Ward.",
                 "effects": [
                   {
                     "op": "stat",
@@ -15436,7 +15436,8 @@
                     "defense": 1,
                     "keywords": ["Ward"]
                   }
-                ]
+                ],
+                "label": "Give all allied followers +0/+1 and Ward."
               }
             ],
             "select": 1
@@ -15591,7 +15592,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Mordred, Illusory Lion"
+        "name": "Mordred, Illusory Lion",
+        "count": 1
       }
     ],
     "superevolve": [],
@@ -15618,7 +15620,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Arthur, Staunch Dragon"
+        "name": "Arthur, Staunch Dragon",
+        "count": 1
       }
     ],
     "superevolve": [],
@@ -15739,27 +15742,26 @@
         "op": "mode",
         "options": [
           {
-            "name": "Super-Evolve",
             "effects": [
               {
                 "op": "evolve",
                 "target": "self",
                 "mode": "super"
               }
-            ]
+            ],
+            "label": "Super-Evolve"
           },
           {
-            "name": "Deal 4 to all enemy followers",
             "effects": [
               {
                 "op": "damage",
                 "target": "enemy:follower",
                 "amount": 4
               }
-            ]
+            ],
+            "label": "Deal 4 to all enemy followers"
           },
           {
-            "name": "Restore 4 to leader",
             "effects": [
               {
                 "op": "restore",
@@ -15767,7 +15769,8 @@
                 "player": "self",
                 "amount": 4
               }
-            ]
+            ],
+            "label": "Restore 4 to leader"
           }
         ],
         "select": 1
@@ -15797,7 +15800,6 @@
         "op": "mode",
         "options": [
           {
-            "name": "Give the leftmost allied Swordcraft follower \"Can attack 2 times per turn\"",
             "effects": [
               {
                 "op": "stat",
@@ -15809,10 +15811,10 @@
                 },
                 "attacks_per_turn": 2
               }
-            ]
+            ],
+            "label": "Give the leftmost allied Swordcraft follower \"Can attack 2 times per turn\""
           },
           {
-            "name": "Give all allied Swordcraft followers +1/+1 and Barrier",
             "effects": [
               {
                 "op": "stat",
@@ -15825,10 +15827,10 @@
                 "defense": 1,
                 "keywords": ["Barrier"]
               }
-            ]
+            ],
+            "label": "Give all allied Swordcraft followers +1/+1 and Barrier"
           },
           {
-            "name": "Recover 2 play points and 1 evolution point",
             "effects": [
               {
                 "op": "pp",
@@ -15840,17 +15842,19 @@
                 "action": "recover",
                 "amount": 1
               }
-            ]
+            ],
+            "label": "Recover 2 play points and 1 evolution point"
           },
           {
-            "name": "Restore 6 defense to your leader",
             "effects": [
               {
                 "op": "restore",
                 "target": "leader",
-                "amount": 6
+                "amount": 6,
+                "player": "self"
               }
-            ]
+            ],
+            "label": "Restore 6 defense to your leader"
           }
         ],
         "select": 1
@@ -15901,7 +15905,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Zeta & Bea, Crimson and Blue"
+        "name": "Zeta & Bea, Crimson and Blue",
+        "count": 1
       }
     ],
     "evolve": [],
@@ -16051,7 +16056,8 @@
       {
         "op": "restore",
         "target": "leader",
-        "amount": 3
+        "amount": 3,
+        "player": "self"
       }
     ],
     "evolve": [],
@@ -16112,7 +16118,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Mireille & Risette, Penitent Duo"
+        "name": "Mireille & Risette, Penitent Duo",
+        "count": 1
       },
       {
         "op": "earth_rite",
@@ -16154,7 +16161,6 @@
         "op": "mode",
         "options": [
           {
-            "name": "Draw a card. Deal 4 damage to a random enemy follower.",
             "effects": [
               {
                 "op": "draw",
@@ -16168,10 +16174,10 @@
                 "distribution": "random_hits",
                 "count": 1
               }
-            ]
+            ],
+            "label": "Draw a card. Deal 4 damage to a random enemy follower."
           },
           {
-            "name": "Draw 2 cards. Deal 4 damage to 2 random enemy followers and 2 damage to your leader.",
             "effects": [
               {
                 "op": "draw",
@@ -16190,7 +16196,8 @@
                 "target": "ally:leader",
                 "amount": 2
               }
-            ]
+            ],
+            "label": "Draw 2 cards. Deal 4 damage to 2 random enemy followers and 2 damage to your leader."
           }
         ],
         "select": 1
@@ -16346,21 +16353,17 @@
         "op": "mode",
         "options": [
           {
-            "name": "Give all other allied followers on the field Barrier.",
             "effects": [
               {
                 "op": "stat",
                 "action": "give",
                 "target": "ally:follower",
-                "filter": {
-                  "not_self": true
-                },
                 "keywords": ["Barrier"]
               }
-            ]
+            ],
+            "label": "Give all other allied followers on the field Barrier."
           },
           {
-            "name": "Deal X damage split between all enemy followers. X is this follower's attack.",
             "effects": [
               {
                 "op": "damage",
@@ -16369,7 +16372,8 @@
                 "spill_to_leader": true,
                 "target": "enemy:follower"
               }
-            ]
+            ],
+            "label": "Deal X damage split between all enemy followers. X is this follower's attack."
           }
         ]
       }
@@ -16980,7 +16984,8 @@
           {
             "op": "summon",
             "source": "named",
-            "name": "Vaseraga, Unyielding Scythe"
+            "name": "Vaseraga, Unyielding Scythe",
+            "count": 1
           },
           {
             "op": "damage",
@@ -17035,7 +17040,8 @@
               },
               {
                 "op": "restore",
-                "target": "ally:leader",
+                "target": "leader",
+                "player": "self",
                 "amount": 1
               }
             ],
@@ -17157,7 +17163,6 @@
         "op": "mode",
         "options": [
           {
-            "name": "Give this follower and another random allied follower on the field +1/+1",
             "effects": [
               {
                 "op": "stat",
@@ -17173,15 +17178,12 @@
                 "action": "give",
                 "attack": 1,
                 "defense": 1,
-                "filter": {
-                  "not_self": true
-                },
                 "select_mode": "random"
               }
-            ]
+            ],
+            "label": "Give this follower and another random allied follower on the field +1/+1"
           },
           {
-            "name": "Deal 3 damage to a random enemy follower",
             "effects": [
               {
                 "op": "damage",
@@ -17190,7 +17192,8 @@
                 "distribution": "random_hits",
                 "count": 1
               }
-            ]
+            ],
+            "label": "Deal 3 damage to a random enemy follower"
           }
         ],
         "select": 1
@@ -17653,10 +17656,7 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "keywords": ["Barrier"],
-        "filter": {
-          "not_self": true
-        }
+        "keywords": ["Barrier"]
       }
     ],
     "keywords": [],
@@ -19317,9 +19317,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
         "attack": 3,
         "defense": 3
       }
@@ -19934,9 +19931,6 @@
         "op": "transform",
         "target": "any:follower",
         "select": 1,
-        "condition": {
-          "not_self": true
-        },
         "into": "Regal Falcon"
       }
     ],
@@ -20661,10 +20655,7 @@
       {
         "op": "damage",
         "target": "all:follower",
-        "amount": 1,
-        "condition": {
-          "not_self": true
-        }
+        "amount": 1
       }
     ],
     "superevolve": [],
@@ -20899,8 +20890,7 @@
               {
                 "op": "damage",
                 "target": "enemy:any",
-                "amount": 4,
-                "distribution": "all"
+                "amount": 4
               }
             ]
           }
@@ -21095,8 +21085,7 @@
           {
             "op": "damage",
             "target": "enemy:follower",
-            "amount": 1,
-            "distribution": "all"
+            "amount": 1
           }
         ]
       }
@@ -21276,9 +21265,6 @@
                 "op": "stat",
                 "action": "give",
                 "target": "all:follower",
-                "condition": {
-                  "not_self": true
-                },
                 "attack": -1,
                 "defense": -1
               }
@@ -21314,8 +21300,7 @@
                 "mode": "random",
                 "condition": {
                   "unevolved": true,
-                  "has_keyword": "ward",
-                  "not_self": true
+                  "has_keyword": "ward"
                 },
                 "effects": [
                   {
@@ -23007,7 +22992,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "exclude_self": true,
         "attack": 1,
         "defense": 1
       }
@@ -23886,7 +23870,6 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "distribution": "all",
         "amount": "{self.cost}"
       }
     ],
@@ -24345,7 +24328,7 @@
       {
         "op": "attacks_per_turn",
         "target": "self",
-        "amount": 3
+        "value": 3
       }
     ],
     "keywords": ["Aura", "cant_be_destroyed"],
@@ -24438,7 +24421,8 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Prostrating Coward"
+                "name": "Prostrating Coward",
+                "count": 1
               }
             ]
           }
@@ -24589,7 +24573,8 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Venerating Dyer"
+                "name": "Venerating Dyer",
+                "count": 1
               }
             ]
           }
@@ -24727,7 +24712,8 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Worshipful Crusader"
+                "name": "Worshipful Crusader",
+                "count": 1
               }
             ]
           }
@@ -24862,8 +24848,7 @@
               {
                 "op": "damage",
                 "target": "enemy:follower",
-                "amount": 3,
-                "distribution": "all"
+                "amount": 3
               }
             ]
           }
@@ -25529,7 +25514,6 @@
           {
             "op": "draw",
             "source": "deck",
-            "player": "self",
             "count": 1
           }
         ]
@@ -25566,7 +25550,6 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "distribution": "all",
         "amount": 2
       }
     ]
@@ -25788,7 +25771,6 @@
           {
             "op": "draw",
             "source": "deck",
-            "player": "self",
             "count": 1
           }
         ],
@@ -25898,7 +25880,6 @@
       {
         "op": "draw",
         "source": "deck",
-        "player": "self",
         "count": 2
       }
     ]
@@ -26066,7 +26047,6 @@
               {
                 "op": "draw",
                 "source": "deck",
-                "player": "self",
                 "count": 1
               }
             ]
@@ -26503,7 +26483,6 @@
       {
         "op": "draw",
         "source": "deck",
-        "player": "self",
         "count": 2
       },
       {
@@ -26595,10 +26574,7 @@
                 "target": "ally:follower",
                 "attack": 1,
                 "defense": 0,
-                "keywords": ["Rush"],
-                "condition": {
-                  "not_self": true
-                }
+                "keywords": ["Rush"]
               }
             ]
           },
@@ -26611,10 +26587,7 @@
                 "target": "ally:follower",
                 "attack": 0,
                 "defense": 1,
-                "keywords": ["Ward"],
-                "condition": {
-                  "not_self": true
-                }
+                "keywords": ["Ward"]
               }
             ]
           }
@@ -26656,7 +26629,6 @@
           {
             "op": "damage",
             "target": "enemy:follower",
-            "distribution": "all",
             "amount_source": "other_allies"
           }
         ]
@@ -26791,8 +26763,7 @@
         "defense": 3,
         "keywords": ["Ward"],
         "condition": {
-          "class": "Swordcraft",
-          "not_self": true
+          "class": "Swordcraft"
         }
       }
     ]
@@ -27033,7 +27004,6 @@
               {
                 "op": "damage",
                 "target": "enemy:follower",
-                "distribution": "all",
                 "amount": 2
               }
             ]
@@ -27080,7 +27050,6 @@
                   {
                     "op": "damage",
                     "target": "enemy:follower",
-                    "distribution": "all",
                     "amount": 3
                   }
                 ]
@@ -27091,7 +27060,6 @@
                   {
                     "op": "draw",
                     "source": "deck",
-                    "player": "self",
                     "count": 2
                   }
                 ]
@@ -27202,7 +27170,8 @@
                   {
                     "op": "summon",
                     "source": "named",
-                    "name": "Lilanthim, Anathema of Predation"
+                    "name": "Lilanthim, Anathema of Predation",
+                    "count": 1
                   },
                   {
                     "op": "evolve",
@@ -27272,7 +27241,6 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "distribution": "all",
         "amount": 6
       }
     ]
@@ -27350,10 +27318,7 @@
         "target": "ally:follower",
         "select": 1,
         "attack": 2,
-        "defense": 2,
-        "filter": {
-          "not_self": true
-        }
+        "defense": 2
       }
     ]
   },
@@ -27525,7 +27490,6 @@
           {
             "op": "draw",
             "source": "deck",
-            "player": "self",
             "count": 1
           }
         ]
@@ -27609,7 +27573,6 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "distribution": "all",
         "amount": 5
       },
       {
@@ -27680,7 +27643,6 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "distribution": "all",
         "amount": 9
       }
     ],
@@ -27864,7 +27826,6 @@
       {
         "op": "draw",
         "source": "deck",
-        "player": "self",
         "count": 1
       }
     ]
@@ -28154,7 +28115,7 @@
         "source": "deck",
         "count": 2,
         "distinct_by": "name",
-        "filters": {
+        "filter": {
           "type": "Follower",
           "class": "Abysscraft",
           "cost_lte": 2
@@ -28247,7 +28208,6 @@
           {
             "op": "draw",
             "source": "deck",
-            "player": "self",
             "count": 1
           }
         ]
@@ -28451,8 +28411,7 @@
           {
             "op": "damage",
             "target": "enemy:follower",
-            "amount": 1,
-            "distribution": "all"
+            "amount": 1
           }
         ]
       },
@@ -28463,8 +28422,7 @@
           {
             "op": "damage",
             "target": "enemy:follower",
-            "amount": 1,
-            "distribution": "all"
+            "amount": 1
           }
         ]
       }
@@ -29683,7 +29641,7 @@
         "source": "deck",
         "count": 2,
         "distinct_by": "name",
-        "filters": {
+        "filter": {
           "type": "Follower",
           "cost_lte": 2
         }
@@ -29726,7 +29684,6 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "exclude_self": true,
         "attack": 1,
         "defense": 1
       }
@@ -30003,8 +29960,8 @@
         "defense": -10,
         "distribution": "highest",
         "stat": "attack",
-        "pick": "random",
-        "select": 1
+        "select": 1,
+        "select_mode": "random"
       }
     ],
     "fanfare": []
@@ -32078,7 +32035,7 @@
         "op": "summon",
         "source": "deck",
         "count": 1,
-        "filters": {
+        "filter": {
           "type": "Follower",
           "cost_lte": 2
         }
@@ -32684,9 +32641,6 @@
         "action": "give",
         "target": "ally:follower",
         "select": 2,
-        "condition": {
-          "not_self": true
-        },
         "attack": 3,
         "defense": 3
       }
@@ -33096,9 +33050,6 @@
         "action": "give",
         "target": "ally:follower",
         "select": 1,
-        "condition": {
-          "not_self": true
-        },
         "attack": 1,
         "defense": 1,
         "keywords": ["Rush"]
@@ -34336,7 +34287,6 @@
         "action": "give",
         "target": "ally:follower",
         "select": 1,
-        "exclude_self": true,
         "attack": 3,
         "defense": 3
       }
@@ -34726,7 +34676,8 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Void Colonel"
+                "name": "Void Colonel",
+                "count": 1
               }
             ]
           }
@@ -35309,7 +35260,8 @@
               {
                 "op": "summon",
                 "source": "named",
-                "name": "Miraculous Al-mi'raj"
+                "name": "Miraculous Al-mi'raj",
+                "count": 1
               }
             ]
           },
