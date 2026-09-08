@@ -384,27 +384,31 @@ describe("official Q&A — Dragoncraft batch 3", () => {
     expect(getEffectiveCost(goliath)).toBe(0);
   }, 60_000);
 
-  it("10244120 Fennie, Prismatic Phoenix — odd cost halving rounds up (official Q&A)", () => {
-    setupTurn(R6, {
-      hand: [FENNIE],
-      pp: 8,
-      deck: [{ name: "Nine", type: "Spell", cost: 9, attack: 0, defense: 0 }],
-    });
-    whenPlayCard("first", 0);
-    expect(thenDeck("first")[0]!.cost).toBe(5);
-  }, 60_000);
+  describe("10244120 Fennie — odd-numbered cost halved rounded", () => {
+    it("10244120 Fennie — numbered halving rounds up (9 becomes 5) (official Q&A)", () => {
+      setupTurn(R6, {
+        hand: [FENNIE],
+        pp: 8,
+        deck: [{ name: "Nine", type: "Spell", cost: 9, attack: 0, defense: 0 }],
+      });
+      whenPlayCard("first", 0);
+      expect(thenDeck("first")[0]!.cost).toBe(5);
+    }, 60_000);
+  });
 
-  it("10244120 Fennie, Prismatic Phoenix — two Fanfares halve costs twice (official Q&A)", () => {
-    setupTurn(R6, {
-      hand: [FENNIE, FENNIE],
-      pp: 16,
-      deck: [{ name: "Eight", type: "Spell", cost: 8, attack: 0, defense: 0 }],
-    });
-    whenPlayCard("first", 0);
-    expect(thenDeck("first")[0]!.cost).toBe(4);
-    whenPlayCard("first", 0);
-    expect(thenDeck("first")[0]!.cost).toBe(2);
-  }, 60_000);
+  describe("10244120 Fennie — halved again two copies row", () => {
+    it("10244120 Fennie — two copies row: deck costs halved again happen (9→5→3) (official Q&A)", () => {
+      setupTurn(R6, {
+        hand: [FENNIE, FENNIE],
+        pp: 16,
+        deck: [{ name: "Nine", type: "Spell", cost: 9, attack: 0, defense: 0 }],
+      });
+      whenPlayCard("first", 0);
+      expect(thenDeck("first")[0]!.cost).toBe(5);
+      whenPlayCard("first", 0);
+      expect(thenDeck("first")[0]!.cost).toBe(3);
+    }, 60_000);
+  });
 
   it("10341110 Devotee of Disdain — attacking Leah draws on 0 counter-damage (official Q&A)", () => {
     setupTurn(R6, {

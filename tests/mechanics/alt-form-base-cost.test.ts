@@ -58,30 +58,32 @@ describe("Alternate-form played card base cost (2026-09-06)", () => {
     state.activePlayer = "first";
   });
 
-  it("Jailor Accelerate (1): ladder records 1 not 6; GY spell cost 1; shadow; PP 0", () => {
-    givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
-      .withFirstHand([JAILOR])
-      .withFirstPP(1, 6)
-      .build();
-    enemyFollower(5);
-    const shadowsBefore = getShadows(state, "first");
+  describe("10904110 Zerael — accelerated Jailor of Antiquity base cost", () => {
+    it("10904110 Zerael — accelerated Jailor of Antiquity base cost is 1 (official Q&A)", () => {
+      givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
+        .withFirstHand([JAILOR])
+        .withFirstPP(1, 6)
+        .build();
+      enemyFollower(5);
+      const shadowsBefore = getShadows(state, "first");
 
-    expect(playCardNoRender(getHand(state, "first"), "first", 0).kind).toBe(
-      "done",
-    );
+      expect(playCardNoRender(getHand(state, "first"), "first", 0).kind).toBe(
+        "done",
+      );
 
-    const costs = state.players.first.playedBaseCostsThisMatch;
-    expect(costs).toContain(1);
-    expect(costs).not.toContain(6);
+      const costs = state.players.first.playedBaseCostsThisMatch;
+      expect(costs).toContain(1);
+      expect(costs).not.toContain(6);
 
-    const gy = getGraveyard(state, "first").find((c) => c.id === JAILOR)!;
-    expect(gy.type).toBe("Spell");
-    expect(Number(gy.cost)).toBe(1);
-    expect(Number(gy.base_cost)).toBe(1);
-    expect(Number((gy as any).originalPrintedBaseCost)).toBe(6);
-    expect(getShadows(state, "first")).toBe(shadowsBefore + 1);
-    expect(getPP(state, "first")).toBe(0);
-  }, 60_000);
+      const gy = getGraveyard(state, "first").find((c) => c.id === JAILOR)!;
+      expect(gy.type).toBe("Spell");
+      expect(Number(gy.cost)).toBe(1);
+      expect(Number(gy.base_cost)).toBe(1);
+      expect(Number((gy as any).originalPrintedBaseCost)).toBe(6);
+      expect(getShadows(state, "first")).toBe(shadowsBefore + 1);
+      expect(getPP(state, "first")).toBe(0);
+    }, 60_000);
+  });
 
   it("Jailor normal play (6 PP): ladder records 6; follower on board base cost 6", () => {
     givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })

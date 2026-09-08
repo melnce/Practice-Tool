@@ -349,23 +349,25 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     expect(findOnBoard("first", "Marlone, Scales of the Past")).toBeTruthy();
   }, 60_000);
 
-  it("10911210 Trap in the Woods — only first of multi-summon destroyed (official Q&A)", () => {
-    setupTurn(R6, {
-      hand: [TRAP],
-      pp: 3,
-      secondHand: [ADVENT_ELD_SWORD],
-      secondPP: 5,
-      active: "first",
-    });
-    whenPlayCard("first", 0);
-    whenEndTurn();
-    whenPlayCard("second", 0);
-    const soldiers = thenBoard("second").filter(
-      (c) => c.name === "Fearless Soldier",
-    );
-    expect(soldiers.length).toBe(2);
-    expect(findOnBoard("first", "Trap in the Woods")).toBeFalsy();
-  }, 60_000);
+  describe("10911210 Trap in the Woods — multiple Advent Eld Sword summon", () => {
+    it("10911210 Trap — only first destroyed when many followers enter at once (official Q&A)", () => {
+      setupTurn(R6, {
+        hand: [TRAP],
+        pp: 3,
+        secondHand: [ADVENT_ELD_SWORD],
+        secondPP: 5,
+        active: "first",
+      });
+      whenPlayCard("first", 0);
+      whenEndTurn();
+      whenPlayCard("second", 0);
+      const soldiers = thenBoard("second").filter(
+        (c) => c.name === "Fearless Soldier",
+      );
+      expect(soldiers.length).toBe(2);
+      expect(findOnBoard("first", "Trap in the Woods")).toBeFalsy();
+    }, 60_000);
+  });
 
   it("10111130 Deepwood Fairy Beast — restores defense equal to hand size (official Q&A)", () => {
     setupTurn(R10, {
@@ -645,7 +647,7 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     ).toBe(1);
   }, 60_000);
 
-  it("10214120 Lymaga, Untamed Wild — bleed triggers at both players' end of turn (official Q&A)", () => {
+  it("10214120 Lymaga, Untamed Wild — bleed at each player turn end damages leader and cursed follower (official Q&A)", () => {
     setupTurn(R10, { hand: [LYMAGA], pp: 7, evo: 0 });
     const victim = enemyFollower(2, 5, "Victim");
     whenPlayCard("first", 0);
@@ -668,23 +670,25 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     expect(Number(victim.defense)).toBe(defBefore - 4);
   }, 60_000);
 
-  it("10224110 Gildaria, Anathema of Peace — Rally 19 Fanfare does not super-evolve (official Q&A)", () => {
-    setupTurn(R7, { hand: [GILDARIA], pp: 6 });
-    setRally(state, "first", 19);
-    state.players.first.superEvoPoints = 1;
-    whenPlayCard("first", 0);
-    const gild = findOnBoard("first", "Gildaria, Anathema of Peace")!;
-    expect(gild.evoType).not.toBe("super");
-    expect(getRally(state, "first")).toBe(20);
+  describe("10224110 Gildaria — rally unlike combo increases enters", () => {
+    it("10224110 Gildaria — Rally 19 Fanfare does not super-evolve (unlike Combo; rally increases after enter) (official Q&A)", () => {
+      setupTurn(R7, { hand: [GILDARIA], pp: 6 });
+      setRally(state, "first", 19);
+      state.players.first.superEvoPoints = 1;
+      whenPlayCard("first", 0);
+      const gild = findOnBoard("first", "Gildaria, Anathema of Peace")!;
+      expect(gild.evoType).not.toBe("super");
+      expect(getRally(state, "first")).toBe(20);
 
-    resetUidCounter();
-    setupTurn(R7, { hand: [GILDARIA], pp: 6 });
-    setRally(state, "first", 20);
-    state.players.first.superEvoPoints = 1;
-    whenPlayCard("first", 0);
-    const gild2 = findOnBoard("first", "Gildaria, Anathema of Peace")!;
-    expect(gild2.evoType).toBe("super");
-  }, 60_000);
+      resetUidCounter();
+      setupTurn(R7, { hand: [GILDARIA], pp: 6 });
+      setRally(state, "first", 20);
+      state.players.first.superEvoPoints = 1;
+      whenPlayCard("first", 0);
+      const gild2 = findOnBoard("first", "Gildaria, Anathema of Peace")!;
+      expect(gild2.evoType).toBe("super");
+    }, 60_000);
+  });
 
   it("10224120 Yurius, Levin Authority — banished Yurius does not trigger on enemy enter (official Q&A)", () => {
     setupTurn(R8, {
