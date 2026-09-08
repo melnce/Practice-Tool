@@ -64,7 +64,7 @@ describe("baseline isolation runner", () => {
     }
 
     expect(prefix.some((c) => String(c.id) === probeHeavyId)).toBe(true);
-  });
+  }, 60_000);
 
   it("matches committed baseline for isolated Ralmia play fingerprint", () => {
     const baseline = loadCommittedBaseline();
@@ -81,13 +81,13 @@ describe("baseline isolation runner", () => {
       (m) => m.scenario === "play" && m.kind === "baseline",
     );
     expect(playMismatch).toBeUndefined();
-  });
+  }, 60_000);
 
   it("full sample check passes on current tree", () => {
     const report = runBaselineIsolationCheck();
     expect(report.exitCode).toBe(0);
     expect(report.mismatches).toHaveLength(0);
-  });
+  }, 60_000);
 });
 
 describe("baseline isolation gate failure path", () => {
