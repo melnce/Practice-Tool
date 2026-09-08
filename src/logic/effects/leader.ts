@@ -115,8 +115,8 @@ export function applyLeaderDamage(
   const mod = state.players[owner].leaderDamageTakenBonus || 0;
 
   // Apply modifier BEFORE cap
-  if (mod > 0) {
-    amount += mod;
+  if (mod !== 0) {
+    amount = Math.max(0, amount + mod);
     logEvent("leaderDamageResistMod", { owner, mod, newAmount: amount });
   }
 
@@ -203,23 +203,5 @@ export function handleSetLeaderMaxDamageCap(eff: Effect, owner: Player) {
     owner: targetOwner,
     cap: amount,
     duration: eff.duration,
-  });
-}
-
-// NEW: Modify how much damage a leader takes (permanently or temporarily)
-export function handleModifyLeaderDamageReceived(eff: Effect, owner: Player) {
-  const targetPlayerString = eff.player || "self";
-  const isOpponent = targetPlayerString === "opponent";
-  const targetOwner: Player = isOpponent ? opponentOf(owner) : owner;
-
-  const amt = parseInt(eff.amount as any) || 0;
-
-  // Use nested player state
-  state.players[targetOwner].leaderDamageTakenBonus += amt;
-
-  logEvent("modifyLeaderDamageReceived", {
-    owner: targetOwner,
-    amount: amt,
-    total: state.players[targetOwner].leaderDamageTakenBonus,
   });
 }
