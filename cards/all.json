@@ -10955,11 +10955,6 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "draw",
-        "source": "deck",
-        "count": 3
-      },
-      {
         "op": "gate",
         "condition": "highlander",
         "effects": [
@@ -10969,6 +10964,11 @@
             "amount": 3
           }
         ]
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 3
       }
     ],
     "keywords": [],
