@@ -28,13 +28,9 @@ import {
   trySetPendingTarget,
   reportSelectFizzled,
 } from "../../../core/pendingTarget/index.js";
-import {
-  handleStatSelf,
-  handleDynamicStatSelf,
-} from "../../../effects/self.js";
+import { handleStatSelf } from "../../../effects/self.js";
 import {
   validateStatOp,
-  isSpecialMode,
   getComboCount,
   detectSpecialTarget,
   applyLeaderStat,
@@ -43,7 +39,8 @@ import {
   applyLastAddedToHandBuff,
   pickRandomFromPool,
 } from "./helpers.js";
-import { resolveDynamicValue } from "../../../core/values.js";
+import { normalizeStatSpec } from "./spec.js";
+import { rejectStatSetWithDuration } from "./duration.js";
 
 /**
  * Orchestrates stat operations.
@@ -79,21 +76,15 @@ export function handleStatOrchestrator(
   const specialTarget = detectSpecialTarget(eff);
 
   if (specialTarget === "self" && sourceCard) {
-    // Handle action: "set" separately - it overrides stats rather than adding
     if (eff.action === "set") {
-      const setA =
-        eff.attack !== undefined ? parseInt(eff.attack as any) || 0 : null;
-      const setD =
-        eff.defense !== undefined ? parseInt(eff.defense as any) || 0 : null;
+      rejectStatSetWithDuration(eff, "self");
+      const spec = normalizeStatSpec(eff, { owner, sourceCard });
+      const setA = eff.attack !== undefined ? spec.attack : null;
+      const setD = eff.defense !== undefined ? spec.defense : null;
       setStatsBuff(sourceCard, setA, setD, owner);
       return "done";
     }
-    // Default: action: "give" adds stats
-    if (eff.attack_source || eff.defense_source) {
-      handleDynamicStatSelf(sourceCard, eff as Effect, owner);
-    } else {
-      handleStatSelf(sourceCard, eff as Effect);
-    }
+    handleStatSelf(sourceCard, eff as Effect, owner);
     return "done";
   }
 
@@ -346,14 +337,10 @@ export function applyBuffsToTargets(
 
   for (const target of targets) {
     if (action === "set") {
-      const setA =
-        eff.attack !== undefined
-          ? resolveDynamicValue(eff.attack as any, { owner, sourceCard })
-          : null;
-      const setD =
-        eff.defense !== undefined
-          ? resolveDynamicValue(eff.defense as any, { owner, sourceCard })
-          : null;
+      rejectStatSetWithDuration(eff, "pooled");
+      const spec = normalizeStatSpec(eff, { owner, sourceCard });
+      const setA = eff.attack !== undefined ? spec.attack : null;
+      const setD = eff.defense !== undefined ? spec.defense : null;
       setStatsBuff(target, setA, setD, owner);
     } else if (action === "give") {
       withBuffDuration(

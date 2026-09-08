@@ -582,6 +582,72 @@ function checkOpKeyShape(card: CardJson): Warning[] {
     }
 
     if (op === "stat") {
+      if ((obj as { until_eot?: boolean }).until_eot === true) {
+        out.push({
+          family: "op-key-shape",
+          id: card.id,
+          name: card.name,
+          found: compact({ path, op, until_eot: true }),
+          canonical: compact({ path, op, until_end_of_turn: true }),
+          note: 'op:"stat" must use until_end_of_turn, not until_eot',
+        });
+      }
+
+      const hasDuration =
+        obj.until_end_of_turn === true ||
+        (obj as { until_eot?: boolean }).until_eot === true ||
+        obj.duration !== undefined;
+      if (obj.action === "set" && hasDuration) {
+        out.push({
+          family: "op-key-shape",
+          id: card.id,
+          name: card.name,
+          found: compact({
+            path,
+            op,
+            action: "set",
+            until_end_of_turn: obj.until_end_of_turn ?? null,
+            until_eot: (obj as { until_eot?: boolean }).until_eot ?? null,
+            duration: obj.duration ?? null,
+          }),
+          canonical: compact({ path, op, action: "set" }),
+          note: 'op:"stat" action:"set" must not carry duration keys',
+        });
+      }
+
+      if (obj.duration === "opponent_turn_end") {
+        const atk = obj.attack !== undefined ? Number(obj.attack) || 0 : 0;
+        const def = obj.defense !== undefined ? Number(obj.defense) || 0 : 0;
+        const hasSource =
+          (obj as { attack_source?: unknown }).attack_source !== undefined ||
+          (obj as { defense_source?: unknown }).defense_source !== undefined;
+        if (atk !== 0 || def !== 0 || hasSource) {
+          out.push({
+            family: "op-key-shape",
+            id: card.id,
+            name: card.name,
+            found: compact({
+              path,
+              op,
+              duration: "opponent_turn_end",
+              attack: obj.attack ?? null,
+              defense: obj.defense ?? null,
+              attack_source:
+                (obj as { attack_source?: unknown }).attack_source ?? null,
+              defense_source:
+                (obj as { defense_source?: unknown }).defense_source ?? null,
+            }),
+            canonical: compact({
+              path,
+              op,
+              duration: "opponent_turn_end",
+              keywords: obj.keywords ?? null,
+            }),
+            note: 'op:"stat" duration:"opponent_turn_end" is keyword-only — must not carry attack, defense, or *_source',
+          });
+        }
+      }
+
       const badRandom =
         obj.random === true ||
         String((obj as any).pick || "").toLowerCase() === "random" ||

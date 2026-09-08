@@ -57,29 +57,10 @@ export type StatOp = Effect & {
 
   // Duration
   until_end_of_turn?: boolean;
+  duration?: "turn_end" | "opponent_turn_end" | string;
 
   // Dynamic
   attack_source?: string;
   defense_source?: string;
   exclude_self?: boolean;
 };
-
-export function isStatBuff(op: StatOp): boolean {
-  return (
-    op.attack !== undefined ||
-    op.defense !== undefined ||
-    op.set_to !== undefined
-  );
-}
-
-export function isKeywordBuff(op: StatOp): boolean {
-  return (
-    op.keywords !== undefined ||
-    op.keyword !== undefined ||
-    op.has_keyword !== undefined
-  );
-}
-
-export function isSpecialBuff(op: StatOp): boolean {
-  return op.attacks_per_turn !== undefined;
-}

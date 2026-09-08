@@ -16,8 +16,8 @@ export type DurationGateIssue = {
   message: string;
 };
 
-/** Ops that honour `until_eot` (stat/duration.ts, cost/unified.ts, attacks.ts). */
-const UNTIL_EOT_OPS = new Set(["stat", "cost", "attacks_per_turn"]);
+/** Ops that honour `until_eot` (cost/unified.ts, attacks.ts). Stat uses until_end_of_turn only. */
+const UNTIL_EOT_OPS = new Set(["cost", "attacks_per_turn"]);
 
 /** Ops that honour `until_end_of_turn` (stat, attacks, keyword grant). */
 const UNTIL_END_OF_TURN_OPS = new Set(["stat", "attacks_per_turn", "keyword"]);

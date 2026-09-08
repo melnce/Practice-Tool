@@ -52,11 +52,6 @@ export function validateStatOp(eff: StatOp): void {
 // Special Modes
 // -----------------------------------------------------------------------------
 
-export function isSpecialMode(eff: StatOp): boolean {
-  const mode = (eff as any).mode;
-  return mode === "combo_repeat" || mode === "double";
-}
-
 export function getComboCount(owner: Player): number {
   return getPlaysThisTurn(state, owner);
 }
@@ -102,7 +97,7 @@ export function applyLeaderStat(
     setMaxHP(state, targetOwner, defense);
     setHP(state, targetOwner, Math.min(getHP(state, targetOwner), defense));
     logEvent("setLeaderMaxHP", { owner: targetOwner, maxHP: defense });
-  } else if (action === "give" || action === "modify" || !action) {
+  } else if (action === "give" || !action) {
     // Relative change to max defense (e.g. Lhynkal crest −2)
     const curMax = getMaxHP(state, targetOwner);
     const next = Math.max(1, curMax + defense);

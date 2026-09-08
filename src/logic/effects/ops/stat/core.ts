@@ -7,6 +7,7 @@ import type { StatOp } from "./types.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { getBoard } from "../../../../core/playerHelpers.js";
 import { applyAttacksPerTurnToCard } from "../../attacks.js";
+import { resolveStatDuration } from "./duration.js";
 
 /**
  * Applies stat changes to a card (additive).
@@ -112,12 +113,12 @@ export function applyKeywordBuff(
       const name = (typeof kw === "string" ? kw : kw?.name) || "";
       const options: any = typeof kw === "object" ? { ...kw } : {};
 
-      // Pass duration from effect to keyword options
-      if (eff.duration === "opponent_turn_end") {
+      const duration = resolveStatDuration(eff);
+      if (duration === "opponent_turn_end") {
         options.until_opponent_eot = true;
-        options.request_owner = requestOwner; // Who cast the debuff
+        options.request_owner = requestOwner;
       }
-      if (eff.duration === "turn_end" || (eff as any).until_end_of_turn) {
+      if (duration === "turn_end") {
         options.expires_on_turn = state.roundCount;
       }
 
@@ -141,8 +142,7 @@ export function applyAttacksPerTurnBuff(
 ) {
   if ((eff as any).attacks_per_turn !== undefined) {
     const n = parseInt((eff as any).attacks_per_turn) || 1;
-    const untilEot =
-      !!(eff as any).until_end_of_turn || eff.duration === "turn_end";
+    const untilEot = resolveStatDuration(eff) === "turn_end";
     applyAttacksPerTurnToCard(target, n, untilEot);
     logEvent("attacksPerTurn", {
       owner,
