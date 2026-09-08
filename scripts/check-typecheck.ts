@@ -14,12 +14,12 @@ if (report.errors.length > 0) {
     console.error(`  ${err}`);
   }
   console.error(
-    `\n  live=${report.diagnostics.length} dangerous=${report.dangerous.length} allowlisted=${report.allowlisted.length} new=${report.unallowlisted.length} stale=${report.unmatchedAllowlist.length}`,
+    `\n  live=${report.diagnostics.length} dangerous=${report.dangerous.length} debt=${report.debt.length}`,
   );
   process.exit(1);
 }
 
 console.log(
-  `typecheck gate passed (${report.allowlisted.length} allowlisted diagnostic(s), 0 dangerous)`,
+  `typecheck gate passed (0 dangerous, ${report.debt.length} debt diagnostic(s) not gated)`,
 );
 process.exit(0);
