@@ -131,6 +131,8 @@ export type AssertingBlock = {
   composedTitle: string;
   ownTitle: string;
   describeTitles: string[];
+  /** Source text of the it/test callback (used for block-scoped Q&A pin checks). */
+  bodyText: string;
 };
 
 /** One-line caveat for report table footnote and reports/subjecthood.json. */
@@ -292,11 +294,14 @@ function collectTitlesFromFile(sourceFile: SourceFile): {
       allTitles.push(title);
       const describeTitles = describeStack;
       const composedTitle = [...describeTitles, title].join(COMPOSED_TITLE_SEP);
+      const callback = node.getArguments()[1];
+      const bodyText = callback ? callback.getText() : "";
       assertingBlocks.push({
         file: relFile,
         composedTitle,
         ownTitle: title,
         describeTitles: [...describeTitles],
+        bodyText,
       });
       return;
     }

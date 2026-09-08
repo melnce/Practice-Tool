@@ -20,7 +20,10 @@ import {
   writeOfficialOutputs,
   type OfficialCardListResponse,
 } from "./lib/officialCards.js";
-import { writeOfficialReport } from "./lib/officialReconcile.js";
+import {
+  QA_PIN_BLOCK_KEYWORD_MIN,
+  writeOfficialReport,
+} from "./lib/officialReconcile.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -127,7 +130,7 @@ export async function runOfficialCards(
       const report = await writeOfficialReport(meta, reportDir);
       console.log(`Wrote ${path.relative(ROOT, reportDir)}/reconciliation.md`);
       console.log(
-        `Rotation mismatches: ${report.rotation.length}; official-not-encoded: ${report.officialNotEncoded.length}; encoded-not-official: ${report.encodedNotOfficial.length}; unresolved tokens: ${report.unresolvedTokens.length}; Q&A pinned ${report.pinnedCount} / unpinned ${report.unpinnedCount}; Q&A-vs-rulings notes: ${report.qaRulings.length}`,
+        `Rotation mismatches: ${report.rotation.length}; official-not-encoded: ${report.officialNotEncoded.length}; encoded-not-official: ${report.encodedNotOfficial.length}; unresolved tokens: ${report.unresolvedTokens.length}; Q&A pinned ${report.pinnedCount} / unpinned ${report.unpinnedCount} (block ≥${QA_PIN_BLOCK_KEYWORD_MIN}, was file-scoped ${report.pinnedFileScopedCount}); Q&A-vs-rulings notes: ${report.qaRulings.length}`,
       );
     }
     return 0;
