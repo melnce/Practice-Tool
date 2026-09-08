@@ -71,7 +71,6 @@ export interface CardCondition {
   // Combat state
   damaged?: boolean;
   did_not_attack_this_turn?: boolean;
-  still_alive?: boolean;
 
   // Name filter
   name?: string;
@@ -139,7 +138,6 @@ export const CARD_CONDITION_KEYS = new Set([
   "is_super_evolved",
   "damaged",
   "did_not_attack_this_turn",
-  "still_alive",
   "name",
   "uid",
 ]);
@@ -382,9 +380,6 @@ export function evaluateCardCondition(
     if (card.type !== "Follower") return false;
     if ((card as any).attacks_used_this_turn || card.hasAttacked) return false;
   }
-
-  // Still alive
-  if (cond.still_alive === true && def <= 0) return false;
 
   // Name filter
   if (cond.name) {

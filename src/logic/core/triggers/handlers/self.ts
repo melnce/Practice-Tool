@@ -24,11 +24,7 @@ export function handleDamageEvent(
       }
 
       const cond = trigger.condition || {};
-      const lifeEntity = cand.source === "crest" ? damaged : cand.card;
-      if (
-        cond.still_alive &&
-        (parseInt(String(lifeEntity.defense), 10) || 0) <= 0
-      )
+      if (cond.still_alive && (parseInt(String(damaged.defense), 10) || 0) <= 0)
         return false;
       if (cond.own_turn && cand.owner !== activePlayer) return false;
 
