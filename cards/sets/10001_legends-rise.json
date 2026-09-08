@@ -3303,6 +3303,9 @@
           {
             "event": "leader_restored",
             "once_per_turn": true,
+            "condition": {
+              "whose_turn": "owner"
+            },
             "effects": [
               {
                 "op": "damage",
