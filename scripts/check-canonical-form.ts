@@ -25,6 +25,7 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import { loadCardsForGates, type CardJson } from "./lib/loadCards.js";
+import { checkRouteDropSiblingGuards } from "./lib/op-key-shape-route-guards.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const ROOT = path.resolve(path.dirname(__filename), "..");
@@ -629,6 +630,16 @@ function checkOpKeyShape(card: CardJson): Warning[] {
       }
     }
   });
+  for (const g of checkRouteDropSiblingGuards(card)) {
+    out.push({
+      family: "op-key-shape",
+      id: g.id,
+      name: g.name,
+      found: compact({ path: g.path, detail: g.found }),
+      canonical: compact({ path: g.path }),
+      note: g.note,
+    });
+  }
   return out;
 }
 

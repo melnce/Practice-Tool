@@ -240,6 +240,8 @@ export function normalizeToUnifiedSpec(
     spec.amount_source = eff.amount_source as DamageAmountSource;
   }
   if ((eff as any).filter && typeof (eff as any).filter === "object") {
+    // On damage, `filter` is an amount filter (e.g. base_cost_gte for Camiscilla
+    // 10674110), not a recipient-pool narrow — see damage/helpers.ts.
     spec.filter = (eff as any).filter as Record<string, unknown>;
   }
   if (eff.count !== undefined) {

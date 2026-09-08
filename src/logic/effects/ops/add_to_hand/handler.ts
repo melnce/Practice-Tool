@@ -19,6 +19,7 @@ import { normalizeToAddToHandSpec } from "./types.js";
 import type { AddToHandFromZone } from "./types.js";
 import { normalizeInstanceEnteringHandAsCopy } from "./normalizeHandCopy.js";
 import { bumpZoneVersion } from "../../../core/triggers/utils.js";
+import { rejectUnsupportedPoolNarrowKeys } from "../../../core/targeting/poolCondition.js";
 import { pickDestroyedMatch } from "../../../core/destroyedHistory.js";
 import {
   getHand,
@@ -52,6 +53,13 @@ export function handleAddToHand(
   const spec = normalizeToAddToHandSpec(eff);
 
   if (spec.count <= 0) return; // No-op
+
+  if (spec.source === "named" || spec.source === "copy") {
+    rejectUnsupportedPoolNarrowKeys(
+      eff as Record<string, unknown>,
+      `source:"${spec.source}"`,
+    );
+  }
 
   // Determine who receives the cards
   const receivingPlayer: Player =
