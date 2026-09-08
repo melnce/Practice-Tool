@@ -3,6 +3,11 @@
  * Gate: every L2 `describe` block with a card id must declare `const printed`
  * equal to that card's description (from cards/all.json or cards/token_details.json).
  *
+ * The gate refuses to skip: a `const printed` outside a card-id describe title, a
+ * non-literal initialiser (only a string literal or `+` of string literals is
+ * accepted), or a card id missing from both lookup files — each fails with file
+ * and line. No suppression list.
+ *
  * Annotation marker (stripped before compare):
  *   `// Special Effects: <text>` — records crest/trigger behaviour omitted from
  *   printed card text. Must appear at most once per literal, after `\n`, ` `, or
@@ -252,32 +257,76 @@ function innermostBlock(
   return best;
 }
 
+type ExtractionIssue = {
+  file: string;
+  line: number;
+  message: string;
+};
+
+function readPrintedInitializer(
+  source: string,
+  start: number,
+): { value: string; end: number } | null {
+  let i = skipWs(source, start);
+  let value = "";
+
+  while (true) {
+    const lit = readStringLiteral(source, i);
+    if (!lit) return null;
+    value += lit.value;
+    i = skipWs(source, lit.end);
+    if (source[i] === "+") {
+      i = skipWs(source, i + 1);
+      continue;
+    }
+    return { value, end: i };
+  }
+}
+
 function extractPrintedBindings(
   source: string,
   file: string,
-): PrintedBinding[] {
+): { bindings: PrintedBinding[]; issues: ExtractionIssue[] } {
   const relFile = path.relative(ROOT, file).replace(/\\/g, "/");
   const blocks = collectDescribeBlocks(source, relFile);
   const bindings: PrintedBinding[] = [];
+  const issues: ExtractionIssue[] = [];
   const printedRe = /\bconst\s+printed\s*=/g;
   let m: RegExpExecArray | null;
   while ((m = printedRe.exec(source)) !== null) {
     const assignIndex = m.index;
+    const line = lineNumberAt(source, assignIndex);
     const block = innermostBlock(blocks, assignIndex);
-    if (!block?.cardId) continue;
+    if (!block?.cardId) {
+      issues.push({
+        file: relFile,
+        line,
+        message:
+          "const printed is not inside a describe whose title carries a card id",
+      });
+      continue;
+    }
     const eqIndex = source.indexOf("=", assignIndex);
-    const lit = readStringLiteral(source, eqIndex + 1);
-    if (!lit) continue;
+    const init = readPrintedInitializer(source, eqIndex + 1);
+    if (!init) {
+      issues.push({
+        file: relFile,
+        line,
+        message:
+          "const printed is not a plain string literal, so the gate cannot pin it (accepted: a string literal, or + concatenation of string literals)",
+      });
+      continue;
+    }
     bindings.push({
       file: relFile,
       cardId: block.cardId,
       cardName: block.title.replace(/\s*\(\d{8}\).*$/, ""),
       title: block.title,
-      literal: lit.value,
-      line: lineNumberAt(source, assignIndex),
+      literal: init.value,
+      line,
     });
   }
-  return bindings;
+  return { bindings, issues };
 }
 
 function loadCardLookup(): CardLookup {
@@ -393,7 +442,18 @@ function runAudit(): void {
 
   for (const file of files) {
     const source = fs.readFileSync(file, "utf-8");
-    const fileBindings = extractPrintedBindings(source, file);
+    const { bindings: fileBindings, issues: extractionIssues } =
+      extractPrintedBindings(source, file);
+    if (extractionIssues.length) {
+      console.log(
+        `❌ ${extractionIssues.length} const printed binding(s) outside gate scope:\n`,
+      );
+      for (const issue of extractionIssues) {
+        console.log(`  ${issue.file}:${issue.line}: ${issue.message}`);
+      }
+      console.log("");
+      process.exit(1);
+    }
     if (fileBindings.length) filesWithPrinted.add(path.relative(ROOT, file));
     bindings.push(...fileBindings);
     const counts = countExpectPrintedAssertions(source);
@@ -477,7 +537,19 @@ function runGate(): void {
 
   for (const file of files) {
     const source = fs.readFileSync(file, "utf-8");
-    const bindings = extractPrintedBindings(source, file);
+    const { bindings, issues: extractionIssues } = extractPrintedBindings(
+      source,
+      file,
+    );
+    for (const issue of extractionIssues) {
+      issues.push({
+        file: issue.file,
+        line: issue.line,
+        cardId: "",
+        cardName: "",
+        message: issue.message,
+      });
+    }
     for (const b of bindings) {
       checked++;
       const card = lookup.get(b.cardId);
@@ -519,9 +591,8 @@ function runGate(): void {
   if (issues.length) {
     console.log(`❌ ${issues.length} printed-literal mismatch(es):\n`);
     for (const i of issues) {
-      console.log(
-        `  [${i.cardId}] ${i.cardName} — ${i.file}:${i.line}: ${i.message}`,
-      );
+      const who = i.cardId ? `[${i.cardId}] ${i.cardName} — ` : "";
+      console.log(`  ${who}${i.file}:${i.line}: ${i.message}`);
     }
     console.log("");
     process.exit(1);
