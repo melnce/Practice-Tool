@@ -1,13 +1,16 @@
 import fs from "fs";
 import os from "os";
 import path from "path";
+import { fileURLToPath } from "url";
 import { describe, it, expect } from "vitest";
 import {
+  buildOfficialReport,
   buildQaPinBlockIndex,
   evaluateQaPin,
   extractQaKeywords,
   isQaPinnedFileScoped,
   QA_PIN_BLOCK_KEYWORD_MIN,
+  qaPinTwoKeywordTierCaveat,
 } from "../../scripts/lib/officialReconcile.js";
 
 const CARD_ID = "10021130";
@@ -238,5 +241,28 @@ describe("Q&A pin predicate (block-scoped)", () => {
     expect(pin.matchedKeywords).not.toContain("beelzebub");
     expect(pin.matchedKeywords).not.toContain("supreme");
     expect(pin.matchedKeywords).not.toContain("king");
+  });
+});
+
+describe("two-keyword tier caveat", () => {
+  it("pins report.qaPinTwoKeywordTierCaveat to the exported formatter", () => {
+    const root = path.resolve(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "../..",
+    );
+    const meta = JSON.parse(
+      fs.readFileSync(path.join(root, "cards/official-meta.json"), "utf-8"),
+    );
+    const report = buildOfficialReport(meta, root);
+    expect(report.qaPinTwoKeywordTierCaveat).toBe(
+      qaPinTwoKeywordTierCaveat(report.twoKeywordPinCount),
+    );
+    expect(report.qaPinTwoKeywordTierCaveat).toContain("weakest tier");
+    expect(report.qaPinTwoKeywordTierCaveat).toContain(
+      String(report.twoKeywordPinCount),
+    );
+    expect(report.qaPinTwoKeywordTierCaveat).toContain(
+      "not a coverage guarantee",
+    );
   });
 });

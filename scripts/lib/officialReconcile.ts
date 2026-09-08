@@ -489,6 +489,23 @@ export function compareTokenLinks(
  */
 export const QA_PIN_BLOCK_KEYWORD_MIN = 2;
 
+/** Footnote marker for the two-keyword tier caveat in Q&A coverage reports. */
+export const QA_PIN_TWO_KEYWORD_TIER_FOOTNOTE = "†";
+
+/**
+ * One-line caveat for Q&A pin report output. Count is supplied at render time so
+ * the footnote stays honest as coverage shifts.
+ */
+export function qaPinTwoKeywordTierCaveat(
+  exactTwoKeywordPinCount: number,
+): string {
+  return `Heuristic only (not a coverage guarantee): ${exactTwoKeywordPinCount} pinned rulings rest on exactly two keyword hits at the ≥${QA_PIN_BLOCK_KEYWORD_MIN} threshold — the weakest tier; spot-check before treating as covered (e.g. 10144110 duplicate-crest Q&A pinning crest routing, not duplicate-crest logic).`;
+}
+
+export function countQaPinsAtExactlyTwoKeywords(rows: QaCoverageRow[]): number {
+  return rows.filter((r) => r.pinned && r.matchedKeywords.length === 2).length;
+}
+
 export type QaPinThreshold = "min1" | "min2" | "half";
 
 export type QaPinResult = {
@@ -1011,6 +1028,9 @@ export type OfficialReport = {
   unpinnedBlockScopedHalfCount: number;
   pinnedBlockScopedMin1Count: number;
   unpinnedBlockScopedMin1Count: number;
+  /** Same text as qaPinTwoKeywordTierCaveat(twoKeywordPinCount); echoed for JSON consumers. */
+  qaPinTwoKeywordTierCaveat: string;
+  twoKeywordPinCount: number;
 };
 
 export function summarizeQaCoverage(rows: QaCoverageRow[]): {
@@ -1059,6 +1079,7 @@ export function buildOfficialReport(
     "utf-8",
   );
   const qaRulings = compareQaToRulings(meta, ownerRulings, rulebook);
+  const twoKeywordPinCount = countQaPinsAtExactlyTwoKeywords(qaCoverage);
   return {
     rotation,
     officialNotEncoded: tokens.officialNotEncoded,
@@ -1074,6 +1095,8 @@ export function buildOfficialReport(
     unpinnedBlockScopedHalfCount: qaSummary.unpinnedBlockScopedHalf,
     pinnedBlockScopedMin1Count: qaSummary.pinnedBlockScopedMin1,
     unpinnedBlockScopedMin1Count: qaSummary.unpinnedBlockScopedMin1,
+    twoKeywordPinCount,
+    qaPinTwoKeywordTierCaveat: qaPinTwoKeywordTierCaveat(twoKeywordPinCount),
   };
 }
 
@@ -1159,7 +1182,7 @@ export function renderOfficialReportMarkdown(
     ),
     "## Q&A coverage",
     "",
-    "Pin predicates (measurement only — not a CI gate). Keywords: 4+ letter tokens from question + answer after dropping stopwords and the subject card name.",
+    "Pin predicates (measurement only — not a CI gate). Keywords: 4+ letter tokens from question + answer after dropping stopwords and the subject card name. Asserting-block scope deliberately matches the `it`/`test` title plus callback body (not body alone): official Q&A tests encode ruling phrases in titles; subject-card name stripping keeps that honest.",
     "",
     table(
       ["scope", "threshold", "pinned", "unpinned", "total"],
@@ -1180,7 +1203,7 @@ export function renderOfficialReportMarkdown(
         ],
         [
           "block (subject `it`/`test`)",
-          `≥${QA_PIN_BLOCK_KEYWORD_MIN} keywords in asserting block`,
+          `≥${QA_PIN_BLOCK_KEYWORD_MIN} keywords in asserting block${QA_PIN_TWO_KEYWORD_TIER_FOOTNOTE}`,
           String(report.pinnedCount),
           String(report.unpinnedCount),
           String(report.qaCoverage.length),
@@ -1195,7 +1218,9 @@ export function renderOfficialReportMarkdown(
       ],
     ),
     "",
-    `Default \`pinned\` field: block-scoped, ≥${QA_PIN_BLOCK_KEYWORD_MIN} keywords (subject block from \`subjecthood.ts\` title matcher). Legacy file-scoped verdict kept as \`pinnedFileScoped\`.`,
+    `${QA_PIN_TWO_KEYWORD_TIER_FOOTNOTE} ${report.qaPinTwoKeywordTierCaveat}`,
+    "",
+    `Default \`pinned\` field: block-scoped, ≥${QA_PIN_BLOCK_KEYWORD_MIN} keywords in the asserting block title + body (subject block from \`subjecthood.ts\` title matcher). Legacy file-scoped verdict kept as \`pinnedFileScoped\`.`,
     "",
     table(
       ["id", "name", "status", "keywords / block", "Q / A"],
