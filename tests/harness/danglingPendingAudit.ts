@@ -5,14 +5,16 @@
  * tests/fixtures/setup.ts + full `npx vitest run -c vitest.config.ts`:
  *   56 dangling / 4227 passing / 326 files — suite GREEN.
  *
- * Classifications:
- *   A — Prompt-is-the-subject: pending state, pool, snapshot/undo, or lifecycle.
- *       Correct as written; next PR strict-choose gate should not flag these.
- *   B — Silently unresolved: plays a card, asserts an outcome, leaves a prompt open
+ * Classifications (this file is the authority — headline counts must match it):
+ *   A (53) — Prompt-is-the-subject: pending state, pool, snapshot/undo, or lifecycle.
+ *       Correct as written. Proposed **allowlist** for the strict-choose gate: each (A)
+ *       entry is allowlisted with its `reason`; an entry that stops reproducing must fail.
+ *   B (3)  — Silently unresolved: plays a card, asserts an outcome, leaves a prompt open
  *       so a card clause never ran and existing assertions did not cover it.
+ *       **Never allowlisted** — must be fixed (resolve the prompt or rewrite the test).
  *
- * Do not resolve prompts or change assertions based on this file alone — the
- * follow-up PR turns (B) into gate failures or test fixes.
+ * Imported by nothing yet — inert data until the gate PR wires it in. Do not resolve
+ * prompts or change assertions based on this file alone.
  */
 
 export type DanglingPendingClassification = "A" | "B";
@@ -332,7 +334,7 @@ export const DANGLING_PENDING_AUDIT: readonly DanglingPendingAuditEntry[] = [
       "Engage (1): Select an allied follower on the field and give it +1/+1. Restore 1 defense to your leader.",
     assertionsWouldStillPass: true,
     finding:
-      "Neither the +1/+1 buff nor leader restore runs because selection never completes; HP stays 20 trivially, so this positive control cannot detect a broken restore path.",
+      "Vacuous as a control: Engage never completes (no resolvePendingTarget), so restore never fires and HP stays 20 because nothing happened — passes identically whether or not the effect runs (verified: adding resolvePendingTarget(ally.uid) still yields hp=20). A positive control that passes because the controlled-for thing never happened is worse than no control. Sibling test ~20 lines above (Burnite crest at full HP) uses the same setup with resolvePendingTarget before asserting — that is the correct pattern; fix here is one line. First item for the follow-up PR.",
   },
   {
     id: 25,
@@ -710,7 +712,7 @@ export const DANGLING_PENDING_SUMMARY = {
   ).length,
 } as const;
 
-/** (B) entries only — the set a strict-choose gate would flag. */
+/** (B) entries only — must be fixed, never allowlisted. Gate flags anything not in (A). */
 export const SILENTLY_UNRESOLVED = DANGLING_PENDING_AUDIT.filter(
   (e) => e.classification === "B",
 );
