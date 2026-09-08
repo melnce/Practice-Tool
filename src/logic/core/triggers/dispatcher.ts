@@ -65,6 +65,8 @@ const EVENT_HANDLERS: Record<string, EventHandler> = {
   ally_earth_rite: handleGenericEvent,
   ally_follower_leaves_field: handleGenericEvent,
   enemy_follower_leaves_field: handleGenericEvent,
+  ally_follower_destroyed: handleGenericEvent,
+  enemy_follower_destroyed: handleGenericEvent,
   enemy_follower_defense_down: handleGenericEvent,
   ally_ward_destroyed: handleGenericEvent,
   ally_amulet_destroyed: handleGenericEvent,

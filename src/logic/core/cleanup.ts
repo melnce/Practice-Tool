@@ -124,11 +124,27 @@ function dispatchLeaveTriggers(
       leavingOwner: owner,
       context: enemyCtx,
     });
+    leaveBatch.push({
+      event: "ally_follower_destroyed",
+      activePlayer: owner,
+      leavingCardUid: card.uid,
+      leavingOwner: owner,
+      context: allyCtx,
+    });
+    leaveBatch.push({
+      event: "enemy_follower_destroyed",
+      activePlayer: owner,
+      leavingCardUid: card.uid,
+      leavingOwner: owner,
+      context: enemyCtx,
+    });
     return;
   }
 
   fireTrigger("ally_follower_leaves_field", owner as any, allyCtx);
   fireTrigger("enemy_follower_leaves_field", owner as any, enemyCtx);
+  fireTrigger("ally_follower_destroyed", owner as any, allyCtx);
+  fireTrigger("enemy_follower_destroyed", owner as any, enemyCtx);
 }
 
 function triggerLastWords(card: CardInstance, owner: Player): "pending" | void {

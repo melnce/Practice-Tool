@@ -132,7 +132,9 @@ export function processCandidateTriggers(
       // Rulebook §317: a dying follower does not observe its own leave/destruction.
       if (
         (event === "ally_follower_leaves_field" ||
-          event === "enemy_follower_leaves_field") &&
+          event === "enemy_follower_leaves_field" ||
+          event === "ally_follower_destroyed" ||
+          event === "enemy_follower_destroyed") &&
         context.leavingCard &&
         cand.card?.uid === context.leavingCard.uid
       ) {

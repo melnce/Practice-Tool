@@ -2331,7 +2331,22 @@
     "keywords": [],
     "triggers": [
       {
-        "event": "ally_follower_leaves_field",
+        "event": "ally_follower_destroyed",
+        "source": "board",
+        "condition": {
+          "name": "Skeleton"
+        },
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 1
+          }
+        ]
+      },
+      {
+        "event": "enemy_follower_destroyed",
         "source": "board",
         "condition": {
           "name": "Skeleton"

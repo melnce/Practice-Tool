@@ -391,6 +391,14 @@ Consequences: no Last Words, no shadow, no `leaves_field` / `enter` reactive tri
 
 There is no official Cygames Q&A on transform vs leave/enter triggers (checked all 904 entries in `cards/official-meta.json`).
 
+## `_destroyed` events — destruction only — 2026-09-08
+
+> A `_destroyed` event must never fire for something that was not destroyed.
+
+Banishing or bouncing a follower (or amulet) does **not** raise `ally_*_destroyed` / `enemy_*_destroyed` / `ally_amulet_destroyed` — it raises nothing on the destroyed axis. Those events are reserved for genuine destruction (defense ≤ 0 on a follower, countdown 0 on an amulet, etc.), not for any other form of leaving play.
+
+Same principle as the rulebook at line 591 in `docs/svwb_rulebook_formatted.md`: _"Triggers that say 'destroyed' mean specifically destroyed; 'leaves play' means any removal."_ This is the rule `ally_follower_destroyed` / `enemy_follower_destroyed` are built on (Lifestealer `10553110`, PR #352). Context: #353 asked whether banishing or bouncing an amulet should raise `ally_amulet_destroyed` instead of a leave-field event — answer is no, it should raise nothing on the destroyed axis.
+
 ## Faith is not a crest for counting (2026-09-06)
 
 Owner:
