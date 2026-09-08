@@ -134,12 +134,13 @@ export function handleSummonFromHand(
   if (eff.mode === "copy" || !eff.mode) {
     if (isArtifact) {
       if (eff.eot_destroy) {
-        handleSelectHandSummonArtifactCopiesEOT(eff, owner, effectsQueue);
-        return "pending";
-      } else {
-        handleSelectHandSummonArtifactCopy(eff, owner, effectsQueue);
-        return "pending";
+        return handleSelectHandSummonArtifactCopiesEOT(
+          eff,
+          owner,
+          effectsQueue,
+        );
       }
+      return handleSelectHandSummonArtifactCopy(eff, owner, effectsQueue);
     }
   }
 
