@@ -265,10 +265,10 @@ describe("two-keyword tier caveat", () => {
     expect(report.qaPinTwoKeywordTierCaveat).toContain(
       "not a coverage guarantee",
     );
-    expect(report.pinnedAnswerOnlyFileScopedCount).toBe(65);
+    expect(report.pinnedAnswerOnlyFileScopedCount).toBe(66);
     expect(report.pinnedAnswerOnlyBlockScopedMin2Count).toBe(16);
-    expect(report.pinnedCount).toBe(119);
-    expect(report.pinnedFileScopedCount).toBe(146);
+    expect(report.pinnedCount).toBe(126);
+    expect(report.pinnedFileScopedCount).toBe(148);
     expect(QA_PIN_UNPINNED_FILE_SCOPED_SAME_EXTRACTION_STATUS).toBe(
       "unpinned (file-scoped, same extraction)",
     );
