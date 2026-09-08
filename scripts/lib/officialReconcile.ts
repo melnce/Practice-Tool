@@ -179,7 +179,8 @@ export const QA_COVERAGE_STOPWORDS = new Set([
   "another",
   "such",
   "very",
-  "more",
+  // "more" kept extractable — survives in named ability phrases like
+  // "Takes 1 more damage" that official Q&A and tests share.
   "most",
   "some",
   "any",
@@ -297,6 +298,8 @@ export const QA_COVERAGE_STOPWORDS = new Set([
   "gives",
   "select",
   "selected",
+  // Question fillers with no discriminating power ("how much damage", etc.).
+  "much",
 ]);
 
 export function loadJsonArray<T>(filePath: string): T[] {
@@ -478,9 +481,10 @@ export function compareTokenLinks(
 }
 
 /**
- * Block-scoped pin threshold (chosen rule): require at least this many answer
- * keywords inside the body of a subject asserting block. Single-keyword matches
- * are too loose — median pinned verdict on main rested on one generic token.
+ * Block-scoped pin threshold (chosen rule): require at least this many Q&A
+ * keywords inside the body of a subject asserting block. Keywords are mined
+ * from question + answer (subject card name stripped). Single-keyword matches
+ * are too loose on answer-only extraction; with Q+A, ≥2 survives spot-checks.
  * Also report pinnedBlockScopedHalf (≥ceil(n/2) keywords) for comparison.
  */
 export const QA_PIN_BLOCK_KEYWORD_MIN = 2;
@@ -537,12 +541,14 @@ export function qaPinThresholdMet(
  */
 export function isQaPinnedFileScoped(
   id: string,
+  cardName: string,
+  question: string,
   answer: string,
   corpus: Array<{ file: string; text: string }>,
 ): Pick<QaPinResult, "pinnedFileScoped" | "matchedKeywords" | "matchedFile"> & {
   pinned: boolean;
 } {
-  const keywords = extractAnswerKeywords(answer);
+  const keywords = extractQaKeywords(question, answer, cardName, id);
   if (!keywords.length) {
     return {
       pinned: false,
@@ -574,10 +580,12 @@ export function isQaPinnedFileScoped(
 /** @deprecated Use evaluateQaPin — kept for callers that only need file-scoped. */
 export function isQaPinned(
   id: string,
+  cardName: string,
+  question: string,
   answer: string,
   corpus: Array<{ file: string; text: string }>,
 ): { pinned: boolean; matchedKeywords: string[]; matchedFile: string | null } {
-  const result = isQaPinnedFileScoped(id, answer, corpus);
+  const result = isQaPinnedFileScoped(id, cardName, question, answer, corpus);
   return {
     pinned: result.pinned,
     matchedKeywords: result.matchedKeywords,
@@ -602,12 +610,19 @@ export function buildQaPinBlockIndex(root = ROOT): QaPinBlockIndex {
 export function evaluateQaPin(
   cardId: string,
   cardName: string,
+  question: string,
   answer: string,
   corpus: Array<{ file: string; text: string }>,
   blockIndex: QaPinBlockIndex,
 ): QaPinResult {
-  const keywords = extractAnswerKeywords(answer);
-  const fileScoped = isQaPinnedFileScoped(cardId, answer, corpus);
+  const keywords = extractQaKeywords(question, answer, cardName, cardId);
+  const fileScoped = isQaPinnedFileScoped(
+    cardId,
+    cardName,
+    question,
+    answer,
+    corpus,
+  );
   const card = { id: cardId, name: cardName };
 
   let best: {
@@ -619,7 +634,10 @@ export function evaluateQaPin(
   for (const block of blockIndex.subjectBlocks) {
     const titleMatch = cardMatchesTitle(card, block.composedTitle);
     if (!titleMatch.byId && !titleMatch.byName) continue;
-    const hits = matchAnswerKeywordsInText(keywords, block.bodyText);
+    const hits = matchAnswerKeywordsInText(
+      keywords,
+      `${block.composedTitle} ${block.bodyText}`,
+    );
     if (!best || hits.length > best.hits.length) {
       best = {
         hits,
@@ -662,15 +680,56 @@ export function evaluateQaPin(
 }
 
 /**
- * Answer keywords for Q&A pin checks: 4+ letter tokens not in QA_COVERAGE_STOPWORDS.
+ * Tokenize Q&A text into pin keywords: 4+ letter tokens not in stopwords.
  */
-export function extractAnswerKeywords(answer: string): string[] {
-  const words = answer
+export function tokenizeQaKeywords(text: string): string[] {
+  const words = text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, " ")
     .split(/\s+/)
     .filter((w) => w.length >= 4 && !QA_COVERAGE_STOPWORDS.has(w));
   return [...new Set(words)];
+}
+
+/** Tokens from the subject card name (and id) that must not count as keywords. */
+export function subjectCardDropTokens(
+  cardName: string,
+  cardId: string,
+): Set<string> {
+  const drop = new Set(tokenizeQaKeywords(cardName));
+  drop.add(cardId.toLowerCase());
+  return drop;
+}
+
+export function stripSubjectCardKeywords(
+  keywords: string[],
+  cardName: string,
+  cardId: string,
+): string[] {
+  const drop = subjectCardDropTokens(cardName, cardId);
+  return keywords.filter((kw) => !drop.has(kw));
+}
+
+/**
+ * Q&A keywords for pin checks: mined from question + answer, with the subject
+ * card's own name tokens (and id) removed so a block cannot trivially self-pin.
+ */
+export function extractQaKeywords(
+  question: string,
+  answer: string,
+  cardName: string,
+  cardId: string,
+): string[] {
+  const combined = tokenizeQaKeywords(`${question} ${answer}`);
+  return stripSubjectCardKeywords(combined, cardName, cardId);
+}
+
+/**
+ * @deprecated Answer-only extraction — blind to content-free official answers.
+ * Use extractQaKeywords for pin predicates.
+ */
+export function extractAnswerKeywords(answer: string): string[] {
+  return tokenizeQaKeywords(answer);
 }
 
 export function loadTestCorpus(
@@ -709,7 +768,14 @@ export function coverOfficialQa(
     const rec = getOfficialCard(meta, id);
     if (!rec) continue;
     for (const qa of rec.questions) {
-      const pin = evaluateQaPin(id, rec.name, qa.answer, corpus, blockIndex);
+      const pin = evaluateQaPin(
+        id,
+        rec.name,
+        qa.question,
+        qa.answer,
+        corpus,
+        blockIndex,
+      );
       const blockPinned = pin.pinnedBlockScopedMin2;
       rows.push({
         id,
@@ -1093,7 +1159,7 @@ export function renderOfficialReportMarkdown(
     ),
     "## Q&A coverage",
     "",
-    "Pin predicates (measurement only — not a CI gate). Keywords: 4+ letter tokens from the answer after dropping stopwords.",
+    "Pin predicates (measurement only — not a CI gate). Keywords: 4+ letter tokens from question + answer after dropping stopwords and the subject card name.",
     "",
     table(
       ["scope", "threshold", "pinned", "unpinned", "total"],
@@ -1107,21 +1173,21 @@ export function renderOfficialReportMarkdown(
         ],
         [
           "block (subject `it`/`test`)",
-          "≥1 keyword in block body",
+          "≥1 keyword in asserting block",
           String(report.pinnedBlockScopedMin1Count),
           String(report.unpinnedBlockScopedMin1Count),
           String(report.qaCoverage.length),
         ],
         [
           "block (subject `it`/`test`)",
-          `≥${QA_PIN_BLOCK_KEYWORD_MIN} keywords in block body`,
+          `≥${QA_PIN_BLOCK_KEYWORD_MIN} keywords in asserting block`,
           String(report.pinnedCount),
           String(report.unpinnedCount),
           String(report.qaCoverage.length),
         ],
         [
           "block (subject `it`/`test`)",
-          "≥ceil(n/2) keywords in block body",
+          "≥ceil(n/2) keywords in asserting block",
           String(report.pinnedBlockScopedHalfCount),
           String(report.unpinnedBlockScopedHalfCount),
           String(report.qaCoverage.length),
