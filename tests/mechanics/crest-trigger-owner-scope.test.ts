@@ -359,7 +359,7 @@ describe("Crest trigger owner scoping — real cards", () => {
         expect(getHP(state, "second")).toBe(19);
       });
 
-      it("leader_restored on crest owner deals damage only to that leader", () => {
+      it("10144110 — leader_restored on crest owner deals damage only on owner's turn", () => {
         givenGameState({ seed: 1, activePlayer: "first" })
           .withFirstHP(20)
           .withSecondHP(15)
@@ -367,7 +367,11 @@ describe("Crest trigger owner scoping — real cards", () => {
         gainCardCrest("10144110", "first"); // crest lands on second
 
         restoreLeaderHP("second", 3);
-        expect(getHP(state, "second")).toBe(17);
+        expect(getHP(state, "second")).toBe(18);
+
+        state.activePlayer = "second";
+        restoreLeaderHP("second", 3);
+        expect(getHP(state, "second")).toBe(19);
 
         restoreLeaderHP("first", 3);
         expect(getHP(state, "first")).toBe(20);
