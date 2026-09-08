@@ -293,6 +293,28 @@ describe("stat spec normalizer — set action guard (BG3)", () => {
     resetUidCounter();
   });
 
+  it("throws in NODE_ENV=test when opponent_turn_end carries a numeric delta", () => {
+    givenGameState({ seed: 1 }).build();
+    const card = allyFollower("BadOpp", 2, 2);
+    expect(() =>
+      whenRunEffects(
+        [
+          {
+            op: "stat",
+            action: "give",
+            target: "ally:follower",
+            attack: 2,
+            duration: "opponent_turn_end",
+          },
+        ] as any,
+        "first",
+      ),
+    ).toThrow(
+      /duration:"opponent_turn_end" cannot carry non-zero attack\/defense/i,
+    );
+    expect(card.attack).toBe(2);
+  });
+
   it("throws in NODE_ENV=test when set carries duration", () => {
     givenGameState({ seed: 1 }).build();
     const card = allyFollower("SetTemp", 3, 3);

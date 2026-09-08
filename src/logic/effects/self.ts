@@ -8,7 +8,10 @@ import {
   checkPostBuffTriggers,
 } from "./ops/stat/core.js";
 import { banishCard } from "./ops/banish/index.js";
-import { recordTemporaryStatBuff } from "./ops/stat/duration.js";
+import {
+  recordTemporaryStatBuff,
+  rejectStatOpponentTurnEndNumericDelta,
+} from "./ops/stat/duration.js";
 import {
   normalizeStatSpec,
   statOpHasKeywordOrAttacksGrant,
@@ -36,6 +39,7 @@ export function handleStatSelf(
   }
 
   if (a !== 0 || d !== 0) {
+    rejectStatOpponentTurnEndNumericDelta(statEff, a, d, "self");
     applyStatBuff(sourceCard, a, d, owner);
 
     if (a > 0 || d > 0) {
@@ -49,15 +53,6 @@ export function handleStatSelf(
 
   applyKeywordBuff(sourceCard, statEff, owner);
   applyAttacksPerTurnBuff(sourceCard, statEff, owner);
-}
-
-/** @deprecated Use handleStatSelf — dynamic sources are folded into normalizeStatSpec. */
-export function handleDynamicStatSelf(
-  sourceCard: CardInstance,
-  eff: Effect,
-  owner: Player,
-) {
-  handleStatSelf(sourceCard, eff, owner);
 }
 
 // Add this new function to clear temporary buffs

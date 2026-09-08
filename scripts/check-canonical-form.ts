@@ -615,6 +615,39 @@ function checkOpKeyShape(card: CardJson): Warning[] {
         });
       }
 
+      if (obj.duration === "opponent_turn_end") {
+        const atk = obj.attack !== undefined ? Number(obj.attack) || 0 : 0;
+        const def = obj.defense !== undefined ? Number(obj.defense) || 0 : 0;
+        const hasSource =
+          (obj as { attack_source?: unknown }).attack_source !== undefined ||
+          (obj as { defense_source?: unknown }).defense_source !== undefined;
+        if (atk !== 0 || def !== 0 || hasSource) {
+          out.push({
+            family: "op-key-shape",
+            id: card.id,
+            name: card.name,
+            found: compact({
+              path,
+              op,
+              duration: "opponent_turn_end",
+              attack: obj.attack ?? null,
+              defense: obj.defense ?? null,
+              attack_source:
+                (obj as { attack_source?: unknown }).attack_source ?? null,
+              defense_source:
+                (obj as { defense_source?: unknown }).defense_source ?? null,
+            }),
+            canonical: compact({
+              path,
+              op,
+              duration: "opponent_turn_end",
+              keywords: obj.keywords ?? null,
+            }),
+            note: 'op:"stat" duration:"opponent_turn_end" is keyword-only — must not carry attack, defense, or *_source',
+          });
+        }
+      }
+
       const badRandom =
         obj.random === true ||
         String((obj as any).pick || "").toLowerCase() === "random" ||

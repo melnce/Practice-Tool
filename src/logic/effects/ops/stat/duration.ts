@@ -25,6 +25,32 @@ export function resolveStatDuration(eff: StatOp): StatDuration {
 }
 
 const warnedStatSetDuration = new Set<string>();
+const warnedOpponentTurnEndNumeric = new Set<string>();
+
+/**
+ * Rejects opponent_turn_end on stat ops that carry a non-zero numeric delta.
+ * Throws in NODE_ENV=test; warn-once in production (never isDev).
+ */
+export function rejectStatOpponentTurnEndNumericDelta(
+  eff: StatOp,
+  attack: number,
+  defense: number,
+  routeLabel = "stat",
+): void {
+  if (resolveStatDuration(eff) !== "opponent_turn_end") return;
+  if (attack === 0 && defense === 0) return;
+  const warnKey = `${routeLabel}:opponent_turn_end+numeric`;
+  const msg =
+    `[stat] duration:"opponent_turn_end" cannot carry non-zero attack/defense on route ${routeLabel}. ` +
+    `Effect: ${JSON.stringify(eff)}`;
+  if (readEnv("NODE_ENV") === "test") {
+    throw new Error(msg);
+  }
+  if (!warnedOpponentTurnEndNumeric.has(warnKey)) {
+    console.warn(msg);
+    warnedOpponentTurnEndNumeric.add(warnKey);
+  }
+}
 
 /**
  * Rejects action:"set" combined with any duration key.
@@ -50,7 +76,7 @@ export function rejectStatSetWithDuration(
 
 /**
  * Records a turn-scoped stat delta for later cleanup.
- * Only turn_end applies to numeric stat deltas; opponent_turn_end is keyword-only today.
+ * Only turn_end applies; opponent_turn_end numeric deltas are rejected upstream.
  */
 export function recordTemporaryStatBuff(
   target: CardInstance,
@@ -84,6 +110,7 @@ export function withBuffDuration(
   );
   const duration = resolveStatDuration(eff);
 
+  rejectStatOpponentTurnEndNumericDelta(eff, a, d, "pooled");
   recordTemporaryStatBuff(target, a, d, duration);
   applyFn({ attack: a, defense: d });
 }
