@@ -11,6 +11,8 @@ import {
   findOnBoard,
   thenBoard,
 } from "../harness/builders.js";
+import { summonFollowerByCardId } from "../harness/l2Dispatch.js";
+import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { whenSuperEvolve } from "../harness/whenEvolve.js";
@@ -64,10 +66,32 @@ function allyFollower(atk: number, name = "Bystander", def = atk) {
   return c;
 }
 
-describe("tier C — C13 enter-trigger migration", () => {
+describe("tier C — C13 enter-trigger migration (behaviour fix)", () => {
   beforeEach(() => resetUidCounter());
 
-  it("10011210 Wild Profusion — Pixie enter deals 1 to a random enemy follower", () => {
+  it("10011210 Wild Profusion — summoned Pixie deals 1 to a random enemy follower", () => {
+    setupTurn(R6);
+    const profusion = createCard(WILD_PROFUSION, "board", "first");
+    applyKeywordsFromList(profusion);
+    state.players.first.board = [profusion];
+    const foe = enemyFollower(2, 3, "Foe");
+    const bystander = enemyFollower(2, 3, "Bystander");
+    summonFollowerByCardId(FAIRY, "first");
+    const totalDef = Number(foe.defense) + Number(bystander.defense);
+    expect(6 - totalDef).toBe(1);
+  }, 60_000);
+
+  it("10022210 Ancestral Crown — summoned follower gains +1/+1", () => {
+    setupTurn(R6);
+    const crown = createCard(ANCESTRAL_CROWN, "board", "first");
+    applyKeywordsFromList(crown);
+    state.players.first.board = [crown];
+    const summoned = summonFollowerByCardId(DRAW_TOP, "first");
+    expect(Number(summoned.attack)).toBe(2);
+    expect(Number(summoned.defense)).toBe(2);
+  }, 60_000);
+
+  it("10011210 Wild Profusion — played Pixie still fires (play path regression)", () => {
     setupTurn(R6, { hand: [FAIRY], pp: 1 });
     const profusion = createCard(WILD_PROFUSION, "board", "first");
     applyKeywordsFromList(profusion);
@@ -77,15 +101,6 @@ describe("tier C — C13 enter-trigger migration", () => {
     whenPlayCard("first", 0);
     const totalDef = Number(foe.defense) + Number(bystander.defense);
     expect(6 - totalDef).toBe(1);
-  }, 60_000);
-
-  it("10022210 Ancestral Crown — allied follower enter gains +1/+1", () => {
-    setupTurn(R6, { hand: [ANCESTRAL_CROWN, DRAW_TOP], pp: 10 });
-    whenPlayCard("first", 0);
-    whenPlayCard("first", 0);
-    const quick = findOnBoard("first", "Flashstep Quickblader")!;
-    expect(Number(quick.attack)).toBe(2);
-    expect(Number(quick.defense)).toBe(2);
   }, 60_000);
 });
 
@@ -116,6 +131,18 @@ describe("tier C — C12 inert self-exclusion proof (three spellings)", () => {
     whenSuperEvolve(noel, "first");
     expect(Number(noel.attack)).toBeGreaterThanOrEqual(7);
     expect(Number(bystander.attack)).toBe(3);
+  }, 60_000);
+
+  it("10741120 Carrier Wyvern — Fanfare buffs bystander not self (filter not_self inert)", () => {
+    setupTurn(R6, { hand: ["10741120"], pp: 4 });
+    const bystander = allyFollower(2, "Bystander", 2);
+    whenPlayCard("first", 0);
+    const wyvern = findOnBoard("first", "Carrier Wyvern")!;
+    resolvePendingTarget(String(bystander.uid));
+    expect(Number(wyvern.attack)).toBe(3);
+    expect(Number(wyvern.defense)).toBe(2);
+    expect(Number(bystander.attack)).toBe(4);
+    expect(Number(bystander.defense)).toBe(4);
   }, 60_000);
 });
 
