@@ -160,10 +160,8 @@ export function handleSummonDestroyedMatch(
   spec: UnifiedSummonSpec,
   owner: Player,
 ): void {
-  const filter = {
-    ...(spec.filter || {}),
-    ...((eff.filter as object) || {}),
-  } as Record<string, unknown>;
+  // filter merge happens in normalizeToUnifiedSpec — do not re-spread eff.filter here
+  const filter = { ...(spec.filter || {}) } as Record<string, unknown>;
 
   const records = pickDestroyedMatch(state, owner, {
     filter: filter as any,
