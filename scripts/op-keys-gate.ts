@@ -351,6 +351,7 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "can_target_leader",
     "condition",
     "filter",
+    "class",
     "exclude_selected",
   ]),
   destroy: new Set([
@@ -461,6 +462,7 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "keywords",
     "passives",
     "target",
+    "is_faith",
   ]),
   fuse: new Set([
     "action",
