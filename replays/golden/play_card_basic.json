@@ -7,11 +7,11 @@
     }
   ],
   "final": {
-    "stateHash": "d4e7e11a"
+    "stateHash": "8046897c"
   },
   "id": "play_card_basic",
   "initial": {
-    "stateHash": "7d8e35ab"
+    "stateHash": "69e0a3c8"
   },
   "seed": 100000,
   "trace": [],

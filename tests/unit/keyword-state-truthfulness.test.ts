@@ -41,7 +41,7 @@ function readyAttacker(card: {
   card.can_attack_leader = true;
 }
 
-describe("BF1 — spellboost keywordState mirror is authoritative", () => {
+describe("BF1 — spellboost keywordState mirror is truthful", () => {
   beforeEach(() => {
     resetUidCounter();
     state.gameStarted = true;
@@ -61,7 +61,7 @@ describe("BF1 — spellboost keywordState mirror is authoritative", () => {
     });
   });
 
-  it("spellboostHand cost reduction reads keywordState.spellboost, not raw keyword JSON", () => {
+  it("spellboostHand cost reduction reads the keyword object, not keywordState.spellboost", () => {
     givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
       .withFirstHand([BLAZE_DESTROYER])
       .withFirstPP(10, 10)
@@ -70,11 +70,11 @@ describe("BF1 — spellboost keywordState mirror is authoritative", () => {
     blaze.keywordState = {
       ...(blaze.keywordState ?? {}),
       hasSpellboost: true,
-      spellboost: { reduceCostBy: 2, minCost: 0 },
+      spellboost: { reduceCostBy: 99, minCost: 0 },
     };
     const cost0 = getEffectiveCost(blaze);
     spellboostHand("first", 1, blaze);
-    expect(getEffectiveCost(blaze)).toBe(cost0 - 2);
+    expect(getEffectiveCost(blaze)).toBe(cost0 - 1);
   });
 
   it("effect-only Spellboost cards do not get implicit cost reduction from mirror defaults", () => {

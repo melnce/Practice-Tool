@@ -99,12 +99,12 @@
       "status": "covered"
     },
     "10011110": {
-      "fingerprint": "d6bf1951",
+      "fingerprint": "2cd3d6c0",
       "gatesSatisfied": [],
       "name": "Fairy Tamer",
       "scenarios": [
         {
-          "fingerprint": "c0585d07",
+          "fingerprint": "80285d52",
           "scenario": "play"
         }
       ],
@@ -139,12 +139,12 @@
       "status": "covered"
     },
     "10011210": {
-      "fingerprint": "c66c8b50",
+      "fingerprint": "687ed6df",
       "gatesSatisfied": [],
       "name": "Wild Profusion",
       "scenarios": [
         {
-          "fingerprint": "56c4a85c",
+          "fingerprint": "a5e4ac2b",
           "scenario": "play"
         },
         {
@@ -519,12 +519,12 @@
       "status": "covered"
     },
     "10052110": {
-      "fingerprint": "069bf663",
+      "fingerprint": "76849cc8",
       "gatesSatisfied": [],
       "name": "Lilith, Enchanting Succubus",
       "scenarios": [
         {
-          "fingerprint": "70df57e2",
+          "fingerprint": "6f0dab43",
           "scenario": "destroy"
         }
       ],
@@ -671,12 +671,12 @@
       "status": "covered"
     },
     "10071120": {
-      "fingerprint": "51996ac5",
+      "fingerprint": "070f177b",
       "gatesSatisfied": [],
       "name": "Puppet Lancer",
       "scenarios": [
         {
-          "fingerprint": "a8012b54",
+          "fingerprint": "705cf3bb",
           "scenario": "play"
         }
       ],
@@ -735,16 +735,16 @@
       "status": "covered"
     },
     "10072210": {
-      "fingerprint": "dabf77c0",
+      "fingerprint": "113095e0",
       "gatesSatisfied": [],
       "name": "Puppet Theater",
       "scenarios": [
         {
-          "fingerprint": "a5382d5c",
+          "fingerprint": "ed1fc918",
           "scenario": "play"
         },
         {
-          "fingerprint": "585154f4",
+          "fingerprint": "792afeb7",
           "scenario": "turn_boundary"
         }
       ],
@@ -763,12 +763,12 @@
       "status": "covered"
     },
     "10101120": {
-      "fingerprint": "62ac7035",
+      "fingerprint": "bad922c8",
       "gatesSatisfied": [],
       "name": "Vigilant Detective",
       "scenarios": [
         {
-          "fingerprint": "72345030",
+          "fingerprint": "088ec5ec",
           "scenario": "destroy"
         }
       ],
@@ -883,16 +883,16 @@
       "status": "covered"
     },
     "10111120": {
-      "fingerprint": "1a136e60",
+      "fingerprint": "9652c881",
       "gatesSatisfied": [],
       "name": "Capricious Sprite",
       "scenarios": [
         {
-          "fingerprint": "f13c7478",
+          "fingerprint": "abdc6ef8",
           "scenario": "play"
         },
         {
-          "fingerprint": "77b8d21f",
+          "fingerprint": "0fc0b068",
           "scenario": "evolve"
         }
       ],
@@ -939,12 +939,12 @@
       "status": "covered"
     },
     "10111310": {
-      "fingerprint": "5c8363cc",
+      "fingerprint": "13aed3a4",
       "gatesSatisfied": [],
       "name": "Fairy Convocation",
       "scenarios": [
         {
-          "fingerprint": "cb4ddc34",
+          "fingerprint": "cdd16ac8",
           "scenario": "play"
         }
       ],
@@ -963,12 +963,12 @@
       "status": "covered"
     },
     "10112120": {
-      "fingerprint": "c741cf55",
+      "fingerprint": "ef5a722c",
       "gatesSatisfied": [],
       "name": "Good Fairy of the Pond",
       "scenarios": [
         {
-          "fingerprint": "8a7389ac",
+          "fingerprint": "0c24771f",
           "scenario": "destroy"
         }
       ],
@@ -995,16 +995,16 @@
       "status": "covered"
     },
     "10112210": {
-      "fingerprint": "b934e644",
+      "fingerprint": "536b7a30",
       "gatesSatisfied": ["combo"],
       "name": "Lambent Cairn",
       "scenarios": [
         {
-          "fingerprint": "ae7fa748",
+          "fingerprint": "88b363fa",
           "scenario": "play_else"
         },
         {
-          "fingerprint": "e4933454",
+          "fingerprint": "40f33e64",
           "scenario": "play"
         },
         {
@@ -2075,12 +2075,12 @@
       "status": "covered"
     },
     "10152130": {
-      "fingerprint": "daa1fc68",
+      "fingerprint": "e7ead720",
       "gatesSatisfied": [],
       "name": "Yuna, Occult Hunter",
       "scenarios": [
         {
-          "fingerprint": "01ed18ae",
+          "fingerprint": "86cfbbb4",
           "scenario": "destroy"
         }
       ],
@@ -2539,12 +2539,12 @@
       "status": "covered"
     },
     "10171140": {
-      "fingerprint": "4b078e40",
+      "fingerprint": "be25a100",
       "gatesSatisfied": [],
       "name": "Medical-Grade Assassin",
       "scenarios": [
         {
-          "fingerprint": "f39dba34",
+          "fingerprint": "20b10f08",
           "scenario": "play"
         },
         {
@@ -2595,28 +2595,28 @@
       "status": "covered"
     },
     "10172120": {
-      "fingerprint": "6b00ee24",
+      "fingerprint": "3eb95fc8",
       "gatesSatisfied": [],
       "name": "Lovestruck Puppeteer",
       "scenarios": [
         {
-          "fingerprint": "de00f2c4",
+          "fingerprint": "d7c79ad0",
           "scenario": "play"
         },
         {
-          "fingerprint": "c605ca14",
+          "fingerprint": "ebe36506",
           "scenario": "evolve"
         }
       ],
       "status": "covered"
     },
     "10172130": {
-      "fingerprint": "d90d41dc",
+      "fingerprint": "a38a5c6f",
       "gatesSatisfied": [],
       "name": "Noah, Thread of Death",
       "scenarios": [
         {
-          "fingerprint": "c0215178",
+          "fingerprint": "b53d497e",
           "scenario": "play"
         }
       ],
@@ -2935,12 +2935,12 @@
       "status": "covered"
     },
     "10212120": {
-      "fingerprint": "0c5dc228",
+      "fingerprint": "8eb1c190",
       "gatesSatisfied": [],
       "name": "Fairy Fencer",
       "scenarios": [
         {
-          "fingerprint": "ed0dceeb",
+          "fingerprint": "d7c4296c",
           "scenario": "play"
         },
         {
@@ -2999,7 +2999,7 @@
       "status": "covered"
     },
     "10214110": {
-      "fingerprint": "4f863cf0",
+      "fingerprint": "f162cbc8",
       "gatesSatisfied": [],
       "name": "Titania, Queen of Fairies",
       "scenarios": [
@@ -3008,7 +3008,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "39169780",
+          "fingerprint": "0f7bc75c",
           "scenario": "turn_boundary"
         },
         {
@@ -3187,12 +3187,12 @@
       "status": "covered"
     },
     "10231110": {
-      "fingerprint": "1bfbcf40",
+      "fingerprint": "11f781a4",
       "gatesSatisfied": ["super_evolved_allied"],
       "name": "Melvie, Adoring Witch",
       "scenarios": [
         {
-          "fingerprint": "3c10e5c0",
+          "fingerprint": "806061f4",
           "scenario": "play"
         }
       ],
@@ -3487,24 +3487,24 @@
       "status": "covered"
     },
     "10251120": {
-      "fingerprint": "bd35a6fc",
+      "fingerprint": "75311167",
       "gatesSatisfied": [],
       "name": "Cultivator of Malice",
       "scenarios": [
         {
-          "fingerprint": "8fe6802c",
+          "fingerprint": "f186167a",
           "scenario": "destroy"
         }
       ],
       "status": "covered"
     },
     "10251310": {
-      "fingerprint": "6d7b05e0",
+      "fingerprint": "44bc79e4",
       "gatesSatisfied": [],
       "name": "Ghastly Soiree",
       "scenarios": [
         {
-          "fingerprint": "d9c747ee",
+          "fingerprint": "8434bed3",
           "scenario": "play"
         }
       ],
@@ -3767,12 +3767,12 @@
       "status": "covered"
     },
     "10271120": {
-      "fingerprint": "d7195a6f",
+      "fingerprint": "25ebd9a8",
       "gatesSatisfied": ["super_evolved_allied"],
       "name": "Puppet Cat",
       "scenarios": [
         {
-          "fingerprint": "56b8048b",
+          "fingerprint": "4ea17243",
           "scenario": "play"
         }
       ],
@@ -4063,12 +4063,12 @@
       "status": "covered"
     },
     "10312120": {
-      "fingerprint": "692bea8c",
+      "fingerprint": "1e331b7f",
       "gatesSatisfied": [],
       "name": "Greatwood Warrior",
       "scenarios": [
         {
-          "fingerprint": "f08f3398",
+          "fingerprint": "715a447c",
           "scenario": "destroy"
         }
       ],
@@ -4935,12 +4935,12 @@
       "status": "covered"
     },
     "10371310": {
-      "fingerprint": "10202100",
+      "fingerprint": "311f0f8c",
       "gatesSatisfied": [],
       "name": "Wired Assault",
       "scenarios": [
         {
-          "fingerprint": "34ff8107",
+          "fingerprint": "eb2a0c5b",
           "scenario": "play"
         }
       ],
@@ -5999,12 +5999,12 @@
       "status": "covered"
     },
     "10471130": {
-      "fingerprint": "e1e0e91f",
+      "fingerprint": "bd19c06c",
       "gatesSatisfied": [],
       "name": "Isaac, Congenial Engineer",
       "scenarios": [
         {
-          "fingerprint": "0f62033c",
+          "fingerprint": "dc95de30",
           "scenario": "destroy"
         }
       ],
@@ -6211,12 +6211,12 @@
       "status": "covered"
     },
     "10511310": {
-      "fingerprint": "0f20e988",
+      "fingerprint": "5d65d384",
       "gatesSatisfied": [],
       "name": "Flight of the Swarmpetal",
       "scenarios": [
         {
-          "fingerprint": "7fc4e7f4",
+          "fingerprint": "d309ad4e",
           "scenario": "play"
         }
       ],
@@ -6311,16 +6311,16 @@
       "status": "covered"
     },
     "10514120": {
-      "fingerprint": "b7d1551c",
+      "fingerprint": "1980a440",
       "gatesSatisfied": [],
       "name": "Miroku, Swarmpetal",
       "scenarios": [
         {
-          "fingerprint": "1e7b1284",
+          "fingerprint": "ae1be55c",
           "scenario": "play"
         },
         {
-          "fingerprint": "d8e7b094",
+          "fingerprint": "0c6dda58",
           "scenario": "evolve"
         }
       ],
@@ -6695,12 +6695,12 @@
       "status": "covered"
     },
     "10542120": {
-      "fingerprint": "e84886e7",
+      "fingerprint": "e0587cf0",
       "gatesSatisfied": [],
       "name": "Jellyfish Dancer",
       "scenarios": [
         {
-          "fingerprint": "89710e1a",
+          "fingerprint": "1906c2aa",
           "scenario": "play"
         },
         {
@@ -7527,12 +7527,12 @@
       "status": "covered"
     },
     "10623110": {
-      "fingerprint": "e97a6964",
+      "fingerprint": "c3b0b574",
       "gatesSatisfied": [],
       "name": "Heartless Strategist",
       "scenarios": [
         {
-          "fingerprint": "db7f1e3e",
+          "fingerprint": "8c573960",
           "scenario": "play"
         },
         {
@@ -7911,12 +7911,12 @@
       "status": "covered"
     },
     "10651120": {
-      "fingerprint": "aa6f9235",
+      "fingerprint": "7a444d80",
       "gatesSatisfied": [],
       "name": "Ghost Dodger",
       "scenarios": [
         {
-          "fingerprint": "2292cf98",
+          "fingerprint": "0f1aebf8",
           "scenario": "destroy"
         }
       ],
@@ -8479,12 +8479,12 @@
       "status": "covered"
     },
     "10711120": {
-      "fingerprint": "0bc98d30",
+      "fingerprint": "7b58f628",
       "gatesSatisfied": [],
       "name": "Elven Trapper",
       "scenarios": [
         {
-          "fingerprint": "60b942a7",
+          "fingerprint": "6b4939cc",
           "scenario": "play"
         }
       ],
@@ -9079,12 +9079,12 @@
       "status": "covered"
     },
     "10751110": {
-      "fingerprint": "036e7fcc",
+      "fingerprint": "a5ae9830",
       "gatesSatisfied": [],
       "name": "Lulumi, Vamp on the Keys",
       "scenarios": [
         {
-          "fingerprint": "985e5fcc",
+          "fingerprint": "2c06d0d2",
           "scenario": "destroy"
         }
       ],
@@ -9423,7 +9423,7 @@
       "status": "covered"
     },
     "10771310": {
-      "fingerprint": "fc86ed08",
+      "fingerprint": "30240400",
       "gatesSatisfied": ["unique_tribe_enters"],
       "name": "Freerunning",
       "scenarios": [
@@ -9432,23 +9432,23 @@
           "scenario": "play_else"
         },
         {
-          "fingerprint": "ea48da30",
+          "fingerprint": "a3652c44",
           "scenario": "play"
         }
       ],
       "status": "covered"
     },
     "10772110": {
-      "fingerprint": "f603f558",
+      "fingerprint": "f92cf437",
       "gatesSatisfied": [],
       "name": "Cool Courier",
       "scenarios": [
         {
-          "fingerprint": "8c4217fa",
+          "fingerprint": "d7080b60",
           "scenario": "play"
         },
         {
-          "fingerprint": "022526d8",
+          "fingerprint": "3867c4e4",
           "scenario": "evolve"
         }
       ],
@@ -9687,12 +9687,12 @@
       "status": "covered"
     },
     "10812110": {
-      "fingerprint": "a4cc0250",
+      "fingerprint": "52c8f138",
       "gatesSatisfied": [],
       "name": "Ruflet, Primeval Fairy",
       "scenarios": [
         {
-          "fingerprint": "7350b913",
+          "fingerprint": "8f754ba4",
           "scenario": "destroy"
         }
       ],
@@ -10095,12 +10095,12 @@
       "status": "covered"
     },
     "10841130": {
-      "fingerprint": "9a96f903",
+      "fingerprint": "d667e598",
       "gatesSatisfied": [],
       "name": "Spirit of Wadatsumi",
       "scenarios": [
         {
-          "fingerprint": "d7ccbf78",
+          "fingerprint": "41da611c",
           "scenario": "play"
         },
         {
@@ -10111,7 +10111,7 @@
       "status": "covered"
     },
     "10842110": {
-      "fingerprint": "fd922b5d",
+      "fingerprint": "4de4fe79",
       "gatesSatisfied": [],
       "name": "Reef & Lolo, Serene Sirens",
       "scenarios": [
@@ -10120,7 +10120,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "e5fd9f8c",
+          "fingerprint": "8de8a7d4",
           "scenario": "turn_boundary"
         }
       ],
@@ -10231,16 +10231,16 @@
       "status": "covered"
     },
     "10851120": {
-      "fingerprint": "61c3fe70",
+      "fingerprint": "6f0835b4",
       "gatesSatisfied": [],
       "name": "Lilith, Devilish Cutie",
       "scenarios": [
         {
-          "fingerprint": "3b5f41ef",
+          "fingerprint": "ee58a354",
           "scenario": "destroy"
         },
         {
-          "fingerprint": "513d2d9c",
+          "fingerprint": "2b2b954c",
           "scenario": "combat"
         }
       ],
@@ -10575,24 +10575,24 @@
       "status": "covered"
     },
     "10872110": {
-      "fingerprint": "15a502f8",
+      "fingerprint": "bfd45e2c",
       "gatesSatisfied": [],
       "name": "Layla, Artificial Gift of Life",
       "scenarios": [
         {
-          "fingerprint": "59a68d7f",
+          "fingerprint": "fbf75910",
           "scenario": "destroy"
         }
       ],
       "status": "covered"
     },
     "10872120": {
-      "fingerprint": "88920150",
+      "fingerprint": "c660df38",
       "gatesSatisfied": [],
       "name": "Lazuli, Gateway Connector",
       "scenarios": [
         {
-          "fingerprint": "41dc4768",
+          "fingerprint": "199f3fb0",
           "scenario": "play"
         }
       ],
@@ -10791,12 +10791,12 @@
       "status": "covered"
     },
     "10912110": {
-      "fingerprint": "3cf73710",
+      "fingerprint": "db9b9797",
       "gatesSatisfied": ["combo"],
       "name": "Leafshadow Assassin",
       "scenarios": [
         {
-          "fingerprint": "cdd3b7a4",
+          "fingerprint": "869dcd2c",
           "scenario": "play"
         }
       ],
@@ -10819,7 +10819,7 @@
       "status": "covered"
     },
     "10912310": {
-      "fingerprint": "aa10a78f",
+      "fingerprint": "1297fc64",
       "gatesSatisfied": ["combo"],
       "name": "Verdant Ring Kindred",
       "scenarios": [
@@ -10828,7 +10828,7 @@
           "scenario": "play_else"
         },
         {
-          "fingerprint": "8fbfcfa4",
+          "fingerprint": "d6d363ff",
           "scenario": "play"
         }
       ],
@@ -11127,12 +11127,12 @@
       "status": "covered"
     },
     "10932310": {
-      "fingerprint": "9d58d170",
+      "fingerprint": "f1e7d0c8",
       "gatesSatisfied": [],
       "name": "Humane Love",
       "scenarios": [
         {
-          "fingerprint": "560babec",
+          "fingerprint": "c5ae85ab",
           "scenario": "play"
         }
       ],

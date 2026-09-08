@@ -5,7 +5,6 @@ import { adapter } from "../core/adapter.js";
 import { getCardDetails, getGlobalCardIndex } from "./cardIndex.js";
 import { logEvent } from "../core/logger.js";
 import type { CardInstance } from "../core/types/index.js";
-import { seedKeywordStateFromDefinition } from "../logic/core/keywords.js";
 import { expandDeckEntries } from "./deckExpand.js";
 import { findUnknownCards } from "./deckValidation.js";
 import type { FetchedDeck, RawDeck, RawDeckCardEntry } from "./rawDeck.js";
@@ -52,13 +51,7 @@ function enrichDeck(
       (card.name != null && getCardDetails(card.name));
 
     const base = fullData ? { ...fullData, ...card } : { ...card };
-    const instance = {
-      ...base,
-      uid: state.rng.makeUid(),
-      owner,
-    } as CardInstance;
-    seedKeywordStateFromDefinition(instance);
-    return instance;
+    return { ...base, uid: state.rng.makeUid(), owner } as CardInstance;
   });
 }
 

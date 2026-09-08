@@ -3,7 +3,6 @@ import { state } from "../../../core/gameState.js";
 import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { pushToHand } from "../../../core/utils.js";
 import { getCardDetails } from "../../../data/cardDatabase.js";
-import { seedKeywordStateFromDefinition } from "../../core/keywords.js";
 import {
   applyCrystallizeTransform,
   getAlternateForms,
@@ -32,7 +31,6 @@ function freshBaseCopyByName(name: string) {
   if (!base) return null;
   const copy = structuredClone(base);
   copy.uid = state.rng.makeUid();
-  seedKeywordStateFromDefinition(copy);
   return copy;
 }
 

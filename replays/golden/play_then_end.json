@@ -13,11 +13,11 @@
     }
   ],
   "final": {
-    "stateHash": "61b08114"
+    "stateHash": "b8c6acb8"
   },
   "id": "play_then_end",
   "initial": {
-    "stateHash": "1111ae10"
+    "stateHash": "1abe5f28"
   },
   "seed": 100003,
   "trace": [],

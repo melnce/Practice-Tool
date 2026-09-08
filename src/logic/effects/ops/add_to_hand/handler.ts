@@ -20,7 +20,6 @@ import type { AddToHandFromZone } from "./types.js";
 import { normalizeInstanceEnteringHandAsCopy } from "./normalizeHandCopy.js";
 import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 import { pickDestroyedMatch } from "../../../core/destroyedHistory.js";
-import { seedKeywordStateFromDefinition } from "../../../core/keywords.js";
 import {
   getHand,
   getDeck,
@@ -102,7 +101,6 @@ function addNamedCards(
     copy.owner = receivingPlayer;
     copy.zone = "hand";
     normalizeCardStats(copy);
-    seedKeywordStateFromDefinition(copy);
 
     // Apply keywords if specified
     if (spec.keywords.length > 0) {
@@ -156,7 +154,6 @@ function addDestroyedMatchCards(
     copy.owner = receivingPlayer;
     copy.zone = "hand";
     normalizeCardStats(copy);
-    seedKeywordStateFromDefinition(copy);
 
     if (spec.keywords.length > 0) {
       applyKeywords(copy, spec.keywords);
@@ -220,7 +217,6 @@ function addZoneSampleCopies(
     copy.zone = "hand";
     normalizeInstanceEnteringHandAsCopy(copy);
     normalizeCardStats(copy);
-    seedKeywordStateFromDefinition(copy);
 
     if (spec.keywords.length > 0) {
       applyKeywords(copy, spec.keywords);
@@ -321,7 +317,6 @@ function addCopiedCards(
     // A card entering hand as a copy must start clean for those fields.
     normalizeInstanceEnteringHandAsCopy(copy);
     normalizeCardStats(copy);
-    seedKeywordStateFromDefinition(copy);
 
     // Apply keywords if specified
     if (spec.keywords.length > 0) {

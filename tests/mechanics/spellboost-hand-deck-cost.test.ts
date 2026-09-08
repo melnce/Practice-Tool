@@ -88,13 +88,4 @@ describe("spellboost cost reduction on deck-loaded hand cards (real play path)",
 
     expect(getEffectiveCost(blaze)).toBe(cost0 - 2);
   });
-
-  it("deckLoader seeds keywordState.spellboost mirror on draw (post-BF1 fix)", () => {
-    loadDeckWithTopCard(DIMENSION_CLIMB);
-    const climb = drawTopDeckCard();
-    expect(climb.keywordState?.spellboost).toEqual({
-      reduceCostBy: 1,
-      minCost: 0,
-    });
-  });
 });
