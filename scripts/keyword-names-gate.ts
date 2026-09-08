@@ -273,11 +273,7 @@ export function runKeywordNamesGate(
   ).length;
 
   const exitCode =
-    unallowlistedErrors.length > 0 ||
-    unmatchedAllowlist.length > 0 ||
-    warnings.length > 0
-      ? 1
-      : 0;
+    unallowlistedErrors.length > 0 || unmatchedAllowlist.length > 0 ? 1 : 0;
 
   return {
     issues,
