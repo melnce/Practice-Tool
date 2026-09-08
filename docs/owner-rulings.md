@@ -378,6 +378,19 @@ Uniformly at random among the destroyed allied followers that share the highest 
 
 Engine already matched (`pickDestroyedMatchHighestBaseCost` keeps every record at `maxBase`, then `top[state.rng.nextInt(top.length)]`). Behaviour pinned; do not change without a new ruling.
 
+## Transform — neither leave nor enter (2026-09-08)
+
+> Transform does **not** count as leaving the field. The transformed-in card does **not** count as entering the field.
+
+**Owner ruling (2026-09-08).** **Source:** [Shadowverse 効果処理 wiki — 変身と破壊の違い](https://w.atwiki.jp/svkoukasyori/pages/16.html), quoted:
+
+- ラストワード・「破壊された時」「**場を離れる時**」効果が発動しない — Last Words, "when destroyed", and **"when leaving the field"** effects do not activate.
+- 変身して別のカードになるが、「場に出たカード」の枚数は増えない(**場に出た扱いにもならない**) — it transforms into a different card, but the count of "cards that entered the field" does not increase (**it is not treated as having entered the field**).
+
+Consequences: no Last Words, no shadow, no `leaves_field` / `enter` reactive triggers on transform. The original ceases to exist and continuous effects on it end; the new card takes its slot with no relation to the old one. The engine (`src/logic/effects/ops/transform.ts`) already implements this deliberately — do not fire enter/leave on transform.
+
+There is no official Cygames Q&A on transform vs leave/enter triggers (checked all 904 entries in `cards/official-meta.json`).
+
 ## Faith is not a crest for counting (2026-09-06)
 
 Owner:
