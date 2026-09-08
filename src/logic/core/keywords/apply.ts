@@ -285,3 +285,11 @@ export function applyKeywordsFromList(card: CardInstance) {
   }
   __initializingKeywords = false;
 }
+
+/**
+ * Seed keywordState mirrors from card.keywords when a card enters deck or hand.
+ * Does not apply board-entry side effects (justPlayed, attacks_left, etc.).
+ */
+export function seedKeywordStateFromDefinition(card: CardInstance): void {
+  applyKeywordsFromList(card);
+}

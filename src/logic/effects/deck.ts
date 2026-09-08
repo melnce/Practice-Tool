@@ -16,6 +16,7 @@ import { handleHalveDeckCost, reduceDeckFollowersCost } from "./cost.js";
 import { pickDestroyedMatchHighestBaseCost } from "../core/destroyedHistory.js";
 import { getCardById } from "../../data/cardDatabase.js";
 import { normalizeCardStats } from "../../core/cardStats.js";
+import { seedKeywordStateFromDefinition } from "../core/keywords.js";
 
 /** Allowed deck.action values — must match handleDeck switch in deck.ts */
 export const DECK_ACTION_VALUES = new Set(["replace", "add", "cost"]);
@@ -104,6 +105,7 @@ function replaceDeckFromSet(
     if (!cardData) continue;
     const copy = structuredClone(cardData);
     copy.uid = state.rng.makeUid();
+    seedKeywordStateFromDefinition(copy);
     deck.push(copy);
   }
 
@@ -137,6 +139,7 @@ function handleReplaceDeckFromList(
       for (let i = 0; i < (count || 1); i++) {
         const copy = structuredClone(cardData);
         copy.uid = state.rng.makeUid();
+        seedKeywordStateFromDefinition(copy);
         deck.push(copy);
       }
     }
@@ -172,6 +175,7 @@ function handleAddToDeck(owner: Player, eff: any): void {
   for (let i = 0; i < count; i++) {
     const copy = structuredClone(cardData);
     copy.uid = state.rng.makeUid();
+    seedKeywordStateFromDefinition(copy);
     // Optional cost override (e.g. Drache crest sets cost to 2)
     if (eff.set_cost !== undefined) {
       const c = parseInt(String(eff.set_cost), 10);
@@ -227,6 +231,7 @@ function handleAddDestroyedMatchToDeck(owner: Player, eff: any): void {
     copy.owner = owner;
     copy.zone = "deck";
     normalizeCardStats(copy);
+    seedKeywordStateFromDefinition(copy);
     const shuffleDeck = eff.shuffle !== false;
     if (shuffleDeck) {
       deck.push(copy);

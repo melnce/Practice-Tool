@@ -15,6 +15,7 @@ import {
   getCardDetails,
   isCardDatabaseInitialized,
 } from "../../data/cardIndex.js";
+import { seedKeywordStateFromDefinition } from "./keywords.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Replay Deck Definitions - Using real card names from the database
@@ -125,6 +126,7 @@ function buildDeckFromNames(
       uid: rng.makeUid(),
       owner,
     } as CardInstance;
+    seedKeywordStateFromDefinition(card);
 
     deck.push(card);
   }

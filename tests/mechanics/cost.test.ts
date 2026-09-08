@@ -32,7 +32,6 @@ import {
   resolvePlayCost,
 } from "../../src/logic/core/playCard/cost.js";
 import { canPlayCard } from "../../src/logic/core/playCard/preflight.js";
-import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import type { CardInstance } from "../../src/core/types/index.js";
 
 describe("Mechanic Contract: cost", () => {
@@ -299,9 +298,6 @@ describe("Mechanic Contract: cost", () => {
         ])
         .build();
 
-      const card = thenHand("first")[0];
-      applyKeywordsFromList(card);
-
       const effect = {
         op: "spellboost" as const,
         target: "ally:hand",
@@ -309,6 +305,7 @@ describe("Mechanic Contract: cost", () => {
       };
       whenRunEffects([effect], "first");
 
+      const card = thenHand("first")[0];
       // Cost should reduce by 3 (1 per boost)
       expect(card.cost).toBe(7);
     });

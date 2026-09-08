@@ -13,6 +13,7 @@ import { runEffects } from "../../core/effects/index.js";
 import { handleStat } from "./stat.js";
 import { handleCost } from "./cost/unified.js";
 import { applySpellboostCostReduction } from "./cost/model.js";
+import { isDev } from "../../../core/env.js";
 
 /* ------------------------ helpers ------------------------ */
 
@@ -38,19 +39,59 @@ function hasSpellboostKeyword(card: CardInstance): boolean {
   return false;
 }
 
+function readSpellboostCostFromKeywordObject(card: CardInstance): {
+  reduceBy: number;
+  minCost: number;
+} | null {
+  if (!Array.isArray(card.keywords)) return null;
+  for (const k of card.keywords) {
+    if (typeof k !== "object" || !k) continue;
+    if (
+      String((k as { name?: string }).name ?? "").toLowerCase() !== "spellboost"
+    )
+      continue;
+    const kw = k as {
+      reduceCostBy?: number;
+      reduce_cost_by?: number;
+      minCost?: number;
+      min_cost?: number;
+    };
+    const hasCostSpec =
+      kw.reduceCostBy != null ||
+      kw.reduce_cost_by != null ||
+      kw.minCost != null ||
+      kw.min_cost != null;
+    if (!hasCostSpec) return null;
+    return {
+      reduceBy: Number(kw.reduceCostBy ?? kw.reduce_cost_by ?? 1),
+      minCost: Number(kw.minCost ?? kw.min_cost ?? 0),
+    };
+  }
+  return null;
+}
+
 function getSpellboostCostReduction(card: CardInstance): {
   reduceBy: number;
   minCost: number;
 } | null {
   const spec = card.keywordState?.spellboost;
-  if (!spec) return null;
-  const reduceBy = Number(spec.reduceCostBy);
-  if (!Number.isFinite(reduceBy) || reduceBy <= 0) return null;
-  const minCost = Number(spec.minCost);
-  return {
-    reduceBy,
-    minCost: Number.isFinite(minCost) ? minCost : 0,
-  };
+  if (spec) {
+    const reduceBy = Number(spec.reduceCostBy);
+    if (!Number.isFinite(reduceBy) || reduceBy <= 0) return null;
+    const minCost = Number(spec.minCost);
+    return {
+      reduceBy,
+      minCost: Number.isFinite(minCost) ? minCost : 0,
+    };
+  }
+
+  const fromKeyword = readSpellboostCostFromKeywordObject(card);
+  if (fromKeyword && isDev()) {
+    console.warn(
+      `[spellboost] keywordState.spellboost missing for ${card.name} (${card.uid}); using raw keyword fallback`,
+    );
+  }
+  return fromKeyword;
 }
 
 function normTimes(x: any) {

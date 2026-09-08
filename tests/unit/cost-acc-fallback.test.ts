@@ -11,7 +11,6 @@ import {
   setCostAcc,
 } from "../../src/logic/effects/ops/cost/model.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
-import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { spellboostHand } from "../../src/logic/effects/ops/spellboost.js";
 import { applyAlternateFormBaseCost } from "../../src/helpers/alternateForm.js";
 
@@ -42,7 +41,6 @@ describe("getCostAcc fallback branches", () => {
       "hand",
       "first",
     );
-    applyKeywordsFromList(card);
     spellboostHand("first", 3, card);
     expect(card.cost_acc).toBe(-3);
     // Simulate a legacy snapshot without cost_acc (e.g. undo from older state)

@@ -6,7 +6,6 @@ import type {
   Player,
 } from "../../../../core/types/index.js";
 import { initAmulet, initFollower } from "./init.js";
-import { applyKeywordsFromList } from "../../../core/keywords.js";
 import { isFollower, isAmulet } from "./utils.js";
 import { setRally, getRally } from "../../../../core/playerHelpers.js";
 import {
@@ -40,7 +39,6 @@ export function makeCardFromDB(
 
   if (isFollower(card)) initFollower(card);
   else if (isAmulet(card)) initAmulet(card);
-  else applyKeywordsFromList(card);
   return card;
 }
 
