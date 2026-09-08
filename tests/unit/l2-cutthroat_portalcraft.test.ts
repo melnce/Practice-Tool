@@ -1525,6 +1525,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       applyKeywordsFromList(w2);
       applyKeywordsFromList(w3);
       whenPlayCard("first", 0);
+      resolvePendingByUid(w1.uid);
       const asher = findOnBoard("first", "Asher & Lydia, Paths Beyond")!;
       state.players.first.evoCharges = 2;
       whenEvolve(asher, "first");

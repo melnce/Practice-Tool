@@ -231,15 +231,25 @@ describe("L2 Amulet Havencraft — real-card tests", () => {
 
     it("Engage: destroys this card on the field", () => {
       setupTurn(R6, {
-        hand: [EARRINGS, RETURN_CARD],
-        deck: [DRAW_TOP],
+        hand: [EARRINGS, RETURN_CARD, FILLER],
+        deck: [DRAW_TOP, "10021120"],
         pp: 1,
       });
       const toReturn = thenHand("first").find((c) => c.id === RETURN_CARD)!;
       whenPlayCard("first", 0);
       resolvePendingByUid(toReturn.uid);
+      const engageReturn = thenHand("first").find((c) => c.id === FILLER)!;
+      const engageReturnUid = engageReturn.uid;
       engageAmulet("first", amuletIndex("Earrings of Sunlight"));
       expect(findOnBoard("first", "Earrings of Sunlight")).toBeUndefined();
+      resolvePendingByUid(engageReturn.uid);
+      expect(thenHand("first").some((c) => c.uid === engageReturnUid)).toBe(
+        false,
+      );
+      expect(thenDeck("first").some((c) => c.uid === engageReturnUid)).toBe(
+        true,
+      );
+      expect(thenHand("first").some((c) => c.id === DRAW_TOP)).toBe(true);
       expect(printed).toContain("Destroy this card");
     });
 
