@@ -26,6 +26,7 @@ import {
   whenEffectEvolve,
 } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
+import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import {
   attackFollower,
   attackLeader,
@@ -264,6 +265,7 @@ describe("Rulebook L383 — Last Words", () => {
       "first",
       { sourceCard: null },
     );
+    resolvePendingTarget(victim.uid);
 
     expect(thenHand("second").length).toBe(handBefore);
     expect(getBoard(state, "second")[0]!.name).toBe("Skeleton");

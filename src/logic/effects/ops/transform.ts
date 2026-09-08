@@ -261,11 +261,34 @@ export function handleTransform(
       }
 
       if (selectN > 0 && !ctx.context?.targetUids?.length) {
-        if (targets.length > 0) {
-          const picks = targets.slice(0, Math.min(selectN, targets.length));
-          for (const t of picks) transformTarget(t, into);
+        if (!targets.length) {
+          reportSelectFizzled({
+            eff,
+            owner,
+            sourceCard: ctx.sourceCard ?? null,
+            target: eff.target,
+          });
           return;
         }
+        const resume = ctx.effectsQueue ? Array.from(ctx.effectsQueue) : [];
+        if (ctx.effectsQueue) ctx.effectsQueue.length = 0;
+        const selectCount = Math.min(selectN, targets.length);
+        if (
+          trySetPendingTarget({
+            eff: { ...eff, op: "transform", into },
+            owner,
+            sourceCard: ctx.sourceCard ?? null,
+            resumeEffects: resume,
+            pool: targets,
+            targets: [],
+            selectCount,
+          }) === "fizzled"
+        ) {
+          if (ctx.effectsQueue) ctx.effectsQueue.push(...resume);
+          return;
+        }
+        highlightSelectable(targets);
+        return "pending";
       }
 
       // Board transform - UID-based targeting only

@@ -3,11 +3,14 @@
  *
  * Measured on origin/main (2026-09-08) via resolveTargetProbe + afterEach in
  * tests/fixtures/setup.ts (keys use task.fullTestName when present):
- *   Before gate: 31 no-prompt calls across 25 tests in 17 files
+ *   Before gate (historical, measured on origin/main at gate introduction): 31 no-prompt
+ *     calls across 25 tests in 17 files
  *     (vitest.config.ts + vitest.audit.config.ts — audit config shares setup.ts,
  *      so the afterEach gate runs there too; npm run check runs test:audit before test)
- *   After gate + mechanics (B) fixes: 21 calls covered by 16 (A) rows below;
+ *   After gate + mechanics (B) fixes: 15 calls covered by 10 (A) rows below;
  *     10 (B) sites fixed by removing the dead resolvePendingTarget call
+ *   Board-route transform fix (PR #368): rows 7, 9, 10, 11, 12, 13 deleted — those
+ *     resolvePendingTarget calls now consume a real prompt instead of no-op'ing
  *
  * Classifications:
  *   A — No-op is legitimate or is itself the subject (soak replay, L2 harness idempotency, etc.)
@@ -91,16 +94,6 @@ export const UNCONSUMED_COMMANDS_AUDIT: readonly UnconsumedCommandAuditEntry[] =
       uid: null,
     },
     {
-      id: 7,
-      file: "tests/mechanics/transform-new-card-turn-state.test.ts",
-      testName:
-        "transform new card — fresh turn state (owner ruling 2026-09-06) > (f) undo/redo across (a) keeps legal ATTACK list identical",
-      classification: "A",
-      reason:
-        "UNDO/REDO replays CHOOSE_TARGET after sincerity transform already committed; legal ATTACK list parity is the subject.",
-      uid: null,
-    },
-    {
       id: 8,
       file: "tests/unit/l2-amulet_havencraft.test.ts",
       testName:
@@ -108,56 +101,6 @@ export const UNCONSUMED_COMMANDS_AUDIT: readonly UnconsumedCommandAuditEntry[] =
       classification: "A",
       reason:
         "resolvePendingByUid runs after play+engage path that already committed the ally pick; the LW summon step does not leave a target prompt open.",
-      uid: null,
-    },
-    {
-      id: 9,
-      file: "tests/unit/l2-artifact_portalcraft.test.ts",
-      testName:
-        "L2 Artifact Portalcraft — real-card tests > Sincerity of the Dewdrop (10573310) > transforms selected enemy into Imari's Little Buddies (90074140); bystander untouched",
-      classification: "A",
-      reason:
-        "Second resolvePendingByUid after whenPlayCard is idempotent — sincerity transform already committed on the first pick; no prompt remains.",
-      uid: null,
-    },
-    {
-      id: 10,
-      file: "tests/unit/l2-lhynkal_runecraft.test.ts",
-      testName:
-        "L2 Lhynkal Runecraft — real-card tests > Ara, Dawnblossom (10534120) > Evolve: transforms another follower into Regal Falcon (90061130)",
-      classification: "A",
-      reason:
-        "resolvePendingByUid after whenEvolve is a no-op because evolve op transform does not honour select on the evolve path — no prompt opens and the leftmost valid ally is silently transformed (engine bug; separate PR). This row should go stale once transform prompts correctly.",
-      uid: null,
-    },
-    {
-      id: 11,
-      file: "tests/unit/l2-rotation-havencraft.test.ts",
-      testName:
-        "L2 — Rotation Havencraft > Awed and Inspired (10461210) > Engage(2) destroys amulet, transforms selected ally into Awed and Inspired, draws stacked card",
-      classification: "A",
-      reason:
-        "resolvePendingByUid after engageAmulet is idempotent — engage transform and draw already committed; no target prompt remains open.",
-      uid: null,
-    },
-    {
-      id: 12,
-      file: "tests/unit/l2-spell_runecraft.test.ts",
-      testName:
-        "L2 Spell Runecraft — real-card tests > Ara, Dawnblossom (10534120) > Evolve: transforms another follower into Regal Falcon (90061130)",
-      classification: "A",
-      reason:
-        "Same Ara evolve path as l2-lhynkal: op transform skips target selection on evolve, so resolvePendingByUid is a no-op with no open prompt (engine bug; separate PR). Row expected to fail bidirectional check once transform prompts.",
-      uid: null,
-    },
-    {
-      id: 13,
-      file: "tests/unit/l2-tokens-havencraft.test.ts",
-      testName:
-        "L2 — Havencraft tokens > Regal Falcon (90061130) > real path via Ara Evolve: transforms ally into Regal Falcon by uid with 6/4/4 stats",
-      classification: "A",
-      reason:
-        "Ara evolve token path: op transform does not open a select prompt on evolve (measured with multiple allies on board); resolvePendingByUid is a no-op until the transform/select engine bug is fixed (separate PR).",
       uid: null,
     },
     {
@@ -193,8 +136,8 @@ export const UNCONSUMED_COMMANDS_AUDIT: readonly UnconsumedCommandAuditEntry[] =
   ];
 
 export const UNCONSUMED_COMMANDS_SUMMARY = {
-  measuredTotal: 21,
-  measuredTests: 16,
+  measuredTotal: 15,
+  measuredTests: 10,
   classificationA: UNCONSUMED_COMMANDS_AUDIT.length,
   classificationB: 10,
 } as const;
