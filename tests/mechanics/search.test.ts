@@ -219,6 +219,14 @@ describe("Mechanic Contract: search op", () => {
             attack: 5,
             defense: 5,
           },
+          // Top-of-deck decoy: same type, wrong cost — selected if cost_eq is ignored.
+          {
+            name: "TopDecoy",
+            type: "Follower",
+            cost: 7,
+            attack: 4,
+            defense: 4,
+          },
         ])
         .build();
 
@@ -226,7 +234,7 @@ describe("Mechanic Contract: search op", () => {
         [
           {
             op: "search" as const,
-            filter: { cost: 8 },
+            filter: { cost_eq: 8 },
             count: 1,
           },
         ],
@@ -236,6 +244,7 @@ describe("Mechanic Contract: search op", () => {
       const found = thenHand("first").find((c) => c.name === "Expensive");
       expect(found).toBeDefined();
       expect(found!.cost).toBe(8);
+      expect(thenHand("first").some((c) => c.name === "TopDecoy")).toBe(false);
     });
 
     it("searches by cost_gte (greater than or equal)", () => {
@@ -586,6 +595,8 @@ describe("Mechanic Contract: search op", () => {
       givenGameState({ seed: 1 })
         .withFirstDeck([
           { name: "DeckFollower", type: "Follower", attack: 2, defense: 2 },
+          // Top-of-deck decoy: same type, wrong attack — selected if attack_eq is ignored.
+          { name: "TopDecoy", type: "Follower", attack: 3, defense: 2 },
         ])
         .withFirstHand([
           { name: "H1", type: "Follower", attack: 1, defense: 1 },
@@ -604,7 +615,7 @@ describe("Mechanic Contract: search op", () => {
         [
           {
             op: "search" as const,
-            filter: { type: "Follower", attack: 2 },
+            filter: { type: "Follower", attack_eq: 2 },
             count: 1,
             keywords: ["Rush"],
           },
@@ -617,6 +628,7 @@ describe("Mechanic Contract: search op", () => {
       const found = grave.find((c) => c.name === "DeckFollower");
       expect(found).toBeDefined();
       expect(found!.hasRush).toBe(true);
+      expect(grave.some((c) => c.name === "TopDecoy")).toBe(false);
     });
 
     it("search spell played from full hand: spell leaves first, then search adds card", () => {

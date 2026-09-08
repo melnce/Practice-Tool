@@ -1329,7 +1329,7 @@ export function raiseLeaveEffects(
     case "destroy":
       return [{ op: "destroy", target, filter }];
     case "bounce":
-      return [{ op: "return", destination: "hand", target, filter }];
+      return [{ op: "return", destination: "hand", target, condition: filter }];
     case "banish":
       return [{ op: "banish", target, filter }];
     case "banish_on_death":
@@ -1344,7 +1344,8 @@ export function raiseLeaveEffects(
         },
       ];
     case "return":
-      return [{ op: "return", destination: "deck", target, filter }];
+      // Deck route ignores target/filter/condition (handleReturnHandToDeck); skipped by v2EnemyLeaveSkipReason.
+      return [{ op: "return", destination: "deck", target }];
     default:
       return [];
   }
