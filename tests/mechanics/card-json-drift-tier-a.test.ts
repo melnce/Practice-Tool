@@ -1,7 +1,7 @@
 /**
  * Tier A — card-JSON authoring drift (behaviour + keyword names).
  */
-import { describe, it, expect, beforeEach, beforeAll } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import "../audit/setup.ts";
 import {
   givenGameState,
@@ -24,6 +24,7 @@ import "../../src/logic/core/effects/index.js";
 const MARAUDER = "10942110";
 const MOELLE = "10811130";
 const RUBY = "10101110";
+const WASTELAND = "10372210";
 const LAPIS = "10163130";
 const INSTITUTE_OF_TRUTH = "10332210";
 const ILLAMRITA = "10704110";
@@ -114,7 +115,7 @@ describe("A1 — until_eot on target:self stat op", () => {
   }, 60_000);
 });
 
-describe("A2 — empty hand does not block return-to-deck draw", () => {
+describe("A2 — independent vs dependent fanfare clauses", () => {
   beforeEach(() => {
     resetUidCounter();
     clearLogs();
@@ -125,7 +126,7 @@ describe("A2 — empty hand does not block return-to-deck draw", () => {
     return getLogs().some((entry) => entry.type === "selectFizzled");
   }
 
-  it("Moelle, Gloomy Maiden — empty hand still draws exactly one card", () => {
+  it("Moelle — independent draw sentence still resolves when return fizzles on empty hand", () => {
     setupTurn(R6, {
       hand: [MOELLE],
       pp: 1,
@@ -155,6 +156,23 @@ describe("A2 — empty hand does not block return-to-deck draw", () => {
       true,
     );
     expect(hasSelectFizzled()).toBe(true);
+  }, 60_000);
+
+  it("Wasteland of Destruction — dependent then clause skipped when no ally to select", () => {
+    setupTurn(R6, {
+      hand: [WASTELAND],
+      pp: 2,
+      deck: [
+        { name: "WouldDraw1", type: "Follower", attack: 1, defense: 1 },
+        { name: "WouldDraw2", type: "Follower", attack: 1, defense: 1 },
+      ],
+    });
+    const deckBefore = state.players.first.deck.length;
+    const outcome = whenPlayCard("first", 0);
+    expect(outcome.kind).toBe("done");
+    expect(findOnBoard("first", "Wasteland of Destruction")).toBeDefined();
+    expect(state.players.first.deck.length).toBe(deckBefore);
+    expect(getHand(state, "first").length).toBe(0);
   }, 60_000);
 });
 
