@@ -381,6 +381,17 @@ function checkOpKeyShape(card: CardJson): Warning[] {
       });
     }
 
+    if (op === "restore" && obj.target === "ally:leader") {
+      out.push({
+        family: "op-key-shape",
+        id: card.id,
+        name: card.name,
+        found: compact({ path, op, target: "ally:leader" }),
+        canonical: compact({ path, op, target: "leader", player: "self" }),
+        note: 'op:"restore" must use target:"leader" with player:"self", not ally:leader',
+      });
+    }
+
     if (op === "damage" && obj.distribution === "all") {
       out.push({
         family: "op-key-shape",

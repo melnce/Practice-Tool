@@ -2327,7 +2327,8 @@
       },
       {
         "op": "restore",
-        "target": "ally:leader",
+        "target": "leader",
+        "player": "self",
         "amount_source": "hand_size"
       }
     ],
@@ -7513,7 +7514,8 @@
                 "else_effects": [
                   {
                     "op": "restore",
-                    "target": "ally:leader",
+                    "target": "leader",
+                    "player": "self",
                     "amount": 1
                   }
                 ]
@@ -12739,7 +12741,8 @@
           },
           {
             "op": "restore",
-            "target": "ally:leader",
+            "target": "leader",
+            "player": "self",
             "amount_source": "context.restore_amount"
           }
         ],
@@ -17037,7 +17040,8 @@
               },
               {
                 "op": "restore",
-                "target": "ally:leader",
+                "target": "leader",
+                "player": "self",
                 "amount": 1
               }
             ],

@@ -2302,7 +2302,8 @@
               },
               {
                 "op": "restore",
-                "target": "ally:leader",
+                "target": "leader",
+                "player": "self",
                 "amount": 1
               }
             ],

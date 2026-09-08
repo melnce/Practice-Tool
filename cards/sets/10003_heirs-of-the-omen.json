@@ -1842,7 +1842,8 @@
           },
           {
             "op": "restore",
-            "target": "ally:leader",
+            "target": "leader",
+            "player": "self",
             "amount_source": "context.restore_amount"
           }
         ],
