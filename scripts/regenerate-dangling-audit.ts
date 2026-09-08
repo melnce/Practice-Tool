@@ -1,118 +1,145 @@
+/**
+ * Reconcile danglingPendingAudit.ts with a fresh measurement.
+ *
+ * Usage (after measure-dangling-pending.ts for both configs):
+ *   npx tsx scripts/measure-dangling-pending.ts vitest.config.ts > /tmp/main-dangling.json
+ *   npx tsx scripts/measure-dangling-pending.ts vitest.audit.config.ts > /tmp/audit-dangling.json
+ *   npx tsx scripts/regenerate-dangling-audit.ts /tmp/main-dangling.json /tmp/audit-dangling.json
+ *
+ * What this script CAN do:
+ *   - Update row order/ids to match a new measurement
+ *   - Upgrade testName keys when suite paths change but the leaf title still matches
+ *     exactly one existing row in the same file
+ *
+ * What it CANNOT do (by design — exits non-zero):
+ *   - Classify a newly dangling test: unmatched measured keys are printed and the run aborts
+ *   - Auto-allowlist via ambiguous leaf match: leaf fallback requires exactly one existing
+ *     row in the same file; zero or multiple leaf matches abort instead of guessing
+ *   - Reuse one audit row for two measured tests: each existing row is claimed at most once
+ *   - Preserve (B) rows in output: measured keys classified (B) abort the run
+ *
+ * Leaf fallback exists only for suite-path renames: when fullTestName changes but the leaf
+ * title still maps to exactly one row in that file, the measured key is upgraded.
+ *
+ * New dangling tests must be classified by hand in danglingPendingAudit.ts before this script
+ * will succeed. Until then, strictChooseGate fails closed via chooseStrictModeFailed.
+ */
 import { readFileSync, writeFileSync } from "node:fs";
+import { DANGLING_PENDING_AUDIT } from "../tests/harness/danglingPendingAudit.ts";
+import type { DanglingPendingAuditEntry } from "../tests/harness/danglingPendingAudit.ts";
+import {
+  auditEntryKey,
+  findExistingAuditRow,
+  leaf,
+} from "./lib/regenerateDanglingAuditMatch.ts";
 
-const oldAudit = readFileSync("/tmp/pr344-audit.ts", "utf8");
-const main = JSON.parse(
-  readFileSync("/tmp/main-dangling-full.json", "utf8"),
-) as Array<{ file: string; testName: string }>;
-const auditMeasure = JSON.parse(
-  readFileSync("/tmp/audit-dangling-full.json", "utf8"),
-) as Array<{ file: string; testName: string }>;
-
-const entryRe =
-  /file: "([^"]+)",\s*testName:\s*\n?\s*"([^"]*(?:\\.[^"]*)*)",\s*classification: "([AB])",\s*reason:\s*\n?\s*"([^"]*(?:\\.[^"]*)*)"/g;
-const reasons = new Map<string, string>();
-let m: RegExpExecArray | null;
-while ((m = entryRe.exec(oldAudit))) {
-  const file = m[1];
-  const testName = m[2].replace(/\\"/g, '"');
-  const reason = m[3].replace(/\\"/g, '"');
-  reasons.set(`${file}::${testName}`, reason);
-  const leaf = testName.includes(" > ")
-    ? testName.split(" > ").pop()!
-    : testName;
-  reasons.set(`${file}::leaf::${leaf}`, reason);
-}
-
-const auditReasonsByLeaf: Record<string, string> = {
-  "10062110 Ironfist Priest — Evolve pool excludes enemies above 3 defense":
-    "Asserts evolve selection pool excludes out-of-filter enemies; pending pool is the subject.",
-  "10672120 Timid Pioneer — Fanfare pool excludes enemies above 3 defense":
-    "Asserts fanfare pool excludes enemies above 3 defense; resolution intentionally omitted.",
-  "10862310 Lingering Threat — pool excludes enemies above 3 defense":
-    "Asserts spell pool excludes high-defense enemies; pending pool is the subject.",
-  "10172320 Doomwright Resurgence — pool is Artifact followers ≤5 only":
-    "Asserts hand selection pool is Artifact followers costing ≤5; pending pool is the subject.",
-  "10271210 Artifact Catapult — Engage pool is Artifact followers ≤5 only":
-    "Asserts Engage hand pool is Artifact followers ≤5; pending pool is the subject.",
-  "10572110 New-Age Cartographer — Super-Evolve pool is Artifact followers ≤5 only":
-    "Asserts Super-Evolve hand pool is Artifact followers ≤5; pending pool is the subject.",
-  "10371120 Supersonic Fighter — Evolve pool is allied Artifact followers only":
-    "Asserts evolve pool is allied Artifact followers only; pending pool is the subject.",
-  "10332210 Institute of Truth — Engage pool is hand followers only":
-    "Asserts Engage hand pool is followers only; pending pool is the subject.",
-  "10741120 Carrier Wyvern — Evolve pool is hand followers only":
-    "Asserts evolve hand pool is followers only; pending pool is the subject.",
-  "10161110 Angelic Prism Priestess — Evolve pool is hand amulets only":
-    "Asserts evolve hand pool is amulets only; pending pool is the subject.",
-  "10131310 Radiant Rainbow — pool is On Spellboost cards only":
-    "Asserts hand pool is On Spellboost cards only; pending pool is the subject.",
-  "10521310 Extravagance — pool is hand spells only":
-    "Asserts hand pool is spells only; pending pool is the subject.",
-  "10262310 Divine Guard — pool is allied followers with Ward only":
-    "Asserts pool is allied Ward followers only; pending pool is the subject.",
-  "10104110 Olivia — Super-Evolve pool is unevolved allies only (excludes evolved)":
-    "Asserts Super-Evolve pool excludes evolved allies; pending pool is the subject.",
-  "10472110 Eustace — Skybound Art pool is unevolved allies only":
-    "Asserts Skybound Art pool is unevolved allies only; pending pool is the subject.",
-  "10874120 Eudie — Evolve pool is unevolved allies only (excludes self)":
-    "Asserts evolve pool is unevolved allies excluding self; pending pool is the subject.",
-  "10032110 Remi & Rami — Super-Evolve pool is allied Golem followers only":
-    "Asserts Super-Evolve pool is allied Golem followers only; pending pool is the subject.",
-  "playing opens pending pool with exactly the two enemy followers":
-    "Asserts pending pool membership for Alchemic Flare; pool composition is the subject.",
-  "pre-fix select_mode leaves pending user selection (fails on main card JSON)":
-    "Regression guard: legacy select_mode must leave pending user selection (pre-fix JSON shape).",
-};
-
-function reasonFor(file: string, testName: string): string {
-  const key = `${file}::${testName}`;
-  if (reasons.has(key)) return reasons.get(key)!;
-  const leaf = testName.split(" > ").pop() ?? testName;
-  if (reasons.has(`${file}::leaf::${leaf}`)) {
-    return reasons.get(`${file}::leaf::${leaf}`)!;
-  }
-  if (auditReasonsByLeaf[leaf]) return auditReasonsByLeaf[leaf];
-  throw new Error(`missing reason for ${file} :: ${testName}`);
-}
+const mainPath = process.argv[2] ?? "/tmp/main-dangling-full.json";
+const auditMeasurePath = process.argv[3] ?? "/tmp/audit-dangling-full.json";
 
 function esc(s: string): string {
   return s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
-const allKeys = [...main, ...auditMeasure];
-
-const entries = allKeys.map(({ file, testName }, i) => {
-  const reason = reasonFor(file, testName);
+function formatEntry(entry: DanglingPendingAuditEntry, id: number): string {
+  const q = (s: string) =>
+    s.includes("\n") ? `\n      "${esc(s)}"` : `"${esc(s)}"`;
   return `  {
-    id: ${i + 1},
-    file: "${file}",
-    testName: "${esc(testName)}",
-    classification: "A",
-    reason: "${esc(reason)}",
-    unresolvedClause: null,
-    assertionsWouldStillPass: null,
-    finding: null,
+    id: ${id},
+    file: "${entry.file}",
+    testName: ${q(entry.testName)},
+    classification: "${entry.classification}",
+    reason: ${q(entry.reason)},
+    unresolvedClause: ${entry.unresolvedClause === null ? "null" : `"${esc(entry.unresolvedClause)}"`},
+    assertionsWouldStillPass: ${entry.assertionsWouldStillPass === null ? "null" : String(entry.assertionsWouldStillPass)},
+    finding: ${entry.finding === null ? "null" : `"${esc(entry.finding)}"`},
   }`;
-});
+}
+
+const main = JSON.parse(readFileSync(mainPath, "utf8")) as Array<{
+  file: string;
+  testName: string;
+}>;
+const auditMeasure = JSON.parse(
+  readFileSync(auditMeasurePath, "utf8"),
+) as Array<{
+  file: string;
+  testName: string;
+}>;
+const measured = [...main, ...auditMeasure];
+
+const unmatched: string[] = [];
+const classifiedB: string[] = [];
+const output: DanglingPendingAuditEntry[] = [];
+const consumed = new Set<string>();
+
+for (const { file, testName } of measured) {
+  const row = findExistingAuditRow(
+    file,
+    testName,
+    DANGLING_PENDING_AUDIT,
+    consumed,
+  );
+  const key = `${file} :: ${testName}`;
+  if (!row) {
+    unmatched.push(key);
+    continue;
+  }
+  if (row.classification === "B") {
+    classifiedB.push(key);
+    continue;
+  }
+  consumed.add(auditEntryKey(row));
+  output.push({ ...row, testName });
+}
+
+if (unmatched.length > 0 || classifiedB.length > 0) {
+  if (unmatched.length > 0) {
+    console.error(
+      "Refusing to regenerate: measured dangling tests with no classified audit row:",
+    );
+    for (const key of unmatched) console.error(`  - ${key}`);
+    console.error(
+      "Add (A) or (B) rows to tests/harness/danglingPendingAudit.ts by hand, then re-run.",
+    );
+  }
+  if (classifiedB.length > 0) {
+    console.error(
+      "Refusing to regenerate: measured tests still classified (B) in the audit file:",
+    );
+    for (const key of classifiedB) console.error(`  - ${key}`);
+    console.error(
+      "Fix the test (resolve the prompt) or reclassify before re-run.",
+    );
+  }
+  process.exit(1);
+}
+
+const measuredKeys = new Set(measured.map((m) => `${m.file}::${m.testName}`));
+const stale = DANGLING_PENDING_AUDIT.filter(
+  (e) =>
+    e.classification === "A" &&
+    !measuredKeys.has(`${e.file}::${e.testName}`) &&
+    !measured.some(
+      (m) => m.file === e.file && leaf(m.testName) === leaf(e.testName),
+    ),
+);
 
 const out = `/**
  * Audit of tests that end with \`state.pendingTargetEffect\` still set.
  *
- * Measured on origin/main (2026-09-08) via afterEach probe in
- * tests/fixtures/setup.ts + vitest run (keys use task.fullTestName when present):
- *   vitest.config.ts: ${main.length} allowlisted test ends
+ * Measured via scripts/measure-dangling-pending.ts (keys use task.fullTestName):
+ *   vitest.config.ts: ${main.length} test ends
  *   vitest.audit.config.ts: ${auditMeasure.length} additional test ends
- *   Combined allowlist keys: ${allKeys.length}
- *
- * Both configs share setupFiles: ["./tests/fixtures/setup.ts"], so the strict-choose
- * afterEach gate covers both suites.
+ *   Combined allowlist keys (classification A only): ${output.length}
  *
  * Classifications:
- *   A — Prompt-is-the-subject: pending state, pool, snapshot/undo, or lifecycle.
- *   B — Silently unresolved (three fixed in I2; no longer in this table).
+ *   A — Prompt-is-the-subject. Allowlisted by strictChooseGate.
+ *   B — Silently unresolved. Never allowlisted — fix the test, then remove the row.
  *
- * Allowlist keys use file + fullTestName (suite path + it title). Renaming an
- * allowlisted test makes the gate fail rather than silently skipping coverage.
+ * Maintenance: scripts/regenerate-dangling-audit.ts reconciles with a new measurement
+ * but refuses to invent classifications. New danglers must be added by hand.
+ *
+ * Keys: file + fullTestName. Renaming an allowlisted test fails the gate (safe).
  */
 
 export type DanglingPendingClassification = "A" | "B";
@@ -129,7 +156,7 @@ export interface DanglingPendingAuditEntry {
 }
 
 export const DANGLING_PENDING_AUDIT: readonly DanglingPendingAuditEntry[] = [
-${entries.join(",\n")},
+${output.map((e, i) => formatEntry(e, i + 1)).join(",\n")},
 ];
 
 export const DANGLING_PENDING_SUMMARY = {
@@ -148,4 +175,14 @@ export const SILENTLY_UNRESOLVED = DANGLING_PENDING_AUDIT.filter(
 `;
 
 writeFileSync("tests/harness/danglingPendingAudit.ts", out);
-console.log(`wrote ${allKeys.length} entries`);
+console.log(
+  `wrote ${output.length} (A) entries to tests/harness/danglingPendingAudit.ts`,
+);
+if (stale.length > 0) {
+  console.warn(
+    `Note: ${stale.length} existing (A) row(s) not in this measurement (stale until removed):`,
+  );
+  for (const row of stale) {
+    console.warn(`  - ${row.file} :: ${row.testName}`);
+  }
+}
