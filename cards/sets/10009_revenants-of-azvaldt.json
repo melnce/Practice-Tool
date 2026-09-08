@@ -3414,7 +3414,7 @@
       {
         "op": "banish",
         "target": "ally:deck",
-        "filters": {
+        "filter": {
           "name": "Cutthroat, Fluxblade Convict"
         }
       },

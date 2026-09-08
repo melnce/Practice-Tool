@@ -1,6 +1,7 @@
 export * from "./types.js";
 export * from "./parser.js";
 export * from "./context.js";
+export * from "./poolCondition.js";
 export * from "./filters.js";
 export * from "./selectHelpers.js";
 

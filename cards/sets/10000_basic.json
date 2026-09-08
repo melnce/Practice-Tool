@@ -1590,7 +1590,7 @@
         "op": "banish",
         "select": 1,
         "target": "enemy:follower",
-        "filters": {
+        "filter": {
           "defense_lte": 3
         }
       }
@@ -1600,7 +1600,7 @@
         "op": "banish",
         "select": false,
         "target": "enemy:follower",
-        "filters": {
+        "filter": {
           "defense_lte": 3
         }
       }

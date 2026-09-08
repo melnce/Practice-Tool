@@ -4,6 +4,7 @@
  */
 import { state } from "../../../../core/gameState.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
+import { mergeEffectPoolCondition } from "../../../core/targeting/poolCondition.js";
 import { cleanupDead } from "../../../core/cleanup.js";
 import { logEvent } from "../../../../core/logger.js";
 import type {
@@ -219,13 +220,7 @@ function handleDoubleStats(
  * String filters like `"leftmost"` stay in filterBuffCandidates.
  */
 function conditionWithObjectFilter(eff: StatOp): any {
-  const base =
-    eff.condition && typeof eff.condition === "object" ? eff.condition : {};
-  const filter = (eff as any).filter;
-  let merged =
-    filter && typeof filter === "object" && !Array.isArray(filter)
-      ? { ...base, ...filter }
-      : base;
+  let merged = mergeEffectPoolCondition(eff);
   if ((eff as any).include_self === true) {
     merged = { ...merged, include_self: true };
   }

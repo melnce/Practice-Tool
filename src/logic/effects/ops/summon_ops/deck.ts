@@ -10,6 +10,7 @@ import { getCardDetails } from "../../../../data/cardDatabase.js";
 import { makeCardFromDB, pushToBoard } from "./core.js";
 import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 import { boardOf, deckOf } from "./utils.js";
+import { readPoolNarrowFilter } from "../../../core/targeting/poolCondition.js";
 
 export function summonRandomFromDeck(eff: Effect, owner: Player) {
   // Desired number
@@ -24,7 +25,7 @@ export function summonRandomFromDeck(eff: Effect, owner: Player) {
   if (space <= 0) return;
 
   // -------- Filters --------
-  const f = (eff as any)?.filters || (eff as any)?.filter || {};
+  const f = readPoolNarrowFilter(eff as Record<string, unknown>) ?? {};
   const wantType = String(f.type ?? "").toLowerCase(); // "amulet" | "follower" | "spell"
   const cls = String(f.class ?? f.class_eq ?? "").toLowerCase();
   const costLte = Number.isFinite(Number(f.cost_lte))
