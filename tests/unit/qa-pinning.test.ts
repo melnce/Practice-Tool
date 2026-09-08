@@ -267,8 +267,8 @@ describe("two-keyword tier caveat", () => {
     );
     expect(report.pinnedAnswerOnlyFileScopedCount).toBe(66);
     expect(report.pinnedAnswerOnlyBlockScopedMin2Count).toBe(16);
-    expect(report.pinnedCount).toBe(126);
-    expect(report.pinnedFileScopedCount).toBe(148);
+    expect(report.pinnedCount).toBe(127);
+    expect(report.pinnedFileScopedCount).toBe(149);
     expect(QA_PIN_UNPINNED_FILE_SCOPED_SAME_EXTRACTION_STATUS).toBe(
       "unpinned (file-scoped, same extraction)",
     );

@@ -616,33 +616,46 @@ describe("official Q&A — Neutral batch 7", () => {
   });
 
   describe("10301310 Greatness Ascended", () => {
-    it("10301310 Greatness Ascended — duplicate check is at play time not after draw (official Q&A)", () => {
-      setupTurn(R6, {
-        hand: [GREATNESS],
-        pp: 4,
-        deck: [
-          { name: "Dup", type: "Follower", attack: 1, defense: 1 },
-          { name: "Dup", type: "Follower", attack: 1, defense: 1 },
-          { name: "OnlyA", type: "Follower", attack: 1, defense: 1 },
-          { name: "OnlyB", type: "Spell", cost: 1 },
-          { name: "OnlyC", type: "Follower", attack: 1, defense: 1 },
-        ],
-      });
-      whenPlayCard("first", 0);
-      expect(getPP(state, "first")).toBe(0);
+    function greatnessFiller(name: string) {
+      return {
+        name,
+        type: "Follower" as const,
+        attack: 1,
+        defense: 1,
+        cost: 1,
+      };
+    }
 
-      resetUidCounter();
-      setupTurn(R6, {
+    function setupGreatness(deckNames: string[]) {
+      setupTurn(R10, {
         hand: [GREATNESS],
-        pp: 4,
-        deck: [
-          { name: "OnlyA", type: "Follower", attack: 1, defense: 1 },
-          { name: "OnlyB", type: "Spell", cost: 1 },
-          { name: "OnlyC", type: "Follower", attack: 1, defense: 1 },
-        ],
+        pp: 10,
+        deck: deckNames.map(greatnessFiller),
       });
+    }
+
+    it("10301310 Greatness Ascended — duplicates before play, none after draw: no PP recover (official Q&A)", () => {
+      setupGreatness(["C", "D", "A", "A", "B"]);
       whenPlayCard("first", 0);
-      expect(getPP(state, "first")).toBe(3);
+      expect(getPP(state, "first")).toBe(6);
+      expect(thenDeck("first").map((c) => c.name)).toEqual(["C", "D"]);
+      expect(thenHand("first").map((c) => c.name)).toEqual(["B", "A", "A"]);
+    }, 60_000);
+
+    it("10301310 Greatness Ascended — no duplicates in deck: recovers 3 PP (official Q&A control)", () => {
+      setupGreatness(["A", "B", "C", "D", "E"]);
+      whenPlayCard("first", 0);
+      expect(getPP(state, "first")).toBe(9);
+      expect(thenDeck("first").map((c) => c.name)).toEqual(["A", "B"]);
+      expect(thenHand("first").map((c) => c.name)).toEqual(["E", "D", "C"]);
+    }, 60_000);
+
+    it("10301310 Greatness Ascended — duplicates before and after draw: no PP recover (official Q&A control)", () => {
+      setupGreatness(["A", "A", "C", "D", "E"]);
+      whenPlayCard("first", 0);
+      expect(getPP(state, "first")).toBe(6);
+      expect(thenDeck("first").map((c) => c.name)).toEqual(["A", "A"]);
+      expect(thenHand("first").map((c) => c.name)).toEqual(["E", "D", "C"]);
     }, 60_000);
   });
 
