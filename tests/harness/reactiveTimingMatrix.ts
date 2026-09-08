@@ -1344,7 +1344,8 @@ export function raiseLeaveEffects(
         },
       ];
     case "return":
-      return [{ op: "return", destination: "deck", target, condition: filter }];
+      // Deck route ignores target/filter/condition (handleReturnHandToDeck); skipped by v2EnemyLeaveSkipReason.
+      return [{ op: "return", destination: "deck", target }];
     default:
       return [];
   }

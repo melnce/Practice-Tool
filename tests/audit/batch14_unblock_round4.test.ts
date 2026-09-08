@@ -225,7 +225,6 @@ describe("Unblock round 4 — general engine capabilities", () => {
           op: "return",
           destination: "deck",
           select: "all",
-          target: "ally:hand",
         } as any,
         { op: "draw", source: "deck", count: "{last_returned}" } as any,
       ],

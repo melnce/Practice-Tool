@@ -59,6 +59,41 @@ export const fx = {
     ).toBe(true);
   });
 
+  it("flags condition on return op with destination deck", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "dangerous-keys-"));
+    const file = path.join(dir, "deck-condition.test.ts");
+    fs.writeFileSync(
+      file,
+      `
+export const fx = {
+  op: "return",
+  destination: "deck",
+  target: "ally:follower",
+  condition: { name: "Skeleton" },
+};
+`,
+    );
+    const violations = scanEffectLiteralFiles([file], dir);
+    expect(violations.some((v) => v.key === "condition")).toBe(true);
+  });
+
+  it("allows bare target on deck return required by return/unified.ts validation", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "dangerous-keys-"));
+    const file = path.join(dir, "deck-target-only.test.ts");
+    fs.writeFileSync(
+      file,
+      `
+export const fx = {
+  op: "return",
+  destination: "deck",
+  target: "ally:hand",
+};
+`,
+    );
+    const violations = scanEffectLiteralFiles([file], dir);
+    expect(violations).toHaveLength(0);
+  });
+
   it("flags filter conservatively when return destination is absent", () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "dangerous-keys-"));
     const file = path.join(dir, "unknown.test.ts");

@@ -684,7 +684,7 @@ describe("Reactive trigger timing matrix v2", () => {
               op: "return",
               destination: "deck",
               target: "ally:follower",
-              condition: { name: "ReturnVictim" },
+              // Deck route picks hand[0] (handleReturnHandToDeck); after PLAY_CARD hand is [ReturnVictim, …].
             },
           ],
         },

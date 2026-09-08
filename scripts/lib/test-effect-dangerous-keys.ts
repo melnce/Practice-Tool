@@ -162,8 +162,14 @@ function checkReturnOpKeys(
   }
 
   if (destination === "deck") {
-    for (const key of ["filter", "condition", "target"] as const) {
-      if (!hasProperty(obj, key)) continue;
+    const hasFilter = hasProperty(obj, "filter");
+    const hasCondition = hasProperty(obj, "condition");
+
+    for (const [key, present] of [
+      ["filter", hasFilter],
+      ["condition", hasCondition],
+    ] as const) {
+      if (!present) continue;
       const prop = obj.getProperty(key);
       violations.push({
         file: relFile,
@@ -176,6 +182,23 @@ function checkReturnOpKeys(
         message: `"${key}" on op "return" with destination:"deck" is silently ignored — ${HANDLER_REF.returnDeckInertKey}`,
       });
     }
+
+    // target is required by return/unified.ts validation but ignored by
+    // handleReturnHandToDeck — flag only alongside filter/condition (name-selection fiction).
+    if (hasProperty(obj, "target") && (hasFilter || hasCondition)) {
+      const prop = obj.getProperty("target");
+      violations.push({
+        file: relFile,
+        line:
+          prop && Node.isPropertyAssignment(prop)
+            ? prop.getStartLineNumber()
+            : obj.getStartLineNumber(),
+        op: "return",
+        key: "target",
+        message: `"target" on op "return" with destination:"deck" is silently ignored — ${HANDLER_REF.returnDeckInertKey}`,
+      });
+    }
+
     return violations;
   }
 
