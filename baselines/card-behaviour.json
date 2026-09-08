@@ -4743,7 +4743,7 @@
       "status": "covered"
     },
     "10361110": {
-      "fingerprint": "3f55c191",
+      "fingerprint": "31b818e7",
       "gatesSatisfied": ["no_ally_attacked"],
       "name": "Devotee of Repose",
       "scenarios": [
@@ -4752,7 +4752,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "8ebb2c4c",
+          "fingerprint": "83cdf506",
           "scenario": "turn_boundary"
         }
       ],
@@ -5779,23 +5779,23 @@
       "status": "covered"
     },
     "10453310": {
-      "fingerprint": "6065cea7",
+      "fingerprint": "d7e028cc",
       "gatesSatisfied": ["skybound_art"],
       "name": "Corruption",
       "scenarios": [
         {
-          "fingerprint": "3bb76f53",
+          "fingerprint": "236f38a4",
           "scenario": "play"
         },
         {
-          "fingerprint": "a4a9e2c4",
+          "fingerprint": "09ef4524",
           "scenario": "turn_boundary"
         }
       ],
       "status": "covered"
     },
     "10454110": {
-      "fingerprint": "45882a1d",
+      "fingerprint": "36bd0c38",
       "gatesSatisfied": ["necromancy"],
       "name": "Fediel, Darkness Personified",
       "scenarios": [
@@ -5804,7 +5804,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "4b2cf830",
+          "fingerprint": "3455a2ec",
           "scenario": "turn_boundary"
         }
       ],
@@ -7195,12 +7195,12 @@
       "status": "covered"
     },
     "10574110": {
-      "fingerprint": "de22c3c1",
+      "fingerprint": "b0262cbc",
       "gatesSatisfied": ["evolved_self"],
       "name": "Slaus, Revolving Wheel of Fortune",
       "scenarios": [
         {
-          "fingerprint": "c5a45588",
+          "fingerprint": "c5d38d5c",
           "scenario": "turn_boundary"
         }
       ],
@@ -9843,16 +9843,16 @@
       "status": "covered"
     },
     "10822310": {
-      "fingerprint": "af364dbd",
+      "fingerprint": "d4886913",
       "gatesSatisfied": [],
       "name": "Shared Existence",
       "scenarios": [
         {
-          "fingerprint": "c3d1a3c0",
+          "fingerprint": "96c0ec46",
           "scenario": "play"
         },
         {
-          "fingerprint": "88b141f4",
+          "fingerprint": "d935aa8c",
           "scenario": "play_base"
         }
       ],
