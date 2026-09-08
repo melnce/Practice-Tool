@@ -310,44 +310,48 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     expect(Number(foe2.defense)).toBe(3);
   }, 60_000);
 
-  it("10524110 Oluon, Raging Chariot — evolved EOT: 5 targets and 21 total damage under seed 11 (official Q&A)", () => {
-    setupTurn(R9, { hand: [OLUON], pp: 9, evo: 2, seed: 11 });
-    whenPlayCard("first", 0);
-    const oluon = findOnBoard("first", "Oluon, Raging Chariot")!;
-    evolveFollower(oluon, "first", "normal");
-    for (let i = 0; i < 3; i++) {
-      const f = createCard(FAIRY, "board", "second");
-      f.peak_defense = f.defense;
-      state.players.second.board.push(f);
-    }
-    expect(getBoard(state, "second").length + 2).toBe(5);
-    state.players.second.hp = 20;
-    state.players.first.hp = 20;
-    const poolBefore = secondSideHpPool();
-    whenEndTurn();
-    expect(poolBefore - secondSideHpPool()).toBe(15);
-    expect(getHP(state, "second")).toBe(6);
+  describe("10524110 Oluon — fairy likelihood probability chance activation", () => {
+    it("10524110 Oluon — evolved EOT: 5 fairy targets, likelihood affects activation probability under seed 11 (official Q&A)", () => {
+      setupTurn(R9, { hand: [OLUON], pp: 9, evo: 2, seed: 11 });
+      whenPlayCard("first", 0);
+      const oluon = findOnBoard("first", "Oluon, Raging Chariot")!;
+      evolveFollower(oluon, "first", "normal");
+      for (let i = 0; i < 3; i++) {
+        const f = createCard(FAIRY, "board", "second");
+        f.peak_defense = f.defense;
+        state.players.second.board.push(f);
+      }
+      expect(getBoard(state, "second").length + 2).toBe(5);
+      state.players.second.hp = 20;
+      state.players.first.hp = 20;
+      const poolBefore = secondSideHpPool();
+      whenEndTurn();
+      expect(poolBefore - secondSideHpPool()).toBe(15);
+      expect(getHP(state, "second")).toBe(6);
 
-    resetUidCounter();
-    setupTurn(R9, { hand: [OLUON], pp: 9, evo: 2, seed: 3 });
-    whenPlayCard("first", 0);
-    const oluonSolo = findOnBoard("first", "Oluon, Raging Chariot")!;
-    evolveFollower(oluonSolo, "first", "normal");
-    state.players.second.board = [];
-    state.players.second.hp = 20;
-    whenEndTurn();
-    expect(getHP(state, "second")).toBe(0);
-  }, 60_000);
+      resetUidCounter();
+      setupTurn(R9, { hand: [OLUON], pp: 9, evo: 2, seed: 3 });
+      whenPlayCard("first", 0);
+      const oluonSolo = findOnBoard("first", "Oluon, Raging Chariot")!;
+      evolveFollower(oluonSolo, "first", "normal");
+      state.players.second.board = [];
+      state.players.second.hp = 20;
+      whenEndTurn();
+      expect(getHP(state, "second")).toBe(0);
+    }, 60_000);
+  });
 
-  it("10811110 Marlone, Scales of the Past — X is 4 with 5 enemy and 0 allied followers before play (official Q&A)", () => {
-    setupTurn(R8, { hand: [MARLONE], pp: 7, seed: 1 });
-    for (let i = 0; i < 5; i++) {
-      enemyFollower(1, 3, `Fairy${i}`);
-    }
-    whenPlayCard("first", 0);
-    expect(thenBoard("second").length).toBe(1);
-    expect(findOnBoard("first", "Marlone, Scales of the Past")).toBeTruthy();
-  }, 60_000);
+  describe("10811110 Marlone — fairy value X", () => {
+    it("10811110 Marlone — value X is 4 with 5 enemy Fairy and 0 allied followers before play (official Q&A)", () => {
+      setupTurn(R8, { hand: [MARLONE], pp: 7, seed: 1 });
+      for (let i = 0; i < 5; i++) {
+        enemyFollower(1, 3, `Fairy${i}`);
+      }
+      whenPlayCard("first", 0);
+      expect(thenBoard("second").length).toBe(1);
+      expect(findOnBoard("first", "Marlone, Scales of the Past")).toBeTruthy();
+    }, 60_000);
+  });
 
   describe("10911210 Trap in the Woods — multiple Advent Eld Sword summon", () => {
     it("10911210 Trap — only first destroyed when many followers enter at once (official Q&A)", () => {
@@ -690,28 +694,30 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     }, 60_000);
   });
 
-  it("10224120 Yurius, Levin Authority — banished Yurius does not trigger on enemy enter (official Q&A)", () => {
-    setupTurn(R8, {
-      hand: [ODIN],
-      pp: 7,
-      secondBoard: [YURIUS],
-      secondPP: 8,
-    });
-    const yurius = findOnBoard("second", "Yurius, Levin Authority")!;
-    whenPlayCard("first", 0);
-    resolvePendingByUid(yurius.uid);
-    expect(getBanish(state, "second").some((c) => c.uid === yurius.uid)).toBe(
-      true,
-    );
-    state.players.second.hp = 20;
-    state.players.first.hp = 15;
-    whenEndTurn();
-    state.players.second.hand = [createCard(FAIRY, "hand", "second")];
-    state.players.second.pp = 1;
-    whenPlayCard("second", 0);
-    expect(getHP(state, "second")).toBe(20);
-    expect(getHP(state, "first")).toBe(15);
-  }, 60_000);
+  describe("10224120 Yurius, Levin Authority — banish Odin Twilit Fate whenever enters", () => {
+    it("10224120 Yurius — banished by Odin Twilit Fate does not trigger whenever enemy enters (official Q&A)", () => {
+      setupTurn(R8, {
+        hand: [ODIN],
+        pp: 7,
+        secondBoard: [YURIUS],
+        secondPP: 8,
+      });
+      const yurius = findOnBoard("second", "Yurius, Levin Authority")!;
+      whenPlayCard("first", 0);
+      resolvePendingByUid(yurius.uid);
+      expect(getBanish(state, "second").some((c) => c.uid === yurius.uid)).toBe(
+        true,
+      );
+      state.players.second.hp = 20;
+      state.players.first.hp = 15;
+      whenEndTurn();
+      state.players.second.hand = [createCard(FAIRY, "hand", "second")];
+      state.players.second.pp = 1;
+      whenPlayCard("second", 0);
+      expect(getHP(state, "second")).toBe(20);
+      expect(getHP(state, "first")).toBe(15);
+    }, 60_000);
+  });
 
   it("10324120 Octrice, Hollowness Manifest — fusing 2 Loot at once advances crest by 1 (official Q&A)", () => {
     setupTurn(R6, { hand: [OCTRICE], pp: 3 });
