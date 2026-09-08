@@ -4,6 +4,7 @@
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import { fireTrigger } from "../../../core/triggers.js";
+import type { TriggerContext } from "../../../core/triggers/types.js";
 import type { CardInstance, Player } from "../../../../core/types/index.js";
 import {
   getBoard as getPlayerBoard,
@@ -33,9 +34,12 @@ export function banishCard(
   if (bi !== -1) {
     firstBoard.splice(bi, 1);
     bumpZoneVersion(); // PERF: Invalidate cache before triggers
-    // Fire ally trigger for first, enemy trigger for second
-    fireTrigger("ally_follower_leaves_field", "first");
-    fireTrigger("enemy_follower_leaves_field", "first");
+    const leaveCtx: TriggerContext = {
+      leavingOwner: "first",
+      leavingCard: card,
+    };
+    fireTrigger("ally_follower_leaves_field", "first", leaveCtx);
+    fireTrigger("enemy_follower_leaves_field", "first", leaveCtx);
     logEvent("banish", {
       card: card.name,
       uid: card.uid,
@@ -52,9 +56,12 @@ export function banishCard(
   if (ri !== -1) {
     secondBoard.splice(ri, 1);
     bumpZoneVersion(); // PERF: Invalidate cache before triggers
-    // Fire ally trigger for second, enemy trigger for acting side (banished owner)
-    fireTrigger("ally_follower_leaves_field", "second");
-    fireTrigger("enemy_follower_leaves_field", "second");
+    const leaveCtx: TriggerContext = {
+      leavingOwner: "second",
+      leavingCard: card,
+    };
+    fireTrigger("ally_follower_leaves_field", "second", leaveCtx);
+    fireTrigger("enemy_follower_leaves_field", "second", leaveCtx);
     logEvent("banish", {
       card: card.name,
       uid: card.uid,
