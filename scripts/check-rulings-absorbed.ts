@@ -258,9 +258,7 @@ function checkRulebookBlocksLogged(
     failed = true;
     console.error("✗ Rulebook owner-ruling blocks with no logged counterpart:");
     for (const block of unmapped) {
-      console.error(
-        `  line ${block.line}: ${block.fullPrefix}`,
-      );
+      console.error(`  line ${block.line}: ${block.fullPrefix}`);
     }
   }
 

@@ -463,7 +463,7 @@ A cost reduction or increase changes the card's own effective play cost. It **ne
 **Accelerate**, **Crystallize** or **Enhance** value N — those are fixed alternate costs as printed.
 
 **The consequence is counter-intuitive and is the part worth testing.** The alternate-form gate compares
-available PP against the card's *effective* cost, so moving that cost moves the threshold: reducing a
+available PP against the card's _effective_ cost, so moving that cost moves the threshold: reducing a
 follower's cost makes its Accelerate/Crystallize form **harder** to reach, not cheaper. Shoddy Plaything
 (`10671110`, base 6 / Accelerate 2) at 5 PP plays via Accelerate; reduce its cost to 4 and the same 5 PP
 plays the printed follower instead.
@@ -495,8 +495,8 @@ alternate's **printed** N. Both already correct.
 The crest area holds at most five, and **Faith counts toward the five**. A gain beyond the cap is a
 silent no-op: the crest never exists, so neither do its Countdown or its Last Words.
 
-The worked consequence is a real play pattern: Maddening Benison `10263310` (*Restore 10 defense to your
-leader. Gain Crest: Maddening Benison* — crest: Countdown (2), Last Words: deal 10 damage to your leader)
+The worked consequence is a real play pattern: Maddening Benison `10263310` (_Restore 10 defense to your
+leader. Gain Crest: Maddening Benison_ — crest: Countdown (2), Last Words: deal 10 damage to your leader)
 at five crests is a **drawback-free 10 heal** — the restore resolves, the crest gain does nothing, and
 the self-damage never comes.
 
@@ -543,8 +543,8 @@ A `summon` with `count: N` is **N sequential entries**, never one simultaneous a
 its own enter trigger, and each trigger's condition is judged at its own moment.
 
 The worked case the owner gave: Sephie's Fanfare with exactly four Obsessed Test Subjects already
-entered summons *"a 2/2 and then 5/5"* — the fifth copy's *"if at least 5 **other** allied copies have
-entered"* is judged as it enters (four others, no buff), and the sixth's as it enters (five others,
+entered summons _"a 2/2 and then 5/5"_ — the fifth copy's _"if at least 5 **other** allied copies have
+entered"_ is judged as it enters (four others, no buff), and the sixth's as it enters (five others,
 +3/+3). Two copies from one "summon 2" are **not** simultaneous.
 
 ## Krulle, Heir to Unkilling (`10314110`) — his own Fanfare satisfies his own heal — 2026-09-07
@@ -554,9 +554,9 @@ entered"* is judged as it enters (four others, no buff), and the sixth's as it e
 > "Krulle when he comes onto the field and gives enemy followers -0/-2 he heals the leader 1 if he is
 > successful."
 
-Printed: *"Fanfare: Give all enemy followers on the field -0/-2. | Ambush | Once on each of your turns,
+Printed: _"Fanfare: Give all enemy followers on the field -0/-2. | Ambush | Once on each of your turns,
 when an enemy follower is given -defense on the field, restore 1 defense to your leader. | Super-Evolve:
-Give your opponent Crest: Krulle, Heir to Unkilling."*
+Give your opponent Crest: Krulle, Heir to Unkilling."_
 
 **A card's own Fanfare debuff satisfies its own "when an enemy follower is given -defense" clause.**
 Playing Krulle with at least one enemy follower on the field restores 1 defense to your leader in the
@@ -579,8 +579,8 @@ the no-enemy-followers negative — and all three pass on `main`.
 > "if you play him 3 times in a game every damage instance to the enemy leader will deal +3. realistically
 > you play him once and everything is +1 to the enemy leader attacks or spells."
 
-Printed: *"Fanfare: Select 2 enemy followers on the field, remove all abilities from them, and deal them
-9 damage. **Give the enemy leader 'Takes 1 more damage.'**"*
+Printed: _"Fanfare: Select 2 enemy followers on the field, remove all abilities from them, and deal them
+9 damage. **Give the enemy leader 'Takes 1 more damage.'**"_
 
 - **Permanent for the rest of the match** — not per-turn, and it does not expire.
 - **Stacks additively per instance played.** Three Beelzebubs = **+1 each**, so +3 on every damage
@@ -592,7 +592,7 @@ Printed: *"Fanfare: Select 2 enemy followers on the field, remove all abilities 
 
 **Confirmed by three official Cygames Q&A**, which settle the general shape beyond the owner's words:
 
-1. Multiple copies *can* give the debuff multiple times — stacking confirmed by the publisher.
+1. Multiple copies _can_ give the debuff multiple times — stacking confirmed by the publisher.
 2. Beryl, Nightmare Incarnate's Fanfare into your own leader carrying the debuff deals **4**, not 3 — the
    bonus applies to **self-inflicted** damage from your own card.
 3. An enemy super-evolved follower destroying one of your followers deals **2** to your leader — the
@@ -601,8 +601,8 @@ Printed: *"Fanfare: Select 2 enemy followers on the field, remove all abilities 
 So the bonus is a property of the **damage pipeline into that leader**, not of any source category.
 
 **"Vulnerable" is not a keyword.** The authored JSON grants `keywords: [{"name": "Vulnerable", "value":
-1}]`; there is no such keyword in this game and the printed text is the quoted string *"Takes 1 more
-damage."* The name appears in exactly one card's JSON. It is a naming hazard, not a bug — the behaviour
+1}]`; there is no such keyword in this game and the printed text is the quoted string _"Takes 1 more
+damage."_ The name appears in exactly one card's JSON. It is a naming hazard, not a bug — the behaviour
 is correct — and renaming it to read like the printed text is optional cleanup, not part of any fix.
 
 Engine: implemented as leader state — `PlayerState.leaderDamageTakenBonus`, granted with `+=` (so
