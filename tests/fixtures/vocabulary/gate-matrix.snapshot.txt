@@ -1,0 +1,174 @@
+# Vocabulary gate enforcement matrix
+# op | field | key | errored | concept(s)
+
+add_to_hand|filter|not_self|true|pool narrowing
+add_to_hand|filter|include_self|true|pool narrowing
+add_to_hand|condition|not_self:false|true|self-inclusion (include) — not_self:false
+add_to_hand|top-level|exclude_self|false|
+add_to_hand|top-level|include_self|false|
+add_to_hand|top-level|until_end_of_turn|false|
+add_to_hand|top-level|select:true|true|single selection
+add_to_hand|filter-string|leftmost|false|
+add_to_hand|filter-string|leftmost+distribution|false|
+attacks_per_turn|filter|not_self|true|pool narrowing
+attacks_per_turn|filter|include_self|true|pool narrowing
+attacks_per_turn|condition|not_self:false|true|self-inclusion (include) — not_self:false
+attacks_per_turn|top-level|exclude_self|false|
+attacks_per_turn|top-level|include_self|false|
+attacks_per_turn|top-level|until_end_of_turn|false|
+attacks_per_turn|top-level|select:true|true|single selection
+attacks_per_turn|filter-string|leftmost|false|
+attacks_per_turn|filter-string|leftmost+distribution|false|
+banish|filter|not_self|true|pool narrowing
+banish|filter|include_self|true|pool narrowing
+banish|condition|not_self:false|true|self-inclusion (include) — not_self:false
+banish|top-level|exclude_self|false|
+banish|top-level|include_self|false|
+banish|top-level|until_end_of_turn|false|
+banish|top-level|select:true|true|single selection
+banish|filter-string|leftmost|true|positional selector
+banish|filter-string|leftmost+distribution|true|positional selector
+cost|filter|not_self|true|pool narrowing
+cost|filter|include_self|true|pool narrowing
+cost|condition|not_self:false|true|self-inclusion (include) — not_self:false
+cost|top-level|exclude_self|false|
+cost|top-level|include_self|false|
+cost|top-level|until_end_of_turn|false|
+cost|top-level|select:true|true|single selection
+cost|filter-string|leftmost|false|
+cost|filter-string|leftmost+distribution|false|
+countdown|filter|not_self|false|
+countdown|filter|include_self|false|
+countdown|condition|not_self:false|true|self-inclusion (include) — not_self:false
+countdown|top-level|exclude_self|false|
+countdown|top-level|include_self|false|
+countdown|top-level|until_end_of_turn|false|
+countdown|top-level|select:true|true|single selection
+countdown|filter-string|leftmost|false|
+countdown|filter-string|leftmost+distribution|false|
+damage|filter|not_self|true|pool narrowing
+damage|filter|include_self|true|pool narrowing
+damage|condition|not_self:false|true|self-inclusion (include) — not_self:false
+damage|top-level|exclude_self|false|
+damage|top-level|include_self|false|
+damage|top-level|until_end_of_turn|false|
+damage|top-level|select:true|true|single selection
+damage|filter-string|leftmost|true|positional selector
+damage|filter-string|leftmost+distribution|true|positional selector
+deck|filter|not_self|true|pool narrowing
+deck|filter|include_self|true|pool narrowing
+deck|condition|not_self:false|true|self-inclusion (include) — not_self:false
+deck|top-level|exclude_self|false|
+deck|top-level|include_self|false|
+deck|top-level|until_end_of_turn|false|
+deck|top-level|select:true|true|single selection
+deck|filter-string|leftmost|false|
+deck|filter-string|leftmost+distribution|false|
+destroy|filter|not_self|true|pool narrowing
+destroy|filter|include_self|true|pool narrowing
+destroy|condition|not_self:false|true|self-inclusion (include) — not_self:false
+destroy|top-level|exclude_self|false|
+destroy|top-level|include_self|false|
+destroy|top-level|until_end_of_turn|false|
+destroy|top-level|select:true|true|single selection
+destroy|filter-string|leftmost|true|positional selector
+destroy|filter-string|leftmost+distribution|true|positional selector
+evolve|filter|not_self|true|pool narrowing
+evolve|filter|include_self|true|pool narrowing
+evolve|condition|not_self:false|true|self-inclusion (include) — not_self:false
+evolve|top-level|exclude_self|false|
+evolve|top-level|include_self|false|
+evolve|top-level|until_end_of_turn|false|
+evolve|top-level|select:true|true|single selection
+evolve|filter-string|leftmost|false|
+evolve|filter-string|leftmost+distribution|false|
+evolve_self|filter|not_self|true|pool narrowing
+evolve_self|filter|include_self|true|pool narrowing
+evolve_self|condition|not_self:false|true|self-inclusion (include) — not_self:false
+evolve_self|top-level|exclude_self|false|
+evolve_self|top-level|include_self|false|
+evolve_self|top-level|until_end_of_turn|false|
+evolve_self|top-level|select:true|true|single selection
+evolve_self|filter-string|leftmost|false|
+evolve_self|filter-string|leftmost+distribution|false|
+gate|filter|not_self|false|
+gate|filter|include_self|false|
+gate|condition|not_self:false|true|self-inclusion (include) — not_self:false
+gate|top-level|exclude_self|true|gate exclude_self carve-out
+gate|top-level|include_self|false|
+gate|top-level|until_end_of_turn|false|
+gate|top-level|select:true|true|single selection
+gate|filter-string|leftmost|false|
+gate|filter-string|leftmost+distribution|false|
+keyword|filter|not_self|true|pool narrowing
+keyword|filter|include_self|true|pool narrowing
+keyword|condition|not_self:false|true|self-inclusion (include) — not_self:false
+keyword|top-level|exclude_self|true|self-inclusion (exclude)
+keyword|top-level|include_self|true|self-inclusion (include)
+keyword|top-level|until_end_of_turn|false|
+keyword|top-level|select:true|true|single selection
+keyword|filter-string|leftmost|false|
+keyword|filter-string|leftmost+distribution|false|
+repeat_effect|filter|not_self|false|
+repeat_effect|filter|include_self|false|
+repeat_effect|condition|not_self:false|true|self-inclusion (include) — not_self:false
+repeat_effect|top-level|exclude_self|false|
+repeat_effect|top-level|include_self|false|
+repeat_effect|top-level|until_end_of_turn|false|
+repeat_effect|top-level|select:true|true|single selection
+repeat_effect|filter-string|leftmost|false|
+repeat_effect|filter-string|leftmost+distribution|false|
+return|filter|not_self|true|pool narrowing
+return|filter|include_self|true|pool narrowing
+return|condition|not_self:false|true|self-inclusion (include) — not_self:false
+return|top-level|exclude_self|false|
+return|top-level|include_self|false|
+return|top-level|until_end_of_turn|false|
+return|top-level|select:true|true|single selection
+return|filter-string|leftmost|true|positional selector
+return|filter-string|leftmost+distribution|true|positional selector
+select|filter|not_self|true|pool narrowing
+select|filter|include_self|true|pool narrowing
+select|condition|not_self:false|true|self-inclusion (include) — not_self:false
+select|top-level|exclude_self|false|
+select|top-level|include_self|false|
+select|top-level|until_end_of_turn|false|
+select|top-level|select:true|true|single selection
+select|filter-string|leftmost|true|positional selector
+select|filter-string|leftmost+distribution|true|positional selector
+stat|filter|not_self|true|pool narrowing
+stat|filter|include_self|true|pool narrowing
+stat|condition|not_self:false|true|self-inclusion (include) — not_self:false
+stat|top-level|exclude_self|true|self-inclusion (exclude)
+stat|top-level|include_self|true|self-inclusion (include)
+stat|top-level|until_end_of_turn|true|stat "until end of turn"
+stat|top-level|select:true|true|single selection
+stat|filter-string|leftmost|true|positional selector
+stat|filter-string|leftmost+distribution|true|positional selector
+summon|filter|not_self|false|
+summon|filter|include_self|false|
+summon|condition|not_self:false|true|self-inclusion (include) — not_self:false
+summon|top-level|exclude_self|false|
+summon|top-level|include_self|false|
+summon|top-level|until_end_of_turn|false|
+summon|top-level|select:true|true|single selection
+summon|filter-string|leftmost|true|positional selector
+summon|filter-string|leftmost+distribution|true|positional selector
+super_evolve_self|filter|not_self|true|pool narrowing
+super_evolve_self|filter|include_self|true|pool narrowing
+super_evolve_self|condition|not_self:false|true|self-inclusion (include) — not_self:false
+super_evolve_self|top-level|exclude_self|false|
+super_evolve_self|top-level|include_self|false|
+super_evolve_self|top-level|until_end_of_turn|false|
+super_evolve_self|top-level|select:true|true|single selection
+super_evolve_self|filter-string|leftmost|false|
+super_evolve_self|filter-string|leftmost+distribution|false|
+transform|filter|not_self|true|pool narrowing
+transform|filter|include_self|true|pool narrowing
+transform|condition|not_self:false|true|self-inclusion (include) — not_self:false
+transform|top-level|exclude_self|true|self-inclusion (exclude)
+transform|top-level|include_self|true|self-inclusion (include)
+transform|top-level|until_end_of_turn|false|
+transform|top-level|select:true|true|single selection
+transform|filter-string|leftmost|false|
+transform|filter-string|leftmost+distribution|false|
