@@ -35,6 +35,3 @@ export function clearExpiredTemporaryKeywordsAtEOT(endedPlayer: Player) {
     }
   }
 }
-
-/** @deprecated Use clearExpiredTemporaryKeywordsAtEOT */
-export const clearExpiredCantAttackAtEOT = clearExpiredTemporaryKeywordsAtEOT;
