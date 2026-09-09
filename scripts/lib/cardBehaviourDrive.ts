@@ -66,7 +66,10 @@ import {
   HARNESS_BOARD_RESERVE,
   type GateSpec,
 } from "./cardBehaviourGates.js";
-import { readPoolNarrowFilter } from "../../src/logic/core/targeting/poolCondition.js";
+import {
+  mergePoolCondition,
+  readPoolNarrowFilter,
+} from "../../src/logic/core/targeting/poolCondition.js";
 
 const HARNESS_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -424,13 +427,19 @@ export function analyzeHarnessArenaNeeds(
   walkEffects(allRoots, (obj) => {
     const target = String(obj.target ?? "").toLowerCase();
 
-    const cond = obj.condition;
+    // Read the SAME merged pool condition the engine reads. Card JSON spells
+    // card-narrowing keys `filter` on these ops; reading only `condition` here
+    // makes a canonically-spelled card invisible to the scenario builder, so it
+    // is seeded without the ally it needs and scored play_blocked.
+    const merged = mergePoolCondition(obj.condition, obj.filter);
+    const hasMerged = Object.keys(merged).length > 0;
+
     if (
       (obj.op === "destroy" || obj.op === "select") &&
       target.includes("ally:follower") &&
-      obj.condition
+      hasMerged
     ) {
-      const c = obj.condition as Record<string, unknown>;
+      const c = merged;
       if (String(c.name ?? "") === "Crystalspawn") crystalspawnAlly = true;
       if (String(c.name ?? "").trim()) namedBoardAllies.add(String(c.name));
       if (c.base_cost_gte != null && Number(c.base_cost_gte) >= 5) {
@@ -438,12 +447,8 @@ export function analyzeHarnessArenaNeeds(
       }
     }
 
-    if (
-      obj.op === "keyword" &&
-      target.includes("ally:follower") &&
-      obj.condition
-    ) {
-      const c = obj.condition as Record<string, unknown>;
+    if (obj.op === "keyword" && target.includes("ally:follower") && hasMerged) {
+      const c = merged;
       if (String(c.name ?? "").trim()) namedBoardAllies.add(String(c.name));
       if (c.base_cost_gte != null && Number(c.base_cost_gte) >= 5) {
         highCostAlly = true;
