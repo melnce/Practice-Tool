@@ -102,17 +102,17 @@ export function handleStatOrchestrator(
   }
 
   if (specialTarget === "hand") {
-    applyHandBuff(owner, eff);
+    applyHandBuff(owner, eff, sourceCard);
     return "done";
   }
 
   if (specialTarget === "ally:deck") {
-    applyDeckBuff(owner, eff);
+    applyDeckBuff(owner, eff, sourceCard);
     return "done";
   }
 
   if (specialTarget === "last_added_to_hand") {
-    applyLastAddedToHandBuff(owner, eff);
+    applyLastAddedToHandBuff(owner, eff, sourceCard);
     return "done";
   }
 

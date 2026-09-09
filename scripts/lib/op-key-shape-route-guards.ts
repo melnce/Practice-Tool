@@ -114,3 +114,96 @@ export function checkRouteDropSiblingGuards(
 
   return out;
 }
+
+const ZONE_STAT_TARGETS = new Set([
+  "hand",
+  "ally:deck",
+  "deck",
+  "last_added_to_hand",
+]);
+
+function isZoneStatTarget(target: unknown): boolean {
+  return ZONE_STAT_TARGETS.has(String(target ?? "").toLowerCase());
+}
+
+function hasDurationKeys(obj: Record<string, unknown>): boolean {
+  return (
+    obj.until_end_of_turn === true ||
+    (obj as { until_eot?: boolean }).until_eot === true ||
+    obj.duration !== undefined
+  );
+}
+
+/** Card-data guards for stat ops on hand/deck/last_added_to_hand zone routes (BN3–BN5, BN7). */
+export function checkZoneStatRouteGuards(card: CardJson): RouteGuardWarning[] {
+  const out: RouteGuardWarning[] = [];
+
+  walk(card, "$", (obj, path) => {
+    const op = String(obj.op ?? "");
+    if (op !== "stat" || !isZoneStatTarget(obj.target)) return;
+
+    const target = String(obj.target ?? "").toLowerCase();
+
+    if (
+      obj.keywords !== undefined ||
+      (obj as { attacks_per_turn?: unknown }).attacks_per_turn !== undefined
+    ) {
+      out.push({
+        id: card.id,
+        name: card.name,
+        path,
+        found: compact({
+          op,
+          target,
+          keywords: obj.keywords ?? null,
+          attacks_per_turn:
+            (obj as { attacks_per_turn?: unknown }).attacks_per_turn ?? null,
+        }),
+        note: `op:"stat" on zone route target:"${target}" must not carry keywords or attacks_per_turn`,
+      });
+    }
+
+    if (hasDurationKeys(obj)) {
+      out.push({
+        id: card.id,
+        name: card.name,
+        path,
+        found: compact({
+          op,
+          target,
+          until_end_of_turn: obj.until_end_of_turn ?? null,
+          until_eot: (obj as { until_eot?: boolean }).until_eot ?? null,
+          duration: obj.duration ?? null,
+        }),
+        note: `op:"stat" on zone route target:"${target}" must not carry duration keys — clearTemporaryBuffs never runs for off-board cards`,
+      });
+    }
+
+    if (obj.action === "set") {
+      out.push({
+        id: card.id,
+        name: card.name,
+        path,
+        found: compact({ op, target, action: "set" }),
+        note: `op:"stat" action:"set" is not supported on zone route target:"${target}"`,
+      });
+    }
+
+    if (target === "last_added_to_hand" && hasPoolNarrowObject(obj)) {
+      out.push({
+        id: card.id,
+        name: card.name,
+        path,
+        found: compact({
+          op,
+          target,
+          filter: obj.filter ?? null,
+          condition: obj.condition ?? null,
+        }),
+        note: 'op:"stat" target:"last_added_to_hand" must not carry filter/condition — the target is already unambiguous',
+      });
+    }
+  });
+
+  return out;
+}
