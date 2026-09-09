@@ -78,7 +78,8 @@
         "op": "summon",
         "source": "named",
         "name": "Intrepid Newshound",
-        "count": 2
+        "count": 2,
+        "printed": "Super-Evolve: Summon 2 copies of Intrepid Newshound."
       }
     ],
     "keywords": [
@@ -88,7 +89,8 @@
           {
             "op": "draw",
             "source": "deck",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Draw a card."
           }
         ]
       }
@@ -119,12 +121,14 @@
       {
         "op": "discard",
         "mode": "select",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Select a card in your hand and discard it."
       },
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount": 2
+        "amount": 2,
+        "printed": "Deal 2 damage to all enemy followers."
       }
     ]
   },
@@ -418,12 +422,14 @@
         "op": "return",
         "destination": "deck",
         "select": 1,
-        "target": "ally:hand"
+        "target": "ally:hand",
+        "printed": "Fanfare: Select a card in your hand and return it to deck."
       },
       {
         "op": "add_to_hand",
         "name": "Fairy",
-        "count": 2
+        "count": 2,
+        "printed": "Add 2 copies of Fairy to your hand."
       }
     ]
   },
@@ -514,7 +520,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -525,13 +532,15 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "amount": 4
+        "amount": 4,
+        "printed": "Fanfare: Select an enemy follower on the field and deal it 4 damage."
       },
       {
         "op": "counter",
         "action": "add",
         "key": "combo",
-        "amount": 1
+        "amount": 1,
+        "printed": "Increase your Combo by 1."
       }
     ]
   },
@@ -933,12 +942,14 @@
         "op": "summon",
         "source": "named",
         "name": "Knight",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Knight."
       },
       {
         "op": "add_to_hand",
         "name": "Steelclad Knight",
-        "count": 1
+        "count": 1,
+        "printed": "Add a Steelclad Knight to your hand."
       }
     ]
   },
@@ -1011,7 +1022,8 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "amount": 3
+        "amount": 3,
+        "printed": "Evolve: Select an enemy follower on the field and deal it 3 damage."
       }
     ],
     "superevolve": [],
@@ -1023,7 +1035,8 @@
             "op": "summon",
             "source": "named",
             "name": "Knight",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Summon a Knight."
           }
         ]
       }
@@ -1051,7 +1064,8 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "amount": 3
+        "amount": 3,
+        "printed": "Evolve: Select an enemy follower on the field and deal it 3 damage."
       }
     ],
     "superevolve": [],
@@ -1061,13 +1075,15 @@
       {
         "op": "draw",
         "source": "deck",
-        "count": 2
+        "count": 2,
+        "printed": "Fanfare: Draw 2 cards."
       },
       {
         "op": "summon",
         "source": "named",
         "name": "Knight",
-        "count": 2
+        "count": 2,
+        "printed": "Summon 2 copies of Knight."
       }
     ]
   },
@@ -1322,7 +1338,8 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Super-Evolve: Select an enemy follower on the field and destroy it."
       }
     ],
     "keywords": ["Ward"],
@@ -1332,7 +1349,8 @@
         "op": "summon",
         "source": "named",
         "name": "Steelclad Knight",
-        "count": 2
+        "count": 2,
+        "printed": "Fanfare: Summon 2 copies of Steelclad Knight."
       },
       {
         "op": "stat",
@@ -1343,7 +1361,8 @@
         "keywords": ["Ward"],
         "filter": {
           "class": "Swordcraft"
-        }
+        },
+        "printed": "Give all other allied Swordcraft followers on the field +1/+3 and Ward."
       }
     ]
   },
@@ -1398,7 +1417,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -1409,13 +1429,15 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "amount": 1
+        "amount": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and deal it 1 damage."
       },
       {
         "op": "summon",
         "source": "named",
         "name": "Magic Sediment",
-        "count": 1
+        "count": 1,
+        "printed": "Gain an earth sigil."
       }
     ]
   },
@@ -1493,7 +1515,8 @@
             "name": "Charming Monster",
             "count": 2
           }
-        ]
+        ],
+        "printed": "Super-Evolve: Earth Rite (2) - Summon 2 copies of Charming Monster."
       }
     ],
     "keywords": [
@@ -1505,7 +1528,8 @@
             "op": "summon",
             "source": "named",
             "name": "Magic Sediment",
-            "count": 2
+            "count": 2,
+            "printed": "Last Words: Gain 2 earth sigils."
           }
         ]
       }
@@ -1724,7 +1748,8 @@
             "target": "enemy:follower",
             "select": 1
           }
-        ]
+        ],
+        "printed": "Evolve: Earth Rite (1) - Select an enemy follower on the field and destroy it."
       }
     ],
     "superevolve": [],
@@ -1763,7 +1788,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Earth Rite (1) - Gain Crest: Lilanthim, Anathema of Predation."
       }
     ],
     "specific_effects": [
@@ -1796,7 +1822,8 @@
         "op": "summon",
         "source": "named",
         "name": "Beloved Masterpiece",
-        "count": 1
+        "count": 1,
+        "printed": "Super-Evolve: Summon a Beloved Masterpiece."
       }
     ],
     "keywords": [
@@ -1813,7 +1840,8 @@
                 "target": "enemy:leader",
                 "amount": 3
               }
-            ]
+            ],
+            "printed": "Last Words: Earth Rite (2) - Deal 3 damage to the enemy leader."
           }
         ]
       }
@@ -1823,7 +1851,8 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount": 6
+        "amount": 6,
+        "printed": "Fanfare: Deal 6 damage to all enemy followers."
       }
     ]
   },
@@ -1888,7 +1917,8 @@
         "select": 1,
         "filter": {
           "type": "Follower"
-        }
+        },
+        "printed": "Evolve: Select a follower in your hand and give it +2/+2."
       }
     ],
     "superevolve": [],
@@ -1901,7 +1931,8 @@
         "target": "ally:follower",
         "select": 1,
         "attack": 2,
-        "defense": 2
+        "defense": 2,
+        "printed": "Fanfare: Select another allied follower on the field and give it +2/+2."
       }
     ]
   },
@@ -2218,7 +2249,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Super-Evolve: Give your opponent Crest: Burnite, Anathema of Ash."
       }
     ],
     "keywords": [],
@@ -2227,7 +2259,8 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount": 9
+        "amount": 9,
+        "printed": "Fanfare: Deal 9 damage to all enemy followers."
       }
     ],
     "specific_effects": [
@@ -2260,7 +2293,8 @@
         "op": "crest",
         "action": "delay_countdown",
         "name": "Dragon's Vale Elder",
-        "amount": 2
+        "amount": 2,
+        "printed": "Super-Evolve: Delay the count of your Crest: Dragon's Vale Elder by 2."
       }
     ],
     "keywords": ["Ward"],
@@ -2270,7 +2304,8 @@
         "op": "summon",
         "source": "named",
         "name": "Vastwing Dragon",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Vastwing Dragon."
       },
       {
         "op": "crest",
@@ -2294,7 +2329,8 @@
               "whose_turn": "owner"
             }
           }
-        ]
+        ],
+        "printed": "Gain Crest: Dragon's Vale Elder."
       }
     ],
     "specific_effects": [
@@ -2360,7 +2396,8 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "amount": 3
+        "amount": 3,
+        "printed": "Evolve: Select an enemy follower on the field and deal it 3 damage."
       }
     ],
     "superevolve": [],
@@ -2372,7 +2409,8 @@
             "op": "summon",
             "source": "named",
             "name": "Skeleton",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Summon a Skeleton."
           }
         ]
       }
@@ -2433,7 +2471,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -2444,13 +2483,15 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "amount": 3
+        "amount": 3,
+        "printed": "Fanfare: Select an enemy follower on the field and deal it 3 damage."
       },
       {
         "op": "summon",
         "source": "named",
         "name": "Skeleton",
-        "count": 1
+        "count": 1,
+        "printed": "Summon a Skeleton."
       }
     ]
   },
@@ -2477,12 +2518,14 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and destroy it."
       },
       {
         "op": "summon",
         "source": "graveyard",
-        "max_cost": 2
+        "max_cost": 2,
+        "printed": "Reanimate (2)."
       }
     ]
   },
@@ -2795,7 +2838,8 @@
           {
             "op": "draw",
             "source": "deck",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Draw a card."
           }
         ]
       }
@@ -2813,7 +2857,8 @@
             "name": "Reverend of Finance",
             "count": 1
           }
-        ]
+        ],
+        "printed": "Fanfare: If there are at least 3 allied amulets on the field, summon a Reverend of Finance."
       }
     ]
   },
@@ -2957,7 +3002,8 @@
       {
         "op": "banish",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and banish it."
       },
       {
         "op": "gate",
@@ -2970,7 +3016,8 @@
             "player": "self",
             "amount": 3
           }
-        ]
+        ],
+        "printed": "If there are at least 3 allied amulets on the field, restore 3 defense to your leader."
       }
     ]
   },
@@ -3045,7 +3092,8 @@
             "op": "restore",
             "target": "leader",
             "player": "self",
-            "amount": 3
+            "amount": 3,
+            "printed": "Last Words: Restore 3 defense to your leader."
           }
         ]
       }
@@ -3067,7 +3115,8 @@
             "target": "self",
             "keywords": ["Barrier"]
           }
-        ]
+        ],
+        "printed": "Fanfare: If there are at least 3 allied amulets on the field, evolve this follower and give it Barrier."
       }
     ]
   },
@@ -3135,7 +3184,8 @@
         "board_name": "Rings of Moonlight",
         "select": 1,
         "select_mode": "random",
-        "amount": 1
+        "amount": 1,
+        "printed": "Evolve: Delay the count of a random allied Rings of Moonlight on the field by 1."
       }
     ],
     "superevolve": [],
@@ -3146,7 +3196,8 @@
         "op": "summon",
         "source": "named",
         "name": "Rings of Moonlight",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Rings of Moonlight."
       }
     ]
   },
@@ -3169,7 +3220,8 @@
     "superevolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Super-Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "keywords": ["Ward", "Aura"],
@@ -3178,7 +3230,8 @@
       {
         "op": "banish",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and banish it."
       },
       {
         "op": "gate",
@@ -3191,7 +3244,8 @@
             "player": "self",
             "amount": 3
           }
-        ]
+        ],
+        "printed": "If there are at least 3 allied amulets on the field, restore 3 defense to your leader."
       }
     ]
   },
@@ -3370,7 +3424,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -3380,7 +3435,8 @@
       {
         "op": "add_to_hand",
         "name": "Ancient Artifact",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Add an Ancient Artifact to your hand."
       }
     ]
   },
@@ -3407,7 +3463,8 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and destroy it."
       },
       {
         "op": "gate",
@@ -3427,7 +3484,8 @@
             "name": "Mystic Artifact",
             "count": 1
           }
-        ]
+        ],
+        "printed": "If at least 3 differently named allied Artifact followers have entered the field this match, summon an Ancient Artifact and Mystic Artifact."
       }
     ]
   },

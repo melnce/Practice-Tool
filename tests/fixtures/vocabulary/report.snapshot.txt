@@ -1,8 +1,9 @@
 # Vocabulary report
-generated: 2026-09-09T18:38:31.361Z
+generated: 2026-09-09T20:05:58.054Z
 
 ## op:add_shadows
   amount: total=3 (collectible=3, token=0)
+  printed: total=1 (collectible=1, token=0)
 
 ## op:add_to_hand
   count: total=162 (collectible=160, token=2)
@@ -12,12 +13,12 @@ generated: 2026-09-09T18:38:31.361Z
   from: total=4 (collectible=4, token=0)
   keywords: total=2 (collectible=2, token=0)
   name: total=152 (collectible=151, token=1)
-  printed: total=19 (collectible=19, token=0)
+  printed: total=55 (collectible=55, token=0)
   source: total=10 (collectible=9, token=1)
   target: total=3 (collectible=2, token=1)
 
 ## op:attacks_per_turn
-  printed: total=1 (collectible=0, token=1)
+  printed: total=3 (collectible=2, token=1)
   select: total=1 (collectible=0, token=1)
   target: total=3 (collectible=2, token=1)
   until_eot: total=2 (collectible=2, token=0)
@@ -28,7 +29,7 @@ generated: 2026-09-09T18:38:31.361Z
   count: total=1 (collectible=0, token=1)
   distribution: total=4 (collectible=3, token=1)
   filter: total=7 (collectible=7, token=0)
-  printed: total=5 (collectible=4, token=1)
+  printed: total=14 (collectible=13, token=1)
   scope: total=5 (collectible=4, token=1)
   select: total=14 (collectible=14, token=0)
   store_count_as: total=1 (collectible=1, token=0)
@@ -44,7 +45,7 @@ generated: 2026-09-09T18:38:31.361Z
   filter: total=5 (collectible=5, token=0)
   min_cost: total=8 (collectible=8, token=0)
   mode: total=43 (collectible=39, token=4)
-  printed: total=1 (collectible=1, token=0)
+  printed: total=5 (collectible=5, token=0)
   select: total=2 (collectible=2, token=0)
   target: total=43 (collectible=39, token=4)
   until_eot: total=8 (collectible=7, token=1)
@@ -55,6 +56,7 @@ generated: 2026-09-09T18:38:31.361Z
   amount_source: total=2 (collectible=2, token=0)
   board_name: total=1 (collectible=1, token=0)
   filter: total=1 (collectible=1, token=0)
+  printed: total=8 (collectible=8, token=0)
   select: total=1 (collectible=1, token=0)
   select_mode: total=1 (collectible=1, token=0)
   target: total=2 (collectible=2, token=0)
@@ -63,7 +65,7 @@ generated: 2026-09-09T18:38:31.361Z
   action: total=5 (collectible=4, token=1)
   amount: total=5 (collectible=4, token=1)
   key: total=5 (collectible=4, token=1)
-  printed: total=2 (collectible=1, token=1)
+  printed: total=3 (collectible=2, token=1)
 
 ## op:crest
   action: total=79 (collectible=78, token=1)
@@ -80,7 +82,7 @@ generated: 2026-09-09T18:38:31.361Z
   on_success_effects: total=4 (collectible=4, token=0)
   passives: total=1 (collectible=1, token=0)
   player: total=6 (collectible=6, token=0)
-  printed: total=9 (collectible=9, token=0)
+  printed: total=36 (collectible=36, token=0)
   target: total=1 (collectible=0, token=1)
   triggers: total=54 (collectible=54, token=0)
 
@@ -96,7 +98,7 @@ generated: 2026-09-09T18:38:31.361Z
   filter: total=1 (collectible=1, token=0)
   include_leader: total=2 (collectible=2, token=0)
   pick: total=1 (collectible=1, token=0)
-  printed: total=28 (collectible=18, token=10)
+  printed: total=88 (collectible=76, token=12)
   rank: total=1 (collectible=1, token=0)
   select: total=72 (collectible=66, token=6)
   spill_to_leader: total=4 (collectible=3, token=1)
@@ -112,7 +114,7 @@ generated: 2026-09-09T18:38:31.361Z
   from_set: total=1 (collectible=1, token=0)
   mode: total=1 (collectible=1, token=0)
   name: total=3 (collectible=3, token=0)
-  printed: total=2 (collectible=2, token=0)
+  printed: total=3 (collectible=3, token=0)
   rank: total=1 (collectible=1, token=0)
   shuffle: total=1 (collectible=1, token=0)
   source: total=1 (collectible=1, token=0)
@@ -126,7 +128,7 @@ generated: 2026-09-09T18:38:31.361Z
   exclude: total=2 (collectible=2, token=0)
   filter: total=9 (collectible=8, token=1)
   only_if_damaged: total=1 (collectible=1, token=0)
-  printed: total=15 (collectible=11, token=4)
+  printed: total=35 (collectible=31, token=4)
   scope: total=9 (collectible=6, token=3)
   select: total=52 (collectible=50, token=2)
   stat: total=4 (collectible=4, token=0)
@@ -139,21 +141,21 @@ generated: 2026-09-09T18:38:31.361Z
   filter: total=1 (collectible=1, token=0)
   mode: total=26 (collectible=26, token=0)
   names: total=3 (collectible=3, token=0)
-  printed: total=1 (collectible=1, token=0)
+  printed: total=12 (collectible=12, token=0)
 
 ## op:draw
   count: total=141 (collectible=137, token=4)
   distinct_by: total=1 (collectible=1, token=0)
   filter: total=5 (collectible=5, token=0)
   player: total=2 (collectible=2, token=0)
-  printed: total=10 (collectible=8, token=2)
+  printed: total=40 (collectible=38, token=2)
   source: total=141 (collectible=137, token=4)
 
 ## op:earth_rite
   amount: total=1 (collectible=1, token=0)
   cost: total=20 (collectible=20, token=0)
   effects: total=21 (collectible=21, token=0)
-  printed: total=2 (collectible=2, token=0)
+  printed: total=9 (collectible=9, token=0)
 
 ## op:ep
   action: total=7 (collectible=7, token=0)
@@ -164,7 +166,7 @@ generated: 2026-09-09T18:38:31.361Z
   condition: total=3 (collectible=2, token=1)
   filter: total=6 (collectible=6, token=0)
   mode: total=9 (collectible=9, token=0)
-  printed: total=6 (collectible=4, token=2)
+  printed: total=10 (collectible=8, token=2)
   select: total=7 (collectible=6, token=1)
   select_mode: total=2 (collectible=2, token=0)
   target: total=70 (collectible=68, token=2)
@@ -186,7 +188,7 @@ generated: 2026-09-09T18:38:31.361Z
   has_keyword: total=1 (collectible=1, token=0)
   is_ally: total=3 (collectible=2, token=1)
   name: total=5 (collectible=3, token=2)
-  printed: total=55 (collectible=53, token=2)
+  printed: total=77 (collectible=75, token=2)
   requirement: total=16 (collectible=16, token=0)
   tribe: total=5 (collectible=5, token=0)
   type: total=8 (collectible=7, token=1)
@@ -199,7 +201,7 @@ generated: 2026-09-09T18:38:31.361Z
   keywords: total=65 (collectible=61, token=4)
   name_filter: total=2 (collectible=2, token=0)
   pick: total=1 (collectible=1, token=0)
-  printed: total=8 (collectible=7, token=1)
+  printed: total=19 (collectible=18, token=1)
   select: total=15 (collectible=14, token=1)
   target: total=71 (collectible=67, token=4)
   triggers: total=3 (collectible=3, token=0)
@@ -221,6 +223,7 @@ generated: 2026-09-09T18:38:31.361Z
   amount: total=25 (collectible=25, token=0)
   amount_source: total=1 (collectible=1, token=0)
   player: total=15 (collectible=15, token=0)
+  printed: total=9 (collectible=9, token=0)
 
 ## op:random_split
   effects: total=1 (collectible=0, token=1)
@@ -236,20 +239,21 @@ generated: 2026-09-09T18:38:31.361Z
   printed: total=3 (collectible=2, token=1)
 
 ## op:replicate
+  printed: total=31 (collectible=31, token=0)
   zone: total=52 (collectible=52, token=0)
 
 ## op:restore
   amount: total=105 (collectible=94, token=11)
   amount_source: total=4 (collectible=4, token=0)
   player: total=105 (collectible=94, token=11)
-  printed: total=10 (collectible=5, token=5)
+  printed: total=26 (collectible=19, token=7)
   store_restored_as: total=1 (collectible=1, token=0)
   target: total=109 (collectible=98, token=11)
 
 ## op:return
   destination: total=22 (collectible=22, token=0)
   optional: total=3 (collectible=3, token=0)
-  printed: total=1 (collectible=1, token=0)
+  printed: total=10 (collectible=10, token=0)
   select: total=20 (collectible=20, token=0)
   select_mode: total=3 (collectible=3, token=0)
   target: total=22 (collectible=22, token=0)
@@ -258,14 +262,14 @@ generated: 2026-09-09T18:38:31.361Z
   count: total=23 (collectible=23, token=0)
   filter: total=23 (collectible=23, token=0)
   keywords: total=1 (collectible=1, token=0)
-  printed: total=6 (collectible=6, token=0)
+  printed: total=12 (collectible=12, token=0)
 
 ## op:select
   condition: total=2 (collectible=2, token=0)
   effects: total=28 (collectible=24, token=4)
   filter: total=11 (collectible=10, token=1)
   mode: total=2 (collectible=2, token=0)
-  printed: total=16 (collectible=12, token=4)
+  printed: total=22 (collectible=18, token=4)
   select: total=27 (collectible=23, token=4)
   target: total=28 (collectible=24, token=4)
 
@@ -279,7 +283,7 @@ generated: 2026-09-09T18:38:31.361Z
 
 ## op:spellboost
   count: total=22 (collectible=18, token=4)
-  printed: total=4 (collectible=0, token=4)
+  printed: total=9 (collectible=5, token=4)
   target: total=22 (collectible=18, token=4)
 
 ## op:stat
@@ -297,7 +301,7 @@ generated: 2026-09-09T18:38:31.361Z
   mode: total=1 (collectible=1, token=0)
   name: total=1 (collectible=1, token=0)
   name_filter: total=4 (collectible=3, token=1)
-  printed: total=22 (collectible=19, token=3)
+  printed: total=62 (collectible=59, token=3)
   select: total=39 (collectible=38, token=1)
   select_mode: total=10 (collectible=9, token=1)
   stat: total=1 (collectible=1, token=0)
@@ -316,7 +320,7 @@ generated: 2026-09-09T18:38:31.361Z
   mode: total=8 (collectible=8, token=0)
   name: total=276 (collectible=270, token=6)
   owner: total=3 (collectible=3, token=0)
-  printed: total=35 (collectible=33, token=2)
+  printed: total=120 (collectible=116, token=4)
   select: total=7 (collectible=7, token=0)
   sort: total=1 (collectible=1, token=0)
   source: total=319 (collectible=313, token=6)
@@ -331,7 +335,7 @@ generated: 2026-09-09T18:38:31.361Z
   into: total=11 (collectible=11, token=0)
   into_source: total=2 (collectible=2, token=0)
   mode: total=1 (collectible=1, token=0)
-  printed: total=5 (collectible=5, token=0)
+  printed: total=7 (collectible=7, token=0)
   select: total=6 (collectible=6, token=0)
   target: total=13 (collectible=13, token=0)
 
@@ -339,7 +343,7 @@ generated: 2026-09-09T18:38:31.361Z
   (none)
 
 ## per-effect printed coverage (metric)
-  clause roots: 1631; populated: 296; cards: 296
+  clause roots: 1631; populated: 759; cards: 501
 
 ## conditional keys
   stat.name: when attack_source or defense_source is named_enter_count (same predicate as op-keys-gate statNameAllowed) — Names the card whose allied copies are counted — required for named_enter_count buffs (10844110 Drache & Aluzard, Burning Blood)

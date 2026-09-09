@@ -27,7 +27,8 @@
             "target": "enemy:follower",
             "amount": 2,
             "count": 1,
-            "distribution": "random_hits"
+            "distribution": "random_hits",
+            "printed": "Accelerate (1): Deal 2 damage to a random enemy follower."
           }
         ]
       }
@@ -38,7 +39,8 @@
         "op": "damage",
         "target": "enemy:follower",
         "amount": 6,
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and deal it 6 damage."
       },
       {
         "op": "damage",
@@ -46,7 +48,8 @@
         "amount": 2,
         "count": 1,
         "distribution": "random_hits",
-        "exclude_selected": true
+        "exclude_selected": true,
+        "printed": "Deal 2 damage to a random unselected enemy follower."
       }
     ],
     "specific_effects": [
@@ -382,7 +385,8 @@
       {
         "op": "add_to_hand",
         "name": "Fairy",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Add a Fairy to your hand."
       },
       {
         "op": "gate",
@@ -395,7 +399,8 @@
             "target": "last_added_to_hand",
             "keywords": ["Bane"]
           }
-        ]
+        ],
+        "printed": "Combo (3) - Give it Bane."
       }
     ]
   },
@@ -417,7 +422,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -429,7 +435,8 @@
         "source": "copy",
         "from": "enemy:hand",
         "distribution": "random",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Add an exact copy of a random card in your opponent's hand to your hand without revealing it."
       }
     ]
   },
@@ -537,7 +544,8 @@
         "select": 1,
         "attack": 1,
         "defense": 1,
-        "keywords": ["Rush"]
+        "keywords": ["Rush"],
+        "printed": "Evolve: Select another allied follower on the field and give it +1/+1 and Rush."
       }
     ],
     "superevolve": [],
@@ -554,7 +562,8 @@
             "source": "deck",
             "count": 2
           }
-        ]
+        ],
+        "printed": "Fanfare: Combo (3) - Draw 2 cards."
       }
     ]
   },
@@ -735,7 +744,8 @@
       {
         "op": "add_to_hand",
         "name": "Gilded Boots",
-        "count": 1
+        "count": 1,
+        "printed": "Evolve: Add a Gilded Boots to your hand."
       }
     ],
     "superevolve": [],
@@ -746,7 +756,8 @@
         "op": "summon",
         "source": "named",
         "name": "Dread Pirate's Flag",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Dread Pirate's Flag."
       }
     ]
   },
@@ -839,12 +850,14 @@
         "op": "summon",
         "source": "named",
         "name": "Dread Pirate's Flag",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Dread Pirate's Flag."
       },
       {
         "op": "add_to_hand",
         "name": "Gilded Goblet",
-        "count": 1
+        "count": 1,
+        "printed": "Add a Gilded Goblet to your hand."
       }
     ]
   },
@@ -1083,7 +1096,8 @@
         "op": "summon",
         "source": "named",
         "name": "Dread Pirate's Flag",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Dread Pirate's Flag."
       },
       {
         "op": "countdown",
@@ -1092,7 +1106,8 @@
         "filter": {
           "name": "Dread Pirate's Flag"
         },
-        "amount": 5
+        "amount": 5,
+        "printed": "Advance the counts of all allied copies of Dread Pirate's Flag on the field by 5."
       }
     ]
   },
@@ -1195,7 +1210,8 @@
             "count": 4
           }
         ],
-        "select": 1
+        "select": 1,
+        "printed": "Evolve: Select a card in your hand with On Spellboost and spellboost it 4 times."
       }
     ],
     "superevolve": [],
@@ -1206,12 +1222,14 @@
         "op": "damage",
         "target": "enemy:follower",
         "amount": 7,
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and deal it 7 damage."
       },
       {
         "op": "damage",
         "target": "enemy:leader",
-        "amount": 4
+        "amount": 4,
+        "printed": "Deal 4 damage to the enemy leader."
       }
     ]
   },
@@ -1268,7 +1286,8 @@
         "filter": {
           "name": "Obsessed Test Subject"
         },
-        "keywords": ["Bane"]
+        "keywords": ["Bane"],
+        "printed": "Evolve: Select an allied Obsessed Test Subject on the field and give it Bane."
       }
     ],
     "superevolve": [],
@@ -1282,7 +1301,8 @@
             "source": "named",
             "name": "Obsessed Test Subject",
             "count": 3,
-            "keywords": ["Ward"]
+            "keywords": ["Ward"],
+            "printed": "Enhance (8): Summon 3 copies instead and give them Ward."
           }
         ]
       }
@@ -1293,7 +1313,8 @@
         "op": "summon",
         "source": "named",
         "name": "Obsessed Test Subject",
-        "count": 2
+        "count": 2,
+        "printed": "Fanfare: Summon 2 copies of Obsessed Test Subject."
       }
     ]
   },
@@ -1777,7 +1798,8 @@
         "target": "ally:follower",
         "select": 1,
         "attack": 3,
-        "defense": 3
+        "defense": 3,
+        "printed": "Evolve: Select another allied follower on the field and give it +3/+3."
       }
     ],
     "superevolve": [],
@@ -1788,13 +1810,15 @@
         "op": "restore",
         "target": "leader",
         "player": "self",
-        "amount": 3
+        "amount": 3,
+        "printed": "Fanfare: Restore 3 defense to your leader."
       },
       {
         "op": "pp",
         "action": "recover",
         "player": "self",
-        "amount": 3
+        "amount": 3,
+        "printed": "Recover 3 play points."
       }
     ]
   },
@@ -1857,7 +1881,8 @@
         "op": "summon",
         "source": "named",
         "name": "High-Spirited Marauder",
-        "count": 1
+        "count": 1,
+        "printed": "Evolve: Summon a High-Spirited Marauder."
       }
     ],
     "superevolve": [],
@@ -1884,7 +1909,8 @@
             "count": 1,
             "distribution": "random_hits"
           }
-        ]
+        ],
+        "printed": "Fanfare: Do this 1 time: \"Deal 4 damage to a random enemy follower.\" If an allied follower attacked a leader on your last turn, do it 2 times instead."
       }
     ]
   },
@@ -2227,12 +2253,14 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and destroy it."
       },
       {
         "op": "damage",
         "target": "enemy:leader",
-        "amount": 2
+        "amount": 2,
+        "printed": "Deal 2 damage to the enemy leader."
       }
     ]
   },
@@ -2322,12 +2350,14 @@
       {
         "op": "draw",
         "source": "deck",
-        "count": 2
+        "count": 2,
+        "printed": "Super-Evolve: Draw 2 cards."
       },
       {
         "op": "damage",
         "target": "all:leader",
-        "amount": 1
+        "amount": 1,
+        "printed": "Deal 1 damage to both leaders."
       }
     ],
     "keywords": [],
@@ -2336,12 +2366,14 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount": 3
+        "amount": 3,
+        "printed": "Fanfare: Deal 3 damage to all enemy followers."
       },
       {
         "op": "damage",
         "target": "all:leader",
-        "amount": 3
+        "amount": 3,
+        "printed": "Deal 3 damage to both leaders."
       }
     ]
   },
@@ -2650,14 +2682,16 @@
             "op": "summon",
             "source": "named",
             "name": "Holyflame Tiger",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Summon a Holyflame Tiger."
           },
           {
             "op": "damage",
             "target": "enemy:follower",
             "amount": 4,
             "count": 1,
-            "distribution": "random_hits"
+            "distribution": "random_hits",
+            "printed": "Deal 4 damage to a random enemy follower."
           }
         ]
       },
@@ -2668,7 +2702,8 @@
           {
             "op": "countdown",
             "action": "advance",
-            "amount": 3
+            "amount": 3,
+            "printed": "Engage (3): Advance this amulet's count by 3."
           }
         ]
       }
@@ -2986,7 +3021,8 @@
               "whose_turn": "owner"
             }
           }
-        ]
+        ],
+        "printed": "Evolve: Gain Crest: Erralde, Signet Convict."
       }
     ],
     "superevolve": [],
@@ -2996,7 +3032,8 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and destroy it."
       }
     ],
     "specific_effects": [
@@ -3133,7 +3170,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -3144,7 +3182,8 @@
         "op": "summon",
         "source": "named",
         "name": "Analyzing Artifact",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon an Analyzing Artifact."
       }
     ]
   },
@@ -3355,7 +3394,8 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and destroy it."
       },
       {
         "op": "gate",
@@ -3367,7 +3407,8 @@
             "target": "self",
             "keywords": ["Storm"]
           }
-        ]
+        ],
+        "printed": "If there are no duplicates in your deck, give this follower Storm."
       }
     ]
   },
@@ -3433,7 +3474,8 @@
         "target": "ally:deck",
         "filter": {
           "name": "Cutthroat, Fluxblade Convict"
-        }
+        },
+        "printed": "Evolve: Banish all copies of Cutthroat, Fluxblade Convict from your deck."
       },
       {
         "op": "gate",
@@ -3457,7 +3499,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Then, if there are no duplicates in your deck, gain Crest: Cutthroat, Fluxblade Convict."
       }
     ],
     "superevolve": [],
