@@ -5,13 +5,16 @@
 import { OP_TOP_LEVEL_KEYS } from "../op-keys-gate.js";
 import { collectOpsInTree } from "../op-keys-gate.js";
 import {
-  loadAllCardDataEntries,
+  loadUniqueCardsById,
   isTokenEntry,
   type CardDataEntry,
 } from "./loadAllCardData.js";
 import {
   registryDocumentedTopLevelKeys,
   VOCABULARY_RULES,
+  conditionalDocumentedTopLevelKey,
+  CONDITIONAL_DOCUMENTED_TOP_LEVEL_KEYS,
+  type ConditionalDocumentedKey,
 } from "./vocabularyRegistry.js";
 
 export type KeyCount = {
@@ -51,7 +54,8 @@ function collectTopLevelKeys(
 }
 
 export function buildVocabularyReport(
-  entries: CardDataEntry[] = loadAllCardDataEntries(),
+  entries: Iterable<CardDataEntry> = loadUniqueCardsById().values(),
+  conditionalKeys: ConditionalDocumentedKey[] | "default" = "default",
 ): VocabularyReport {
   const byOp = new Map<
     string,
@@ -76,6 +80,10 @@ export function buildVocabularyReport(
       if (matcher.kind === "top-level") documented.add(matcher.key);
     }
   }
+  const resolvedConditionalKeys =
+    conditionalKeys === "default"
+      ? CONDITIONAL_DOCUMENTED_TOP_LEVEL_KEYS
+      : conditionalKeys;
 
   const ops: OpKeyReport[] = [];
   const undocumentedSummary: Array<{ op: string; key: string; total: number }> =
@@ -98,7 +106,12 @@ export function buildVocabularyReport(
         token: counts.token,
         total,
       });
-      if (!allowed.has(key) && !documented.has(key)) {
+      const conditionalDoc = conditionalDocumentedTopLevelKey(
+        op,
+        key,
+        resolvedConditionalKeys,
+      );
+      if (!allowed.has(key) && !documented.has(key) && !conditionalDoc) {
         undocumented.push(key);
         undocumentedSummary.push({ op, key, total });
       }
@@ -146,6 +159,12 @@ export function formatVocabularyReport(report: VocabularyReport): string {
   } else {
     lines.push("## undocumented summary");
     lines.push("  (none)");
+  }
+
+  lines.push("");
+  lines.push("## conditional keys");
+  for (const doc of CONDITIONAL_DOCUMENTED_TOP_LEVEL_KEYS) {
+    lines.push(`  ${doc.op}.${doc.key}: when ${doc.condition} — ${doc.reason}`);
   }
 
   return lines.join("\n");

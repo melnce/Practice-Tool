@@ -3,10 +3,7 @@
  */
 
 import { collectOpsInTree } from "../op-keys-gate.js";
-import {
-  loadAllCardDataEntries,
-  type CardDataEntry,
-} from "./loadAllCardData.js";
+import { loadUniqueCardsById, type CardDataEntry } from "./loadAllCardData.js";
 import { CARD_CONDITION_KEYS } from "../../src/logic/core/conditions/evaluator.js";
 import {
   VOCABULARY_RULES,
@@ -48,7 +45,7 @@ export type VocabularyAuditReport = {
 };
 
 function countCanonicalVsRejected(
-  entries: CardDataEntry[],
+  entries: Iterable<CardDataEntry>,
   rule: VocabularyRule,
 ): { canonical: number; rejected: number } {
   let canonical = 0;
@@ -126,14 +123,14 @@ function countCanonicalForRule(
 }
 
 export function auditVocabularyRegistry(
-  entries: CardDataEntry[] = loadAllCardDataEntries(),
+  entries: Map<string, CardDataEntry> = loadUniqueCardsById(),
 ): VocabularyAuditReport {
   const rejectedHits: SpellingHit[] = [];
   const errors: string[] = [];
   const canonicalCounts: CanonicalCount[] = [];
   const exemptionAudit: ExemptionAudit[] = [];
 
-  for (const { card, sourceFile } of entries) {
+  for (const { card, sourceFile } of entries.values()) {
     const found: { path: string; eff: Record<string, unknown> }[] = [];
     collectOpsInTree(card, card.id, found);
     for (const { path: opPath, eff } of found) {
@@ -158,7 +155,10 @@ export function auditVocabularyRegistry(
   }
 
   for (const rule of VOCABULARY_RULES) {
-    const { canonical, rejected } = countCanonicalVsRejected(entries, rule);
+    const { canonical, rejected } = countCanonicalVsRejected(
+      entries.values(),
+      rule,
+    );
     canonicalCounts.push({
       rule: rule.concept,
       canonical: rule.canonical,
@@ -186,7 +186,7 @@ export function auditVocabularyRegistry(
 
       if (cardIds.length) {
         for (const cardId of cardIds) {
-          const entry = entries.find((e) => e.card.id === cardId);
+          const entry = entries.get(cardId);
           if (!entry) {
             stale.push(cardId);
             continue;
