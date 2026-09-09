@@ -289,6 +289,25 @@ describe("op-keys gate — stat/destroy/keyword card-narrowing in filter", () =>
     expect(narrow).toHaveLength(0);
   });
 
+  it("allows stat condition.tribe with attack_source (Amataz carve-out)", () => {
+    const issues = checkOpKeysForCard({
+      id: "10114130",
+      name: "Amataz",
+      fanfare: [
+        {
+          op: "stat",
+          action: "give",
+          target: "self",
+          attack_source: "count_in_hand",
+          defense_source: "count_in_hand",
+          condition: { tribe: "Pixie" },
+        },
+      ],
+    });
+    const narrow = issues.filter((i) => i.message.includes("card-narrowing"));
+    expect(narrow).toHaveLength(0);
+  });
+
   it("OPS_CARD_NARROWING_IN_FILTER covers stat, destroy, keyword", () => {
     expect(OPS_CARD_NARROWING_IN_FILTER.has("stat")).toBe(true);
     expect(OPS_CARD_NARROWING_IN_FILTER.has("destroy")).toBe(true);
