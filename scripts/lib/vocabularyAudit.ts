@@ -90,8 +90,7 @@ function countCanonicalForRule(
       const obj = c as Record<string, unknown>;
       return (obj.not_self ? 1 : 0) + (obj.include_self ? 1 : 0);
     }
-    case "self-inclusion (exclude)":
-    case "self-inclusion (exclude) — filter spelling": {
+    case "self-inclusion (exclude)": {
       const c = eff.condition;
       if (c && typeof c === "object" && (c as { not_self?: boolean }).not_self)
         return 1;

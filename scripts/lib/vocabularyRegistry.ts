@@ -187,13 +187,11 @@ export const VOCABULARY_RULES: VocabularyRule[] = [
       "evolve_self",
       "super_evolve_self",
       "add_to_hand",
+      "repeat_effect",
+      "countdown",
+      "deck",
     ],
     exemptions: [
-      {
-        when: (eff) => eff.op === "damage",
-        reason:
-          "damage.filter is the counted set for amount_source, not pool narrowing (10674110 Camiscilla)",
-      },
       {
         when: (eff) => eff.op === "repeat_effect",
         reason: "repeat_effect.filter is a repeat count, not pool narrowing",
@@ -240,18 +238,6 @@ export const VOCABULARY_RULES: VocabularyRule[] = [
     buildMessage: ({ card, opPath, eff }) => {
       const op = String(eff.op);
       return `${op} op at ${opPath} uses top-level "exclude_self" — use condition.not_self:true (pool narrowing) — ${descSnippet(card.description)}`;
-    },
-  },
-  {
-    concept: "self-inclusion (exclude) — filter spelling",
-    canonical: "condition.not_self:true",
-    rejected: [{ kind: "nested", field: "filter", key: "not_self" }],
-    ops: [...POOL_SELF_INCLUSION_OPS],
-    reason:
-      "Pool self-exclusion uses condition.not_self:true, not filter.not_self",
-    buildMessage: ({ card, opPath, eff, nestedKey }) => {
-      const op = String(eff.op);
-      return `${op} op at ${opPath}.filter carries pool-only key "${nestedKey}" — use condition.{${nestedKey}} (filter is for card-narrowing keys) — ${descSnippet(card.description)}`;
     },
   },
   {
@@ -322,13 +308,6 @@ export const VOCABULARY_RULES: VocabularyRule[] = [
     canonical: 'distribution:"leftmost"',
     rejected: [{ kind: "string-filter", value: "leftmost" }],
     ops: ["stat", "select", "summon", "destroy", "banish", "damage", "return"],
-    exemptions: [
-      {
-        when: (eff) => eff.op === "stat" && eff.distribution === "leftmost",
-        reason:
-          "stat with distribution:leftmost applies positional selector after pool (10423310 Knightly Ardor)",
-      },
-    ],
     reason:
       'Positional selection uses distribution:"leftmost", not filter:"leftmost"',
     buildMessage: ({ card, opPath, eff }) => {

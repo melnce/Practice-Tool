@@ -26,10 +26,12 @@ import { normalizeKeywordName } from "../src/logic/core/keywords/registry.js";
 import { resolveStatDuration } from "../src/logic/effects/ops/stat/duration.js";
 import {
   checkVocabularyForEffect,
+  checkVocabularyForEffectWithRules,
   OPS_CARD_NARROWING_IN_FILTER,
   POOL_ONLY_CONDITION_KEYS,
   POOL_SELF_INCLUSION_OPS,
   GATE_EXCLUDE_SELF_CARVEOUT_CARD_IDS,
+  type VocabularyRule,
 } from "./lib/vocabularyRegistry.js";
 
 type CardJson = {
@@ -828,7 +830,14 @@ export function checkTriggerConditionKeysForCard(card: CardJson): Issue[] {
   return issues;
 }
 
-function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
+export type OpKeysGateOptions = {
+  vocabularyRules?: VocabularyRule[];
+};
+
+function checkOpTopLevelKeysForCard(
+  card: CardJson,
+  options?: OpKeysGateOptions,
+): Issue[] {
   const issues: Issue[] = [];
   const found: { path: string; eff: Record<string, unknown> }[] = [];
   collectOpsInTree(card, card.id, found);
@@ -900,7 +909,15 @@ function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
       });
     }
 
-    for (const vocabIssue of checkVocabularyForEffect(card, opPath, eff)) {
+    const vocabCheck = options?.vocabularyRules
+      ? checkVocabularyForEffectWithRules(
+          card,
+          opPath,
+          eff,
+          options.vocabularyRules,
+        )
+      : checkVocabularyForEffect(card, opPath, eff);
+    for (const vocabIssue of vocabCheck) {
       issues.push({
         id: vocabIssue.id,
         name: vocabIssue.name,
@@ -966,9 +983,12 @@ function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
   return issues;
 }
 
-export function checkOpKeysForCard(card: CardJson): Issue[] {
+export function checkOpKeysForCard(
+  card: CardJson,
+  options?: OpKeysGateOptions,
+): Issue[] {
   return [
-    ...checkOpTopLevelKeysForCard(card),
+    ...checkOpTopLevelKeysForCard(card, options),
     ...checkTriggerConditionKeysForCard(card),
   ];
 }
