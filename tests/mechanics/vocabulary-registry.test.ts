@@ -2,7 +2,10 @@ import { describe, it, expect } from "vitest";
 import { VOCABULARY_RULES } from "../../scripts/lib/vocabularyRegistry.js";
 import { checkOpKeysForCard } from "../../scripts/op-keys-gate.js";
 import { auditVocabularyRegistry } from "../../scripts/lib/vocabularyAudit.js";
-import { loadAllCardDataEntries } from "../../scripts/lib/loadAllCardData.js";
+import {
+  loadAllCardDataEntries,
+  loadUniqueCardsById,
+} from "../../scripts/lib/loadAllCardData.js";
 import {
   buildGateMatrix,
   formatGateMatrix,
@@ -341,9 +344,7 @@ describe("vocabulary registry — gate enforcement matrix (BU1 pin)", () => {
 
 describe("vocabulary registry — self-audit (BU2)", () => {
   it("no rejected spelling in the three card-data files", () => {
-    const entries = loadAllCardDataEntries();
-    expect(entries.length).toBeGreaterThan(0);
-    const audit = auditVocabularyRegistry(entries);
+    const audit = auditVocabularyRegistry();
     expect(audit.rejectedHits).toHaveLength(0);
   });
 

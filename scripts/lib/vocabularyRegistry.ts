@@ -401,3 +401,45 @@ export function registryDocumentedTopLevelKeys(): Set<string> {
   keys.add("filter");
   return keys;
 }
+
+const STAT_NAME_VALUE_SOURCES = new Set(["named_enter_count"]);
+
+function statNameAllowed(eff: Record<string, unknown>): boolean {
+  const atkSrc = String(eff.attack_source ?? "").toLowerCase();
+  const defSrc = String(eff.defense_source ?? "").toLowerCase();
+  return (
+    STAT_NAME_VALUE_SOURCES.has(atkSrc) || STAT_NAME_VALUE_SOURCES.has(defSrc)
+  );
+}
+
+/** Top-level keys legal only under a documented predicate (mirrors op-keys-gate carve-outs). */
+export type ConditionalDocumentedKey = {
+  op: string;
+  key: string;
+  canonical: string;
+  condition: string;
+  reason: string;
+  when: (eff: Record<string, unknown>) => boolean;
+};
+
+export const CONDITIONAL_DOCUMENTED_TOP_LEVEL_KEYS: ConditionalDocumentedKey[] =
+  [
+    {
+      op: "stat",
+      key: "name",
+      canonical: "name",
+      condition:
+        "attack_source or defense_source is named_enter_count (same predicate as op-keys-gate statNameAllowed)",
+      reason:
+        "Names the card whose allied copies are counted — required for named_enter_count buffs (10844110 Drache & Aluzard, Burning Blood)",
+      when: statNameAllowed,
+    },
+  ];
+
+export function conditionalDocumentedTopLevelKey(
+  op: string,
+  key: string,
+  conditionalKeys: ConditionalDocumentedKey[] = CONDITIONAL_DOCUMENTED_TOP_LEVEL_KEYS,
+): ConditionalDocumentedKey | undefined {
+  return conditionalKeys.find((d) => d.op === op && d.key === key);
+}
