@@ -24,6 +24,13 @@ import { TRIGGER_EVENTS_WITH_DAMAGE_VICTIM } from "../src/logic/core/triggers/di
 import { KEYWORDS_SUPPORTING_STAT_DURATION } from "../src/logic/core/keywords/apply.js";
 import { normalizeKeywordName } from "../src/logic/core/keywords/registry.js";
 import { resolveStatDuration } from "../src/logic/effects/ops/stat/duration.js";
+import {
+  checkVocabularyForEffect,
+  OPS_CARD_NARROWING_IN_FILTER,
+  POOL_ONLY_CONDITION_KEYS,
+  POOL_SELF_INCLUSION_OPS,
+  GATE_EXCLUDE_SELF_CARVEOUT_CARD_IDS,
+} from "./lib/vocabularyRegistry.js";
 
 type CardJson = {
   id: string;
@@ -66,44 +73,12 @@ export const POOL_CONDITION_KEYS = new Set([
   "include_self",
 ]);
 
-/** Pool-only keys — belong in condition, not filter. */
-export const POOL_ONLY_CONDITION_KEYS = new Set(["not_self", "include_self"]);
-
-/** Ops where top-level exclude_self / include_self mean pool self-inclusion (not gate). */
-export const POOL_SELF_INCLUSION_OPS = new Set([
-  "stat",
-  "keyword",
-  "transform",
-]);
-
-/** Gate exclude_self is a count condition, not pool narrowing — never migrate. */
-export const GATE_EXCLUDE_SELF_CARVEOUT_CARD_IDS = new Set([
-  "10501110", // Monster Litterateur — field_matches gate
-  "10931110", // Obsessed Test Subject — named_enter_count gate
-]);
-
-/**
- * Ops where CARD_CONDITION_KEYS must live in filter (not condition).
- * Banish splits condition→getPool vs filter→applyFilters; select merges both
- * but filter is the canonical spelling (targeting.ts selectPoolCondition).
- */
-export const OPS_CARD_NARROWING_IN_FILTER = new Set([
-  "banish",
-  "select",
-  "stat",
-  "destroy",
-  "keyword",
-]);
-
-/** stat carve-outs where condition may still carry CARD_CONDITION_KEYS. */
-function statCardNarrowingInConditionAllowed(
-  eff: Record<string, unknown>,
-): boolean {
-  // attack_source/defense_source: filter is the counted set, not pool narrowing
-  // (10114130 Amataz: X = Pixie followers in hand).
-  if (eff.attack_source != null || eff.defense_source != null) return true;
-  return false;
-}
+export {
+  OPS_CARD_NARROWING_IN_FILTER,
+  POOL_ONLY_CONDITION_KEYS,
+  POOL_SELF_INCLUSION_OPS,
+  GATE_EXCLUDE_SELF_CARVEOUT_CARD_IDS,
+} from "./lib/vocabularyRegistry.js";
 
 /** cardFilter family (draw, search). */
 export const CARD_FILTER_KEYS = new Set([
@@ -734,93 +709,6 @@ function statNameAllowed(eff: Record<string, unknown>): boolean {
   );
 }
 
-function checkSelfInclusionSpelling(
-  card: CardJson,
-  opPath: string,
-  eff: Record<string, unknown>,
-): Issue[] {
-  const issues: Issue[] = [];
-  const op = String(eff.op);
-
-  if (POOL_SELF_INCLUSION_OPS.has(op) && eff.exclude_self === true) {
-    issues.push({
-      id: card.id,
-      name: card.name,
-      kind: "error",
-      message: `${op} op at ${opPath} uses top-level "exclude_self" — use condition.not_self:true (pool narrowing) — ${descSnippet(card.description)}`,
-    });
-  }
-
-  if (POOL_SELF_INCLUSION_OPS.has(op) && eff.include_self === true) {
-    issues.push({
-      id: card.id,
-      name: card.name,
-      kind: "error",
-      message: `${op} op at ${opPath} uses top-level "include_self" — use condition.include_self:true (pool narrowing) — ${descSnippet(card.description)}`,
-    });
-  }
-
-  if (op === "gate" && eff.exclude_self === true) {
-    if (!GATE_EXCLUDE_SELF_CARVEOUT_CARD_IDS.has(card.id)) {
-      issues.push({
-        id: card.id,
-        name: card.name,
-        kind: "error",
-        message: `${op} op at ${opPath} uses top-level "exclude_self" outside documented gate carve-out (10501110 Monster Litterateur, 10931110 Obsessed Test Subject) — ${descSnippet(card.description)}`,
-      });
-    }
-    return issues;
-  }
-
-  const cond = eff.condition;
-  if (cond && typeof cond === "object" && !Array.isArray(cond)) {
-    const c = cond as Record<string, unknown>;
-    if (c.not_self === false) {
-      issues.push({
-        id: card.id,
-        name: card.name,
-        kind: "error",
-        message: `${op} op at ${opPath}.condition uses not_self:false — use condition.include_self:true — ${descSnippet(card.description)}`,
-      });
-    }
-  }
-
-  return issues;
-}
-
-function checkStatDurationSpelling(
-  card: CardJson,
-  opPath: string,
-  eff: Record<string, unknown>,
-): Issue[] {
-  if (String(eff.op) !== "stat") return [];
-  if (eff.until_end_of_turn !== true) return [];
-  return [
-    {
-      id: card.id,
-      name: card.name,
-      kind: "error",
-      message: `stat op at ${opPath} uses until_end_of_turn:true — use duration:"turn_end" — ${descSnippet(card.description)}`,
-    },
-  ];
-}
-
-function checkSelectBooleanSpelling(
-  card: CardJson,
-  opPath: string,
-  eff: Record<string, unknown>,
-): Issue[] {
-  if (eff.select !== true) return [];
-  return [
-    {
-      id: card.id,
-      name: card.name,
-      kind: "error",
-      message: `${String(eff.op)} op at ${opPath} uses select:true — use select:1 — ${descSnippet(card.description)}`,
-    },
-  ];
-}
-
 export function collectOpsInTree(
   node: unknown,
   pathStr: string,
@@ -1012,9 +900,14 @@ function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
       });
     }
 
-    issues.push(...checkSelfInclusionSpelling(card, opPath, eff));
-    issues.push(...checkStatDurationSpelling(card, opPath, eff));
-    issues.push(...checkSelectBooleanSpelling(card, opPath, eff));
+    for (const vocabIssue of checkVocabularyForEffect(card, opPath, eff)) {
+      issues.push({
+        id: vocabIssue.id,
+        name: vocabIssue.name,
+        kind: vocabIssue.kind,
+        message: vocabIssue.message,
+      });
+    }
 
     for (const field of ["condition", "filter", "filters"] as const) {
       const val = eff[field];
@@ -1026,16 +919,6 @@ function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
       if (!nestedAllowed) continue;
 
       for (const nk of Object.keys(val as Record<string, unknown>)) {
-        if (field === "filter" && POOL_ONLY_CONDITION_KEYS.has(nk)) {
-          issues.push({
-            id: card.id,
-            name: card.name,
-            kind: "error",
-            message: `${op} op at ${opPath}.filter carries pool-only key "${nk}" — use condition.{${nk}} (filter is for card-narrowing keys) — ${descSnippet(card.description)}`,
-          });
-          continue;
-        }
-
         if (REJECTED_NESTED_KEYS.has(nk) || !nestedAllowed.has(nk)) {
           const alt = nearestKey(nk, nestedAllowed);
           const hint = REJECTED_NESTED_KEYS.has(nk)
@@ -1046,24 +929,6 @@ function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
             name: card.name,
             kind: "error",
             message: `${op} op at ${opPath}.${field} has ${hint} key "${nk}" — ${descSnippet(card.description)}`,
-          });
-        }
-      }
-
-      if (
-        field === "condition" &&
-        OPS_CARD_NARROWING_IN_FILTER.has(op) &&
-        typeof val === "object" &&
-        !Array.isArray(val) &&
-        !(op === "stat" && statCardNarrowingInConditionAllowed(eff))
-      ) {
-        for (const nk of Object.keys(val as Record<string, unknown>)) {
-          if (!CARD_CONDITION_KEYS.has(nk)) continue;
-          issues.push({
-            id: card.id,
-            name: card.name,
-            kind: "error",
-            message: `${op} op at ${opPath}.condition carries card-narrowing key "${nk}" — use filter.{${nk}} (condition is for pool-only keys ${[...POOL_ONLY_CONDITION_KEYS].join("/")}) — ${descSnippet(card.description)}`,
           });
         }
       }
