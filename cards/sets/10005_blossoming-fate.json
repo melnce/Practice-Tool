@@ -152,7 +152,6 @@
           {
             "op": "countdown",
             "action": "advance",
-            "target": "self",
             "amount": 1
           }
         ]
@@ -2028,7 +2027,7 @@
                 "target": "attacker",
                 "attack": 1,
                 "defense": 0,
-                "until_end_of_turn": true
+                "duration": "turn_end"
               }
             ]
           },
@@ -2357,8 +2356,10 @@
         "op": "transform",
         "target": "all:follower",
         "distribution": "all",
-        "exclude_self": true,
-        "into": "Skeleton"
+        "into": "Skeleton",
+        "condition": {
+          "not_self": true
+        }
       }
     ],
     "spell": []
@@ -3456,7 +3457,9 @@
                     "target": "ally:follower",
                     "attack": 2,
                     "defense": 2,
-                    "include_self": true
+                    "condition": {
+                      "include_self": true
+                    }
                   }
                 ]
               },
@@ -3523,7 +3526,9 @@
                                 "target": "ally:follower",
                                 "attack": -2,
                                 "defense": -2,
-                                "include_self": true
+                                "condition": {
+                                  "include_self": true
+                                }
                               }
                             ]
                           },

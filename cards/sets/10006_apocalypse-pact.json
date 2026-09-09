@@ -1163,8 +1163,10 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:follower",
-        "exclude_self": true,
-        "keywords": ["Rush"]
+        "keywords": ["Rush"],
+        "condition": {
+          "not_self": true
+        }
       }
     ],
     "keywords": [],
@@ -2522,7 +2524,6 @@
           {
             "op": "countdown",
             "action": "advance",
-            "target": "self",
             "amount": 1
           }
         ]

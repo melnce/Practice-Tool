@@ -479,7 +479,9 @@
         "action": "give",
         "target": "ally:follower",
         "keywords": ["Barrier"],
-        "include_self": true
+        "condition": {
+          "include_self": true
+        }
       }
     ],
     "evolve": [],
@@ -1067,11 +1069,11 @@
                 "op": "stat",
                 "action": "give",
                 "target": "ally:follower",
-                "filter": "leftmost",
-                "condition": {
+                "filter": {
                   "class": "Swordcraft"
                 },
-                "attacks_per_turn": 2
+                "attacks_per_turn": 2,
+                "distribution": "leftmost"
               }
             ],
             "label": "Give the leftmost allied Swordcraft follower \"Can attack 2 times per turn\""
@@ -3529,7 +3531,7 @@
                     "target": "attacker",
                     "attack": -3,
                     "defense": 0,
-                    "until_end_of_turn": true
+                    "duration": "turn_end"
                   }
                 ]
               }

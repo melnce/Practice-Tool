@@ -1316,7 +1316,7 @@
             "target": "self",
             "attack": 1,
             "defense": 0,
-            "until_end_of_turn": true
+            "duration": "turn_end"
           }
         ]
       }
@@ -1777,8 +1777,10 @@
         "filter": {
           "class": "Swordcraft"
         },
-        "exclude_self": true,
-        "keywords": ["Barrier"]
+        "keywords": ["Barrier"],
+        "condition": {
+          "not_self": true
+        }
       }
     ],
     "fanfare": [
@@ -4324,7 +4326,7 @@
             "target": "self",
             "attack": 1,
             "defense": 0,
-            "until_end_of_turn": true
+            "duration": "turn_end"
           }
         ]
       }
@@ -5477,7 +5479,7 @@
         "filter": {
           "type": "Artifact"
         },
-        "select": true,
+        "select": 1,
         "max_cost": 5
       }
     ],

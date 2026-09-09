@@ -218,11 +218,7 @@ function handleDoubleStats(
  * String filters like `"leftmost"` stay in filterBuffCandidates.
  */
 function conditionWithObjectFilter(eff: StatOp): any {
-  let merged = mergeEffectPoolCondition(eff);
-  if ((eff as any).include_self === true) {
-    merged = { ...merged, include_self: true };
-  }
-  return merged;
+  return mergeEffectPoolCondition(eff);
 }
 
 function handlePoolBasedBuff(
