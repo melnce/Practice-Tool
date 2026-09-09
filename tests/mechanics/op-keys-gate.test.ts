@@ -2,7 +2,9 @@ import { describe, it, expect } from "vitest";
 import {
   checkOpKeysForCard,
   checkTriggerConditionKeysForCard,
+  OPS_CARD_NARROWING_IN_FILTER,
 } from "../../scripts/op-keys-gate.js";
+import { KEYWORDS_SUPPORTING_STAT_DURATION } from "../../src/logic/core/keywords/apply.js";
 
 describe("op-keys gate — action enums", () => {
   it("flags bogus pp action naming the card", () => {
@@ -220,5 +222,179 @@ describe("op-keys gate — damage class", () => {
     expect(issues[0]?.message).toMatch(
       /damage op.*unsupported top-level key "card_class"/i,
     );
+  });
+});
+
+describe("op-keys gate — stat/destroy/keyword card-narrowing in filter", () => {
+  for (const op of ["stat", "destroy", "keyword"] as const) {
+    it(`flags condition.tribe on ${op} op`, () => {
+      const issues = checkOpKeysForCard({
+        id: `BAD_${op.toUpperCase()}_COND`,
+        name: `Bad ${op}`,
+        fanfare: [
+          {
+            op,
+            target: "ally:follower",
+            condition: { tribe: "Pixie" },
+          },
+        ],
+      });
+      const narrow = issues.filter((i) => i.message.includes("card-narrowing"));
+      expect(narrow.length).toBeGreaterThan(0);
+      expect(narrow[0]?.message).toMatch(/use filter\.\{tribe\}/);
+    });
+
+    it(`allows filter.tribe on ${op} op`, () => {
+      const issues = checkOpKeysForCard({
+        id: `OK_${op.toUpperCase()}_FILT`,
+        name: `Ok ${op}`,
+        fanfare: [
+          {
+            op,
+            target: "ally:follower",
+            filter: { tribe: "Pixie" },
+          },
+        ],
+      });
+      const narrow = issues.filter((i) => i.message.includes("card-narrowing"));
+      expect(narrow).toHaveLength(0);
+    });
+  }
+
+  it("allows stat condition.class with filter leftmost (Knightly Ardor carve-out)", () => {
+    const issues = checkOpKeysForCard({
+      id: "10423310",
+      name: "Knightly Ardor",
+      spell: [
+        {
+          op: "mode",
+          options: [
+            {
+              effects: [
+                {
+                  op: "stat",
+                  action: "give",
+                  target: "ally:follower",
+                  filter: "leftmost",
+                  condition: { class: "Swordcraft" },
+                  attacks_per_turn: 2,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    const narrow = issues.filter((i) => i.message.includes("card-narrowing"));
+    expect(narrow).toHaveLength(0);
+  });
+
+  it("OPS_CARD_NARROWING_IN_FILTER covers stat, destroy, keyword", () => {
+    expect(OPS_CARD_NARROWING_IN_FILTER.has("stat")).toBe(true);
+    expect(OPS_CARD_NARROWING_IN_FILTER.has("destroy")).toBe(true);
+    expect(OPS_CARD_NARROWING_IN_FILTER.has("keyword")).toBe(true);
+    expect(OPS_CARD_NARROWING_IN_FILTER.has("damage")).toBe(false);
+  });
+});
+
+describe("op-keys gate — pool-only keys in condition", () => {
+  it("flags filter.not_self on destroy op", () => {
+    const issues = checkOpKeysForCard({
+      id: "BAD_NOT_SELF_FILT",
+      name: "Bad Not Self Filter",
+      fanfare: [
+        {
+          op: "destroy",
+          target: "ally:follower",
+          filter: { not_self: true },
+        },
+      ],
+    });
+    const poolOnly = issues.filter((i) => i.message.includes("pool-only"));
+    expect(poolOnly.length).toBeGreaterThan(0);
+    expect(poolOnly[0]?.message).toMatch(/use condition\.\{not_self\}/);
+  });
+
+  it("allows condition.not_self on destroy op", () => {
+    const issues = checkOpKeysForCard({
+      id: "OK_NOT_SELF_COND",
+      name: "Ok Not Self Cond",
+      fanfare: [
+        {
+          op: "destroy",
+          target: "ally:follower",
+          condition: { not_self: true },
+        },
+      ],
+    });
+    const poolOnly = issues.filter((i) => i.message.includes("pool-only"));
+    expect(poolOnly).toHaveLength(0);
+  });
+});
+
+describe("op-keys gate — damage exclude_tribe carve-out", () => {
+  it("allows condition.exclude_tribe on damage op", () => {
+    const issues = checkOpKeysForCard({
+      id: "10603210",
+      name: "Dark Dimensions",
+      fanfare: [
+        {
+          op: "damage",
+          target: "enemy:follower",
+          amount: 3,
+          condition: { exclude_tribe: "Encroacher" },
+        },
+      ],
+    });
+    const narrow = issues.filter((i) => i.message.includes("card-narrowing"));
+    expect(narrow).toHaveLength(0);
+  });
+});
+
+describe("op-keys gate — stat duration keyword grant", () => {
+  const allowed = [...KEYWORDS_SUPPORTING_STAT_DURATION][0] ?? "cant_attack";
+
+  it("rejects non-permanent stat granting unsupported keyword", () => {
+    const issues = checkOpKeysForCard({
+      id: "BAD_STAT_KW_DUR",
+      name: "Bad Stat Kw Dur",
+      fanfare: [
+        {
+          op: "stat",
+          action: "give",
+          target: "ally:follower",
+          attack: 0,
+          defense: 0,
+          keywords: ["Barrier"],
+          until_end_of_turn: true,
+        },
+      ],
+    });
+    const durIssues = issues.filter((i) =>
+      i.message.includes("cannot grant keyword"),
+    );
+    expect(durIssues.length).toBeGreaterThan(0);
+  });
+
+  it("allows non-permanent stat granting supported keyword", () => {
+    const issues = checkOpKeysForCard({
+      id: "OK_STAT_KW_DUR",
+      name: "Ok Stat Kw Dur",
+      fanfare: [
+        {
+          op: "stat",
+          action: "give",
+          target: "ally:follower",
+          attack: 0,
+          defense: 0,
+          keywords: [allowed],
+          until_end_of_turn: true,
+        },
+      ],
+    });
+    const durIssues = issues.filter((i) =>
+      i.message.includes("cannot grant keyword"),
+    );
+    expect(durIssues).toHaveLength(0);
   });
 });

@@ -21,6 +21,9 @@ import {
 import { TRIGGER_CONDITION_KEYS } from "../src/logic/core/triggers/conditions.js";
 import { CARD_CONDITION_KEYS } from "../src/logic/core/conditions/evaluator.js";
 import { TRIGGER_EVENTS_WITH_DAMAGE_VICTIM } from "../src/logic/core/triggers/dispatcher.js";
+import { KEYWORDS_SUPPORTING_STAT_DURATION } from "../src/logic/core/keywords/apply.js";
+import { normalizeKeywordName } from "../src/logic/core/keywords/registry.js";
+import { resolveStatDuration } from "../src/logic/effects/ops/stat/duration.js";
 
 type CardJson = {
   id: string;
@@ -71,7 +74,26 @@ export const POOL_ONLY_CONDITION_KEYS = new Set(["not_self", "include_self"]);
  * Banish splits condition→getPool vs filter→applyFilters; select merges both
  * but filter is the canonical spelling (targeting.ts selectPoolCondition).
  */
-const OPS_CARD_NARROWING_IN_FILTER = new Set(["banish", "select"]);
+export const OPS_CARD_NARROWING_IN_FILTER = new Set([
+  "banish",
+  "select",
+  "stat",
+  "destroy",
+  "keyword",
+]);
+
+/** stat carve-outs where condition may still carry CARD_CONDITION_KEYS. */
+function statCardNarrowingInConditionAllowed(
+  eff: Record<string, unknown>,
+): boolean {
+  // filter:"leftmost" is a positional selector — condition holds the narrowing
+  // (10423310 Knightly Ardor mode 1).
+  if (typeof eff.filter === "string") return true;
+  // attack_source/defense_source: filter is the counted set, not pool narrowing
+  // (10114130 Amataz: X = Pixie followers in hand).
+  if (eff.attack_source != null || eff.defense_source != null) return true;
+  return false;
+}
 
 /** cardFilter family (draw, search). */
 export const CARD_FILTER_KEYS = new Set([
@@ -909,6 +931,19 @@ function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
       if (!nestedAllowed) continue;
 
       for (const nk of Object.keys(val as Record<string, unknown>)) {
+        if (
+          field === "filter" &&
+          POOL_ONLY_CONDITION_KEYS.has(nk)
+        ) {
+          issues.push({
+            id: card.id,
+            name: card.name,
+            kind: "error",
+            message: `${op} op at ${opPath}.filter carries pool-only key "${nk}" — use condition.{${nk}} (filter is for card-narrowing keys) — ${descSnippet(card.description)}`,
+          });
+          continue;
+        }
+
         if (REJECTED_NESTED_KEYS.has(nk) || !nestedAllowed.has(nk)) {
           const alt = nearestKey(nk, nestedAllowed);
           const hint = REJECTED_NESTED_KEYS.has(nk)
@@ -927,7 +962,8 @@ function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
         field === "condition" &&
         OPS_CARD_NARROWING_IN_FILTER.has(op) &&
         typeof val === "object" &&
-        !Array.isArray(val)
+        !Array.isArray(val) &&
+        !(op === "stat" && statCardNarrowingInConditionAllowed(eff))
       ) {
         for (const nk of Object.keys(val as Record<string, unknown>)) {
           if (!CARD_CONDITION_KEYS.has(nk)) continue;
@@ -937,6 +973,33 @@ function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
             kind: "error",
             message: `${op} op at ${opPath}.condition carries card-narrowing key "${nk}" — use filter.{${nk}} (condition is for pool-only keys ${[...POOL_ONLY_CONDITION_KEYS].join("/")}) — ${descSnippet(card.description)}`,
           });
+        }
+      }
+    }
+
+    if (op === "stat") {
+      const duration = resolveStatDuration(eff as Parameters<typeof resolveStatDuration>[0]);
+      if (duration !== "permanent") {
+        const grantListRaw = eff.keywords;
+        if (grantListRaw != null) {
+          const grantList = Array.isArray(grantListRaw)
+            ? grantListRaw
+            : [grantListRaw];
+          for (const kw of grantList) {
+            const name =
+              (typeof kw === "string"
+                ? kw
+                : (kw as { name?: string })?.name) || "";
+            const key = normalizeKeywordName(name);
+            if (!key) continue;
+            if (KEYWORDS_SUPPORTING_STAT_DURATION.has(key)) continue;
+            issues.push({
+              id: card.id,
+              name: card.name,
+              kind: "error",
+              message: `stat op at ${opPath} duration:"${duration}" cannot grant keyword "${name}" — handler does not consume expiry (allowed: ${[...KEYWORDS_SUPPORTING_STAT_DURATION].join(", ")}) — ${descSnippet(card.description)}`,
+            });
+          }
         }
       }
     }
