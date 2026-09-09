@@ -12,7 +12,8 @@ import {
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { dispatch as engineDispatch } from "../../src/engine.js";
-import { getBoard } from "../../src/core/playerHelpers.js";
+import { getBoard, getHand, getDeck } from "../../src/core/playerHelpers.js";
+import { getPool } from "../../src/logic/core/targeting.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import "../../src/logic/core/effects/index.js";
 
@@ -54,6 +55,17 @@ function enemyFollower(name: string, atk = 2, def = 2) {
   c.peak_defense = def;
   c.justPlayed = false;
   getBoard(state, "second").push(c);
+  return c;
+}
+
+function allyAmulet(name: string, extra: Record<string, unknown> = {}) {
+  const c = createCard(
+    { name, type: "Amulet", cost: 2, ...extra },
+    "board",
+    "first",
+  );
+  c.justPlayed = false;
+  getBoard(state, "first").push(c);
   return c;
 }
 
@@ -145,11 +157,12 @@ describe("transform select on board route", () => {
     ).toBe("Regal Falcon");
   }, 60_000);
 
-  it("10573310 Sincerity spell: opens prompt for any card, transforms chosen ally", () => {
+  it("10573310 Sincerity spell: opens prompt for any card including amulets, transforms chosen ally follower", () => {
     enemyFollower("EnemyA");
     enemyFollower("EnemyB");
     const allyA = allyFollower("AllyA");
     allyFollower("AllyB");
+    allyAmulet("AllyAmulet");
 
     const hand = state.players.first.hand;
     hand.push(createCard(SINCERITY, "hand", "first"));
@@ -157,6 +170,7 @@ describe("transform select on board route", () => {
 
     expect(state.pendingTargetEffect).toBeDefined();
     expect(poolNames()).toContain("AllyA");
+    expect(poolNames()).toContain("AllyAmulet");
     expect(allyA.name).toBe("AllyA");
 
     resolvePendingTarget(allyA.uid);
@@ -165,6 +179,114 @@ describe("transform select on board route", () => {
     expect(
       getBoard(state, "first").find((c) => c.uid === allyA.uid)?.name,
     ).toBe("Imari's Little Buddies");
+  }, 60_000);
+
+  it("10573310 Sincerity spell: allied amulet is in pool and transforms into Imari's Little Buddies", () => {
+    enemyFollower("EnemyA");
+    const amulet = allyAmulet("AllyAmulet", {
+      hasCountdown: true,
+      countdown: 3,
+      keywordState: { engagedThisTurn: true },
+    });
+    amulet.keywordState = { engagedThisTurn: true };
+
+    const hand = state.players.first.hand;
+    hand.push(createCard(SINCERITY, "hand", "first"));
+    whenPlayCard("first", hand.length - 1);
+
+    expect(state.pendingTargetEffect).toBeDefined();
+    expect(poolNames()).toContain("AllyAmulet");
+
+    resolvePendingTarget(amulet.uid);
+
+    expect(state.pendingTargetEffect).toBeUndefined();
+    const result = getBoard(state, "first").find((c) => c.uid === amulet.uid)!;
+    expect(result.name).toBe("Imari's Little Buddies");
+    expect(result.type).toBe("Follower");
+    expect(Number(result.attack)).toBe(3);
+    expect(Number(result.defense)).toBe(3);
+    expect(result.peak_defense).toBe(3);
+    expect(result.hasRush).toBe(true);
+    expect(result.justPlayed).toBe(true);
+    expect(result.hasAttacked).toBe(false);
+    expect(result.hasCountdown).toBeFalsy();
+    expect(result.countdown).toBeUndefined();
+    expect(result.keywordState?.engagedThisTurn).toBeFalsy();
+    expect(getBoard(state, "first").every((c) => c != null)).toBe(true);
+    expect(getBoard(state, "first").length).toBe(1);
+  }, 60_000);
+
+  it("negative control: any:any board pool excludes leader", () => {
+    allyFollower("AllyA");
+    allyAmulet("AllyAmulet");
+    const pool = getPool(
+      "any:any",
+      "first",
+      null,
+      {},
+      { isTargetedEffect: true },
+    );
+    expect(pool.some((c) => c.type === "Leader")).toBe(false);
+    expect(
+      pool.every(
+        (c) =>
+          c.zone === "board" ||
+          getBoard(state, "first").includes(c) ||
+          getBoard(state, "second").includes(c),
+      ),
+    ).toBe(true);
+  }, 60_000);
+
+  it("negative control: any:any board pool excludes hand and deck cards", () => {
+    allyFollower("AllyA");
+    allyAmulet("AllyAmulet");
+    const handCard = createCard(
+      { name: "HandSpell", type: "Spell", cost: 1 },
+      "hand",
+      "first",
+    );
+    getHand(state, "first").push(handCard);
+    const deckCard = createCard(
+      { name: "DeckFiller", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      "deck",
+      "first",
+    );
+    getDeck(state, "first").push(deckCard);
+
+    const pool = getPool(
+      "any:any",
+      "first",
+      null,
+      {},
+      { isTargetedEffect: true },
+    );
+    expect(pool.map((c) => c.name)).not.toContain("HandSpell");
+    expect(pool.map((c) => c.name)).not.toContain("DeckFiller");
+  }, 60_000);
+
+  it("negative control: Ara any:follower pool unchanged with amulet on board", () => {
+    enemyFollower("EnemyA");
+    allyFollower("AllyA");
+    allyAmulet("AllyAmulet");
+
+    const ara = createCard(ARA, "board", "first");
+    ara.peak_defense = ara.defense;
+    ara.justPlayed = false;
+    getBoard(state, "first").unshift(ara);
+
+    engineDispatch(state, {
+      type: "EVOLVE",
+      player: "first",
+      cardUid: ara.uid,
+    });
+
+    expect(state.pendingTargetEffect).toBeDefined();
+    expect(poolNames().sort()).toEqual(["AllyA", "EnemyA"]);
+    expect(poolNames()).not.toContain("AllyAmulet");
+
+    resolvePendingTarget(
+      getBoard(state, "first").find((c) => c.name === "AllyA")!.uid,
+    );
   }, 60_000);
 
   it("negative control: damage evolve still prompts with one enemy (sibling op parity)", () => {

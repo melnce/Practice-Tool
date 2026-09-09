@@ -236,7 +236,7 @@ export function handleTransform(
           isTargetedEffect: selectN > 0 && !wantAll,
         },
       );
-      let targets = pool.filter((c) => c && c.type === "Follower");
+      let targets = pool;
       if ((eff as any).exclude_self && ctx.sourceCard) {
         targets = targets.filter((c) => c.uid !== ctx.sourceCard?.uid);
       }
