@@ -65,6 +65,8 @@
     "check:subjecthood": "npx tsx scripts/subjecthood.ts --check",
     "check:test-effect-dangerous-keys": "npx tsx scripts/test-effect-dangerous-keys.ts --check",
     "report:subjecthood": "npx tsx scripts/subjecthood.ts",
+    "report:vocabulary": "npx tsx scripts/report-vocabulary.ts",
+    "report:clause-shape": "npx tsx scripts/report-clause-shape.ts",
     "check:keyword-names": "npx tsx scripts/check-keyword-names.ts",
     "check:rotation-meta": "npx tsx scripts/check-rotation-meta.ts",
     "check:values": "npx tsx scripts/check-values.ts",
