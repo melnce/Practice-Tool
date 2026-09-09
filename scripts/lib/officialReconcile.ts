@@ -76,6 +76,13 @@ export type QaCoverageRow = {
   answer: string;
   /** Block-scoped pin with QA_PIN_BLOCK_KEYWORD_MIN (honest default). */
   pinned: boolean;
+  /**
+   * Derived: fewer extracted Q&A keywords than QA_PIN_BLOCK_KEYWORD_MIN — the ≥2
+   * metric cannot pin this row; behaviour may still be covered at min-1.
+   */
+  unpinnable: boolean;
+  /** Keywords mined from Q+A with subject card name stripped (pin predicate input). */
+  extractedKeywords: string[];
   /** File-scoped pin (Q+A extraction, name stripped): card id + ≥1 keyword anywhere in the file. */
   pinnedFileScoped: boolean;
   /** Block-scoped pin requiring ≥ceil(keywords/2) keyword hits in a subject block. */
@@ -510,6 +517,14 @@ export function countQaPinsAtExactlyTwoKeywords(rows: QaCoverageRow[]): number {
 export const QA_PIN_UNPINNED_FILE_SCOPED_SAME_EXTRACTION_STATUS =
   "unpinned (file-scoped, same extraction)";
 
+/** Status label when the ≥2 keyword metric cannot pin but min-1 behaviour coverage exists. */
+export const QA_PIN_UNPINNABLE_STATUS =
+  "unpinnable (behaviour pinned at min-1; ≥2 metric impossible)";
+
+export function isQaUnpinnable(extractedKeywordCount: number): boolean {
+  return extractedKeywordCount < QA_PIN_BLOCK_KEYWORD_MIN;
+}
+
 export type QaPinThreshold = "min1" | "min2" | "half";
 
 export type QaPinResult = {
@@ -789,6 +804,13 @@ export function coverOfficialQa(
     const rec = getOfficialCard(meta, id);
     if (!rec) continue;
     for (const qa of rec.questions) {
+      const extractedKeywords = extractQaKeywords(
+        qa.question,
+        qa.answer,
+        rec.name,
+        id,
+      );
+      const unpinnable = isQaUnpinnable(extractedKeywords.length);
       const pin = evaluateQaPin(
         id,
         rec.name,
@@ -798,20 +820,29 @@ export function coverOfficialQa(
         blockIndex,
       );
       const blockPinned = pin.pinnedBlockScopedMin2;
+      const min1BlockMatch = unpinnable && pin.pinnedBlockScopedMin1;
       rows.push({
         id,
         name: rec.name,
         question: qa.question,
         answer: qa.answer,
         pinned: blockPinned,
+        unpinnable,
+        extractedKeywords,
         pinnedFileScoped: pin.pinnedFileScoped,
         pinnedBlockScopedMin1: pin.pinnedBlockScopedMin1,
         pinnedBlockScopedHalf: pin.pinnedBlockScopedHalf,
         matchedKeywords: blockPinned
           ? pin.matchedKeywords
-          : pin.fileScopedMatchedKeywords,
-        matchedFile: blockPinned ? pin.matchedFile : pin.fileScopedMatchedFile,
-        matchedBlock: blockPinned ? pin.matchedBlock : null,
+          : min1BlockMatch
+            ? pin.matchedKeywords
+            : pin.fileScopedMatchedKeywords,
+        matchedFile: blockPinned
+          ? pin.matchedFile
+          : min1BlockMatch
+            ? pin.matchedFile
+            : pin.fileScopedMatchedFile,
+        matchedBlock: blockPinned || min1BlockMatch ? pin.matchedBlock : null,
       });
     }
   }
@@ -1025,6 +1056,8 @@ export type OfficialReport = {
   qaRulings: QaRulingNote[];
   /** Block-scoped, ≥2 keywords in a subject block (honest default). */
   pinnedCount: number;
+  unpinnableCount: number;
+  /** Actionable backlog: neither pinned nor unpinnable. */
   unpinnedCount: number;
   pinnedFileScopedCount: number;
   unpinnedFileScopedCount: number;
@@ -1049,6 +1082,8 @@ export function summarizeQaCoverage(rows: QaCoverageRow[]): {
   unpinnedFileScoped: number;
   pinnedBlockScopedMin2: number;
   unpinnedBlockScopedMin2: number;
+  unpinnable: number;
+  unpinnedActionable: number;
   pinnedBlockScopedHalf: number;
   unpinnedBlockScopedHalf: number;
   pinnedBlockScopedMin1: number;
@@ -1060,6 +1095,8 @@ export function summarizeQaCoverage(rows: QaCoverageRow[]): {
     unpinnedFileScoped: rows.filter((r) => !r.pinnedFileScoped).length,
     pinnedBlockScopedMin2: rows.filter((r) => r.pinned).length,
     unpinnedBlockScopedMin2: rows.filter((r) => !r.pinned).length,
+    unpinnable: rows.filter((r) => r.unpinnable).length,
+    unpinnedActionable: rows.filter((r) => !r.pinned && !r.unpinnable).length,
     pinnedBlockScopedHalf: rows.filter((r) => r.pinnedBlockScopedHalf).length,
     unpinnedBlockScopedHalf: rows.filter((r) => !r.pinnedBlockScopedHalf)
       .length,
@@ -1155,7 +1192,8 @@ export function buildOfficialReport(
     qaCoverage,
     qaRulings,
     pinnedCount: qaSummary.pinnedBlockScopedMin2,
-    unpinnedCount: qaSummary.unpinnedBlockScopedMin2,
+    unpinnableCount: qaSummary.unpinnable,
+    unpinnedCount: qaSummary.unpinnedActionable,
     pinnedFileScopedCount: qaSummary.pinnedFileScoped,
     unpinnedFileScopedCount: qaSummary.unpinnedFileScoped,
     pinnedAnswerOnlyFileScopedCount: qaHistorical.pinnedAnswerOnlyFileScoped,
@@ -1323,6 +1361,8 @@ export function renderOfficialReportMarkdown(
     "",
     `Measurement arc (pinned at each era's default): **${report.pinnedAnswerOnlyFileScopedCount}** (file-scoped, answer-only) → **${report.pinnedAnswerOnlyBlockScopedMin2Count}** (block-scoped, answer-only, #337) → **${report.pinnedCount}** (block-scoped, question+answer, #341). File-scoped with current extraction: **${report.pinnedFileScopedCount}** (isolates scoping from extraction: ${report.pinnedFileScopedCount} → ${report.pinnedCount}).`,
     "",
+    `Default headline: **${report.pinnedCount} pinned / ${report.unpinnableCount} unpinnable / ${report.unpinnedCount} unpinned** (total ${report.qaCoverage.length}; ceiling ${report.pinnedCount + report.unpinnableCount} at ≥${QA_PIN_BLOCK_KEYWORD_MIN} keywords). \`unpinnable\` is derived when extracted keyword count < ${QA_PIN_BLOCK_KEYWORD_MIN}; those rows may still have min-1 behaviour coverage.`,
+    "",
     `Default \`pinned\` field: block-scoped, ≥${QA_PIN_BLOCK_KEYWORD_MIN} keywords in the asserting block title + body (question + answer extraction, subject card name stripped). File-scoped same-extraction diagnostic kept as \`pinnedFileScoped\`.`,
     "",
     table(
@@ -1332,11 +1372,13 @@ export function renderOfficialReportMarkdown(
         r.name,
         r.pinned
           ? "pinned"
-          : r.pinnedFileScoped
-            ? QA_PIN_UNPINNED_FILE_SCOPED_SAME_EXTRACTION_STATUS
-            : "unpinned",
-        r.pinned || r.pinnedFileScoped
-          ? `${r.matchedKeywords.join(", ")} @ ${r.matchedFile ?? "?"}${r.matchedBlock ? ` — ${r.matchedBlock}` : ""}`
+          : r.unpinnable
+            ? QA_PIN_UNPINNABLE_STATUS
+            : r.pinnedFileScoped
+              ? QA_PIN_UNPINNED_FILE_SCOPED_SAME_EXTRACTION_STATUS
+              : "unpinned",
+        r.pinned || r.unpinnable || r.pinnedFileScoped
+          ? `[${r.extractedKeywords.join(", ") || "—"}] ${r.matchedKeywords.join(", ")} @ ${r.matchedFile ?? "?"}${r.matchedBlock ? ` — ${r.matchedBlock}` : ""}`
           : "—",
         `Q: ${r.question} / A: ${r.answer}`,
       ]),

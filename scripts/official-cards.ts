@@ -130,7 +130,7 @@ export async function runOfficialCards(
       const report = await writeOfficialReport(meta, reportDir);
       console.log(`Wrote ${path.relative(ROOT, reportDir)}/reconciliation.md`);
       console.log(
-        `Rotation mismatches: ${report.rotation.length}; official-not-encoded: ${report.officialNotEncoded.length}; encoded-not-official: ${report.encodedNotOfficial.length}; unresolved tokens: ${report.unresolvedTokens.length}; Q&A pinned ${report.pinnedCount} / unpinned ${report.unpinnedCount} (block ≥${QA_PIN_BLOCK_KEYWORD_MIN}, Q+A); file-scoped same extraction ${report.pinnedFileScopedCount}; answer-only file-scoped (historical) ${report.pinnedAnswerOnlyFileScopedCount}; Q&A-vs-rulings notes: ${report.qaRulings.length}`,
+        `Rotation mismatches: ${report.rotation.length}; official-not-encoded: ${report.officialNotEncoded.length}; encoded-not-official: ${report.encodedNotOfficial.length}; unresolved tokens: ${report.unresolvedTokens.length}; Q&A pinned ${report.pinnedCount} / unpinnable ${report.unpinnableCount} / unpinned ${report.unpinnedCount} (ceiling ${report.pinnedCount + report.unpinnableCount} at block ≥${QA_PIN_BLOCK_KEYWORD_MIN}, Q+A); file-scoped same extraction ${report.pinnedFileScopedCount}; answer-only file-scoped (historical) ${report.pinnedAnswerOnlyFileScopedCount}; Q&A-vs-rulings notes: ${report.qaRulings.length}`,
       );
     }
     return 0;
