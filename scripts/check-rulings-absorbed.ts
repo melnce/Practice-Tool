@@ -3,8 +3,8 @@
  * scripts/check-rulings-absorbed.ts
  *
  * Verifies every `## ` heading in docs/owner-rulings.md carries exactly one
- * `<!-- rulebook: … -->` marker and that `absorbed` markers point at real
- * rulebook sections that mention the ruling date.
+ * `<!-- rulebook: … -->` marker. For `absorbed`, verifies a unique locator
+ * string appears in the anchored section and exactly once in the rulebook.
  */
 
 import * as fs from "fs";
@@ -15,18 +15,19 @@ const RULINGS_PATH = path.join(ROOT, "docs/owner-rulings.md");
 const RULEBOOK_PATH = path.join(ROOT, "docs/svwb_rulebook_formatted.md");
 
 /** Pinned pending population — must match deliberate `pending` markers. */
-/** Pinned pending population — two rulings not yet written through. */
-const EXPECTED_PENDING_COUNT = 2;
+const EXPECTED_PENDING_COUNT = 3;
 
-const MARKER_RE =
-  /^<!--\s*rulebook:\s*(absorbed\s+#([a-z0-9-]+)|engine-internal\s+—\s+(.+)|pending\s+—\s+(.+))\s*-->$/i;
+const ABSORBED_RE =
+  /^<!--\s*rulebook:\s*absorbed\s+#([a-z0-9-]+)\s+»\s+(.+?)\s*-->$/i;
+const ENGINE_INTERNAL_RE =
+  /^<!--\s*rulebook:\s*engine-internal\s+—\s+(.+?)\s*-->$/i;
+const PENDING_RE = /^<!--\s*rulebook:\s*pending\s+—\s+(.+?)\s*-->$/i;
 
 const DATE_RE = /\d{4}-\d{2}-\d{2}/;
 
 interface Heading {
   line: number;
   title: string;
-  date: string;
 }
 
 interface RulebookSection {
@@ -90,21 +91,27 @@ function parseRulingHeadings(markdown: string): Heading[] {
     const title = m[1].trim();
     if (title.startsWith("Still open")) continue;
 
-    const dateMatch = title.match(DATE_RE);
-    if (!dateMatch) {
+    if (!DATE_RE.test(title)) {
       throw new Error(
         `Could not extract date from ruling heading at line ${i + 1}: ${title}`,
       );
     }
 
-    headings.push({ line: i + 1, title, date: dateMatch[0] });
+    headings.push({ line: i + 1, title });
   }
 
   return headings;
 }
 
-function sectionContainsDate(section: RulebookSection, date: string): boolean {
-  return section.content.includes(date);
+function countOccurrences(haystack: string, needle: string): number {
+  if (!needle) return 0;
+  let count = 0;
+  let index = 0;
+  while ((index = haystack.indexOf(needle, index)) !== -1) {
+    count++;
+    index += needle.length;
+  }
+  return count;
 }
 
 function main(): void {
@@ -127,8 +134,8 @@ function main(): void {
       markerIndex++;
     }
 
-    const markerLine = lines[markerIndex];
-    if (!markerLine?.trim().startsWith("<!-- rulebook:")) {
+    const markerLine = lines[markerIndex]?.trim() ?? "";
+    if (!markerLine.startsWith("<!-- rulebook:")) {
       console.error(
         `✗ Missing marker immediately below heading (line ${heading.line}): ${heading.title}`,
       );
@@ -137,8 +144,7 @@ function main(): void {
     }
 
     const between = lines.slice(headingIndex + 1, markerIndex);
-    const nonEmptyBetween = between.filter((l) => l.trim() !== "");
-    if (nonEmptyBetween.length > 0) {
+    if (between.some((line) => line.trim() !== "")) {
       console.error(
         `✗ Content between heading and marker (line ${heading.line}): ${heading.title}`,
       );
@@ -157,17 +163,13 @@ function main(): void {
       continue;
     }
 
-    const parsed = MARKER_RE.exec(markerLine.trim());
-    if (!parsed) {
-      console.error(
-        `✗ Invalid marker syntax (line ${heading.line + 1}): ${markerLine.trim()}`,
-      );
-      failed = true;
-      continue;
-    }
+    const absorbedMatch = ABSORBED_RE.exec(markerLine);
+    const engineMatch = ENGINE_INTERNAL_RE.exec(markerLine);
+    const pendingMatch = PENDING_RE.exec(markerLine);
 
-    if (parsed[1].toLowerCase().startsWith("absorbed")) {
-      const anchor = parsed[2];
+    if (absorbedMatch) {
+      const anchor = absorbedMatch[1];
+      const locator = absorbedMatch[2];
       const section = rulebookSections.get(anchor);
       if (!section) {
         console.error(
@@ -176,16 +178,34 @@ function main(): void {
         failed = true;
         continue;
       }
-      if (!sectionContainsDate(section, heading.date)) {
+      const occurrences = countOccurrences(rulebook, locator);
+      if (occurrences === 0) {
         console.error(
-          `✗ Absorbed anchor #${anchor} section does not mention ruling date ${heading.date} — heading: ${heading.title}`,
+          `✗ Locator not found in rulebook — heading: ${heading.title}`,
         );
+        console.error(`  locator: ${locator}`);
+        failed = true;
+        continue;
+      }
+      if (occurrences > 1) {
+        console.error(
+          `✗ Locator appears ${occurrences} times in rulebook (must be exactly once) — heading: ${heading.title}`,
+        );
+        console.error(`  locator: ${locator}`);
+        failed = true;
+        continue;
+      }
+      if (!section.content.includes(locator)) {
+        console.error(
+          `✗ Locator not in anchored section #${anchor} — heading: ${heading.title}`,
+        );
+        console.error(`  locator: ${locator}`);
         failed = true;
         continue;
       }
       absorbed++;
-    } else if (parsed[1].toLowerCase().startsWith("engine-internal")) {
-      const reason = parsed[3]?.trim();
+    } else if (engineMatch) {
+      const reason = engineMatch[1]?.trim();
       if (!reason) {
         console.error(
           `✗ engine-internal marker missing reason — heading: ${heading.title}`,
@@ -194,8 +214,8 @@ function main(): void {
         continue;
       }
       engineInternal++;
-    } else if (parsed[1].toLowerCase().startsWith("pending")) {
-      const reason = parsed[4]?.trim();
+    } else if (pendingMatch) {
+      const reason = pendingMatch[1]?.trim();
       if (!reason) {
         console.error(
           `✗ pending marker missing reason — heading: ${heading.title}`,
@@ -206,7 +226,9 @@ function main(): void {
       pending++;
       pendingRows.push(`  - ${heading.title} — ${reason}`);
     } else {
-      console.error(`✗ Unknown marker state — heading: ${heading.title}`);
+      console.error(
+        `✗ Invalid marker syntax (line ${heading.line + 1}): ${markerLine}`,
+      );
       failed = true;
     }
   }

@@ -10,7 +10,7 @@ Rulings Chris has given during development, with the reasoning and evidence behi
 
 ## Rally — 2026-08-12
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » **Owner ruling — Rally (2026-08-12):** -->
 
 > "It doesn't matter how, but only if a follower got successfully summoned to the field."
 
@@ -24,7 +24,7 @@ Note the separate, pre-existing timing rule still stands: a "Fanfare: if Rally (
 
 ## Accelerate — original cost preserved — 2026-08-12
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » **Owner ruling — Accelerate / Crystallize original cost (2026-08-12):** -->
 
 > "In the game there was a puzzle with Accelerate that said the units keep their original cost. Evolution Portalcraft with Shoddy Plaything and Yog-Zentha, Eld Axe abuses this specifically."
 
@@ -36,7 +36,7 @@ The abuse case is also the regression test: Shoddy Plaything is base cost 6 with
 
 ## Accelerate / Crystallize — the played card takes the alternate form's base cost (2026-09-06)
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » the played card takes base cost **N** from that play on -->
 
 > "yes if you play it in that form it stays that value. That was my mistake. The shoddy plaything accelerate spell has the EFFECT of summoning a shoddy plaything. So obviously it will summon a freshly printed one and go to grave as 2 cost spell."
 
@@ -50,7 +50,7 @@ Whatever the alternate form's _effect_ summons is a **freshly printed** card: Sh
 
 ## Hidden information — always visible — 2026-08-13
 
-<!-- rulebook: absorbed #hidden-information -->
+<!-- rulebook: absorbed #hidden-information » **Owner ruling — Hidden information always visible (2026-08-13):** -->
 
 > "Should be always visible cause it's my practice tool and I'm playing against myself. The only time they should be hidden is if playing against a bot or scripted opponent, but that doesn't really have merit since the bot is going to be terrible."
 
@@ -60,7 +60,7 @@ Settles four cards at once: Goddess of Starlight (`10502110`), Wolfraud (`105141
 
 ## Oluon, Raging Chariot (`10524110`) — 2026-08-13
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » _Oluon, Raging Chariot (2026-08-13):_ when evolved -->
 
 > "'Another' means only Oluon is exempt. You can hit an 8 HP unit twice or the leader 3 times. I've seen clips of Oluon just one-shotting the enemy leader (really cancer card)."
 
@@ -68,7 +68,7 @@ Each of the 3 hits picks independently from all characters except Oluon itself. 
 
 ## Slaus, Revolving Wheel of Fortune (`10574110`) — 2026-08-13 — **PROVISIONAL**
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » **Owner ruling — Slaus unused-ability pool (PROVISIONAL, 2026-08-13):** -->
 
 > "Unsure. The crest is clear — it has a 3 turn CD so only 3 abilities max can happen. His card effect is hard to test in game because usually cards in Shadowverse don't survive 3 turns in a row. So I'd have said max 3 times and then it stops."
 
@@ -76,7 +76,7 @@ The unused-ability pool is not replenished: three activations maximum, and nothi
 
 ## Thestae, Anathema of Distortion (`10714110`) — 2026-08-13
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » _Thestae, Anathema of Distortion (2026-08-13):_ the Crest's -->
 
 > "It ONLY buffs cards IN deck, and yes they keep the stats otherwise it would be pointless."
 
@@ -84,7 +84,7 @@ The crest buffs cards while in the deck, and the buff **persists after the card 
 
 ## Copy semantics — general rule — 2026-08-13
 
-<!-- rulebook: absorbed #copy-semantics-exact-copy-vs-copy -->
+<!-- rulebook: absorbed #copy-semantics-exact-copy-vs-copy » **Owner ruling — Exact copy vs copy (2026-08-13):** -->
 
 > "EXACT copy means it has the same stats and modifications. Just copy means the base card."
 
@@ -97,7 +97,7 @@ Also corrected a badly-formed question from a brief: _"Engage is its own thing. 
 
 ## Multi-tier Enhance — ALL affordable tiers activate — 2026-08-15
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » **Owner ruling — multi-tier Enhance (2026-08-15):** -->
 
 > "If you play Noel for 8 play points, both his Enhance 8 and Enhance 7 abilities will activate." — "And his fanfare also activates no matter what — if played from hand ofc."
 
@@ -107,7 +107,7 @@ Engine status at ruling time: the engine applied only the highest affordable tie
 
 ## "Select" is forced — 2026-08-16
 
-<!-- rulebook: absorbed #targeting-rules -->
+<!-- rulebook: absorbed #targeting-rules » **Owner ruling — "Select" is forced (2026-08-16):** -->
 
 > "In this game if it says 'select' then it's forced. You can't play him [Field Scientist] without discarding unless your hand is empty."
 
@@ -117,7 +117,7 @@ Engine status at ruling time: already correct de facto — there is no cancel pa
 
 ## Playability with no "Select" target — spells blocked, followers/amulets fizzle — 2026-08-16
 
-<!-- rulebook: absorbed #targeting-rules -->
+<!-- rulebook: absorbed #targeting-rules » **Owner ruling — Playability with no "Select" target (2026-08-16):** -->
 
 > "If it's something like select on the field but there is no target on the field, then you can still play amulets and followers without the effect. Spells tho — if it says select on the field you can't play the spell if there is no target. Radiant Rainbow sometimes is such a dead card: when you don't have an On-Spellboost card in hand you just can't play it at all, compared to Hearthstone or something where you could just spend 2 mana on nothing to unclog hand."
 
@@ -127,7 +127,7 @@ Engine status at ruling time: already correct — `canPlayCard` (src/logic/core/
 
 ## Azurifrit, Heir to Disdain (`10344110`) — NO per-turn cap — 2026-08-23
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » **Superseded (owner ruling 2026-08-23).** The trigger fires on **every** qualifying self-damage -->
 
 > Q: "In the real game, can Azurifrit ping the leader more than 3 times in one turn?" — A: **"No cap — fires every time."**
 
@@ -141,7 +141,7 @@ Also fixed alongside: _"Super-Evolve: Fully restore the defense of this follower
 
 ## Damage prevented by super-evolve still counts as "taking damage" — 2026-08-23
 
-<!-- rulebook: absorbed #damage-events-general -->
+<!-- rulebook: absorbed #damage-events-general » **Owner ruling — Damage prevented by super-evolve still counts as "taking damage" (2026-08-23):** -->
 
 > "even if superevolved the followers 'take damage' even if it is reduced to 0."
 
@@ -151,7 +151,7 @@ Applies to combat as well as effect damage. Chris hit the combat case live: a su
 
 ## Deaths settle before dependent triggers pick targets — 2026-08-23
 
-<!-- rulebook: absorbed #timing-windows-and-trigger-resolution -->
+<!-- rulebook: absorbed #timing-windows-and-trigger-resolution » **Owner ruling — Deaths settle before dependent triggers pick targets (2026-08-23):** -->
 
 > "playing fangs of ardent destruction should kill the 2/1 at the same time as damaging galmieux. galmieux should then deal 3 dmg to the 5/2 ... but currently the 5/1 ward keeps standing. so either galmieux 3 damage didnt trigger or it targeted the corpse of the 2/1."
 
@@ -159,7 +159,7 @@ A follower reduced to 0 or less defense is dead and must never be a legal target
 
 ## "N random followers" = N distinct targets; "do this N times" = repeats allowed — 2026-08-23
 
-<!-- rulebook: absorbed #random-targeting-and-rng-in-effects -->
+<!-- rulebook: absorbed #random-targeting-and-rng-in-effects » **Owner ruling — "N random followers" = distinct; "do this N times" = repeats allowed (2026-08-23):** -->
 
 > "if the text says 2 random followers it can do max 8 to 1 follower ... if it says 8 to A random follower TWICE it can hit the same target twice."
 
@@ -176,7 +176,7 @@ Blast radius found by scan — 7 cards were wrong (Erntz, Katalina `10401110`, M
 
 ## "Attacked a leader last turn" — the attack counts, not the damage — 2026-08-29
 
-<!-- rulebook: absorbed #combat-timing-specifics -->
+<!-- rulebook: absorbed #combat-timing-specifics » **Owner ruling — "Attacked a leader last turn" counts the attack, not the damage (2026-08-29):** -->
 
 Ruling given on a direct question, for the five set-10009 cards reading _"If an allied follower attacked a leader on your last turn …"_: **"Attack committed counts."**
 
@@ -186,7 +186,7 @@ Engine: `PlayerState.anyAllyAttackedLeaderThisTurn` / `allyAttackedLeaderLastTur
 
 ## Fuse mechanics — Sephie and Ecstatic Scholar — 2026-08-29
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » **Owner ruling — Fuse mechanics, Sephie and Ecstatic Scholar (2026-08-29):** -->
 
 > "sephie and ecstatic scholar do not need any recipes. sephie needs effect on fuse. you can fuse (as many cards as you want to ONE sephie ONCE per turn (if you have 2 sephies in hand ofc you can fuse to both of them ONCE) but you need 2 playpoints available for it to do something. if you have 2 playpoints and you fuse a card to her she will spawn a obsessed test subject on the field."
 
@@ -204,7 +204,7 @@ So: the fuse action is never gated on play points, the fused cards always leave 
 
 ## Tokens live in set "Basic A" (90000) — 2026-08-29
 
-<!-- rulebook: absorbed #card-types-and-terminology -->
+<!-- rulebook: absorbed #card-types-and-terminology » **Owner ruling — Tokens live in set "Basic A" (90000) (2026-08-29):** -->
 
 > "the tokens are all in the set basic A for god knows what reason. you need cursor to get them from there. they are all starting with numbers with 9000"
 
@@ -212,7 +212,7 @@ Token cards (summoned/added-by-effect cards that are not in any collectible set)
 
 ## Trap in the Woods is an AMULET — the data source is wrong — 2026-08-29
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » _Trap in the Woods (`10911210`) (2026-08-29):_ is an **Amulet**, not a Spell -->
 
 > "trap in the woods is an amulet not a handtrap spell the fucking site is wrong for over a year now."
 
@@ -220,7 +220,7 @@ Token cards (summoned/added-by-effect cards that are not in any collectible set)
 
 ## Set 10009 authoring rulings — 2026-08-29
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: pending — composite log entry spans multiple card-specific rulebook bullets; no single unique locator for the whole heading -->
 
 Four questions asked before authoring the last set-10009 cards; answers verbatim.
 
@@ -290,7 +290,7 @@ This is the same species as **Zeta & Bea** (top-level `name`/`not_self` on a sta
 
 ## Barrier inside split damage — allocation is spent even when absorbed — 2026-08-29
 
-<!-- rulebook: absorbed #damage-events-general -->
+<!-- rulebook: absorbed #damage-events-general » **Owner ruling — Barrier in split damage (2026-08-29):** -->
 
 > "if you have 10 points of split damage and a 1/6 with barrier and a 1/5 without barrier: the 1/6 with barrier will take 6 damage reduced to 0 cause of barrier (so still 1/6 but now barrier is gone) and the 1/5 without barrier will now be 1/1 as it takes 4 damage spilled over. oldest to newest"
 
@@ -309,7 +309,7 @@ So a cheap high-defense Barrier body is a genuine soak against split damage — 
 
 ## Witch's New Brew always wins an Earth Sigil merge — 2026-08-30
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » **Merge survivor (owner ruling, 2026-08-30):** When Earth Sigils merge -->
 
 > "witchs new brew is the one that wins when they merge. magic sediment is a 'magically' generated amulet. witchs new brew is an actual amulet you play from hand. so lets say magic sediment is on the field with 2 counters. you play witches new brew: magic sedmient amulet gets destroyed and replaced by the witches new brew that now has 3 counters 2 from before + the one from witches brew. if witches new brew is on the field and you play something that generates magic sediment it will just increase the counter of witches new brew. so witches new brew always wins"
 
@@ -328,7 +328,7 @@ Related and already settled: the stacking itself is correct per the rulebook —
 
 ## Hien vs Bayle — the same clause shape, two different durations — 2026-08-30
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » _Hien, Redolent Revenant (`10914120`) vs Bayle, Luxglaive Warrior (`10113130`) (2026-08-30):_ -->
 
 > "Bayle, Luxglaive Warrior should already have cost reduction implemented whenever an allied follower leaves the field. in his case the reduction is permanent in her case it is not permanent and also her reduction is if you just play any card not just if an allied follower leaves the field."
 
@@ -341,7 +341,7 @@ Hien's entire in-hand line was **unauthored** — she had only a Fanfare and Las
 
 ## Fourth instance of the silently-ignored-key species — `named_enter_count` counts the entering card — 2026-08-30
 
-<!-- rulebook: absorbed #fanfare-and-enter-play-trigger-order -->
+<!-- rulebook: absorbed #fanfare-and-enter-play-trigger-order » **Owner ruling — `named_enter_count` / "other" copies and enter-route timing (2026-08-30):** -->
 
 Reported by another session, then reproduced and measured before acting. `10931110` **Obsessed Test Subject** reads _"if at least 5 **other** allied copies ... have entered the field this match, give it +3/+3"_, so the 6th copy should be the first buffed. Measured on the old main: **the 5th was buffed.**
 
@@ -356,7 +356,7 @@ So a global "exclude self" would have broken Drache. Drache's three measured row
 
 ## Card text is bible — 2026-08-31
 
-<!-- rulebook: absorbed #shadowverse-worlds-beyond-rules-reference -->
+<!-- rulebook: absorbed #shadowverse-worlds-beyond-rules-reference » **Owner ruling — Card text is bible (2026-08-31):** -->
 
 > "card text is bible."
 
@@ -364,13 +364,13 @@ Printed card text governs over authored JSON wherever they disagree. The authore
 
 ## Turn-boundary triggers are owner-scoped — 2026-08-31
 
-<!-- rulebook: absorbed #start-of-turn-and-end-of-turn-sequences -->
+<!-- rulebook: absorbed #start-of-turn-and-end-of-turn-sequences » **Owner ruling — Turn-boundary triggers are owner-scoped (2026-08-31):** -->
 
 A turn-boundary trigger printed _"at the start/end of **your** turn"_ fires only on its owner's boundary. `whose_turn: "opponent"` is the explicit opt-out for cards printed _"at the end of your opponent's turn"_ (Lilanthim `10734110`). The defect being fixed was that _absence_ of the key meant "fire for everyone", which in a mirror made your own turn start add a Fairy to **both** hands.
 
 ## "Takes N more damage" applies to a 0-damage event — 2026-08-31
 
-<!-- rulebook: absorbed #damage-events-general -->
+<!-- rulebook: absorbed #damage-events-general » **Owner ruling — "Takes N more damage" applies to a 0-damage event (2026-08-31):** -->
 
 > "id say so yes. since when i attack with a 0 attack in game it deals 0 damage so +1 would be 1. lets keep it until i ever see a situation where that contradicts itself."
 
@@ -378,19 +378,19 @@ A 0-damage event **does** take the bonus (0 + 1 = 1). Healing does not.
 
 ## Skybound gauge — every allied evolve counts — 2026-08-10
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » **Owner ruling — Skybound gauge, every allied evolve counts (2026-08-10):** -->
 
 Every evolve of an allied follower counts for the Skybound gauge, regardless of whether an `Evolve:` script fired or EP was spent.
 
 ## Hand overflow destroys without Last Words — 2026-08-10
 
-<!-- rulebook: absorbed #zones-and-card-states -->
+<!-- rulebook: absorbed #zones-and-card-states » **Owner ruling (2026-08-10):** a card destroyed by hand overflow triggers **no** Last Words -->
 
 A card destroyed by hand overflow triggers **no** Last Words — "converted into a shadow" beats "destroyed".
 
 ## Accelerate and spells — 2026-09-02
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » **Owner ruling — Accelerate and Spellboost / hand-deck type (2026-09-02):** -->
 
 Quoting the source the owner supplied:
 
@@ -404,7 +404,7 @@ An Accelerate play **is** a spell play for Spellboost and every other spell-inte
 
 ## Alternate-form permanence (Accelerate / Crystallize) — 2026-09-02
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » **Owner ruling — Crystallize / Accelerate alternate-form permanence (2026-09-02):** -->
 
 Asked whether an Accelerate-played follower in the cemetery should be reanimatable. Answer: **no**. The owner reasoned by analogy from Crystallize and quoted:
 
@@ -417,7 +417,7 @@ General rule in both directions: **the printed type governs while the card is in
 
 ## Fused cards are banished — 2026-09-02
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » **Fused partners are banished (2026-09-02).** -->
 
 Live-game bug report (owner, verbatim):
 
@@ -427,7 +427,7 @@ Live-game bug report (owner, verbatim):
 
 ## Reanimate only sees field-destroyed followers — 2026-09-02
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » **Owner ruling — Reanimate provenance (2026-09-02):** -->
 
 Same report, clarifying (owner, verbatim):
 
@@ -440,7 +440,7 @@ This matches the printed Reanimate keyword's "died this match" language and is e
 
 ## Initiation of Rebirth highest-base-cost ties — 2026-09-02
 
-<!-- rulebook: absorbed #random-targeting-and-rng-in-effects -->
+<!-- rulebook: absorbed #random-targeting-and-rng-in-effects » Owner ruling 2026-09-02: _"it says random highest cost so that means if some are tied pick randomly between them."_ -->
 
 Printed text: _"Add a copy of a **random** allied follower destroyed this match with the highest base cost to your deck without revealing it. Draw a card."_
 
@@ -454,7 +454,7 @@ Engine already matched (`pickDestroyedMatchHighestBaseCost` keeps every record a
 
 ## `still_alive` — subject is the damage victim (2026-09-08)
 
-<!-- rulebook: absorbed #damage-events-general -->
+<!-- rulebook: absorbed #damage-events-general » **Owner ruling — `still_alive` subject is the damage victim (2026-09-08):** -->
 
 Asked what the key means, the owner answered with Galmieux, verbatim:
 
@@ -466,7 +466,7 @@ Asked what the key means, the owner answered with Galmieux, verbatim:
 
 ## A printed "Select" means the player picks (2026-09-08)
 
-<!-- rulebook: absorbed #targeting-rules -->
+<!-- rulebook: absorbed #targeting-rules » **Owner ruling — A printed "Select" opens a target prompt (2026-09-08):** -->
 
 Asked whether Titania, Queen of Fairies `10214110` and Ara, Dawnblossom `10534120` should open a target
 prompt on evolve — measured, they opened none and the engine silently transformed the leftmost
@@ -486,7 +486,7 @@ targeted pool (`10553110` Lifestealer, `distribution: "all"`).
 
 ## "A card on the field" includes amulets (2026-09-09)
 
-<!-- rulebook: absorbed #targeting-and-selection-effects -->
+<!-- rulebook: absorbed #targeting-and-selection-effects » **Owner ruling — "A card on the field" includes amulets (2026-09-09):** -->
 
 Sincerity of the Dewdrop `10573310` prints _"Select a card on the field and transform it into an Imari's
 Little Buddies"_ and targets `any:any`, but the board route of `op:"transform"` narrowed its pool to
@@ -502,7 +502,7 @@ already redundant. Fixed in PR #378.
 
 ## An amulet destroyed by its own Engage is destroyed (2026-09-09)
 
-<!-- rulebook: absorbed #destruction-vs-other-removal -->
+<!-- rulebook: absorbed #destruction-vs-other-removal » **Owner ruling — Engage self-sacrifice is destruction (2026-09-09):** -->
 
 Reported from live play: an Engage-sacrifice amulet did not increase Lyanthoth, Eld Tome `10664120`'s
 Faith and did not make Omerio, Winged Revenant `10964120` react. The owner:
@@ -523,7 +523,7 @@ during the engage — now go through the shared `destroyTarget`. 22 amulets carr
 
 ## Transform — neither leave nor enter (2026-09-08)
 
-<!-- rulebook: absorbed #destruction-vs-other-removal -->
+<!-- rulebook: absorbed #destruction-vs-other-removal » **Owner ruling (2026-09-08):** transform is not a leave; the transformed-in card is not an enter. -->
 
 > Transform does **not** count as leaving the field. The transformed-in card does **not** count as entering the field.
 
@@ -548,7 +548,7 @@ Same principle as the rulebook at line 591 in `docs/svwb_rulebook_formatted.md`:
 
 ## Faith is not a crest for counting (2026-09-06)
 
-<!-- rulebook: absorbed #zones-and-card-locations -->
+<!-- rulebook: absorbed #zones-and-card-locations » Faith icons share the same five-slot cap but do not count toward "the number of crests you have" -->
 
 Owner:
 
@@ -568,7 +568,7 @@ Owner-supplied FAQ text (his caveat: "Dont know if this is official but since I 
 
 ## Artifact fuse chain — 2026-09-05
 
-<!-- rulebook: absorbed #classmechanic-specific-keywords -->
+<!-- rulebook: absorbed #classmechanic-specific-keywords » **Owner ruling — Artifact fuse chain (2026-09-05), refined by official Q&A (2026-09-06):** -->
 
 Owner's recollection (caveat: "Its been a while so I'm not 100% sure anymore"): gears fuse only with gears and the gear fused _into_ decides the body (Ambition → Striker 5/1 Rush, Remembrance → Fortifier 1/5 Ward); Striker/Fortifier host any Artifact cards and transform by the partners' total cost (1 → Ominous α, 2 → β, 3+ → γ — which is where γ's many recipes come from); Ominous α needs β **and** γ for Masterwork Ω (only one → consumed, no transform); β, γ, Ω cannot fuse. The engine (`src/logic/effects/ops/fuse/fuse.artifact.ts`) matches all of it and the printed token texts. Open, low priority: the owner "believes" α can fuse with anything except gears — α's printed text says β and γ only, and text wins until the client shows otherwise; and both Gears' printed description in `cards/token_details.json` reads "Fuse: Artifact amulets", which matches neither the owner nor the engine (stale text, not a behaviour bug — do not edit the description in this PR).
 
