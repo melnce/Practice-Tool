@@ -5,6 +5,7 @@
 import { state } from "../../../../core/gameState.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
 import { mergeEffectPoolCondition } from "../../../core/targeting/poolCondition.js";
+import { wantsRandomTargetPick } from "../../../core/targeting/randomPick.js";
 import { cleanupDead } from "../../../core/cleanup.js";
 import { logEvent } from "../../../../core/logger.js";
 import type {
@@ -269,13 +270,12 @@ function handlePoolBasedBuff(
   }
 
   // 3. Check for random distribution - auto-select instead of user selection
-  const isRandomDistribution =
-    distribution === "random" ||
-    eff.random ||
-    String((eff as any).select_mode || "").toLowerCase() === "random" ||
-    String((eff as any).pick || "").toLowerCase() === "random" ||
-    (String(distribution).toLowerCase() === "highest" &&
-      (eff as any).select != null);
+  const isRandomDistribution = wantsRandomTargetPick(
+    eff as Record<string, unknown>,
+    {
+      statLegacy: true,
+    },
+  );
 
   // 4. Handle random selection (including random resolution among highest ties)
   if (isRandomDistribution) {

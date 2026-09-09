@@ -289,8 +289,7 @@
         "target": "enemy:follower",
         "amount": 3,
         "select": 1,
-        "can_target_leader": true,
-        "fallback_leader": true
+        "can_target_leader": true
       }
     ],
     "evolve": [],
@@ -450,8 +449,7 @@
         "target": "enemy:follower",
         "amount": 1,
         "select": 1,
-        "can_target_leader": true,
-        "fallback_leader": true
+        "can_target_leader": true
       }
     ],
     "keywords": [],
@@ -1063,8 +1061,7 @@
         "target": "enemy:follower",
         "amount": 2,
         "select": 1,
-        "can_target_leader": true,
-        "fallback_leader": true
+        "can_target_leader": true
       },
       {
         "op": "restore",
@@ -1701,6 +1698,7 @@
     "spell": [
       {
         "op": "draw",
+        "source": "deck",
         "count": 2
       }
     ]

@@ -464,6 +464,21 @@ function checkOpKeyShape(card: CardJson): Warning[] {
       });
     }
 
+    if (op === "damage" && obj.fallback_leader !== undefined) {
+      out.push({
+        family: "op-key-shape",
+        id: card.id,
+        name: card.name,
+        found: compact({ path, op, fallback_leader: obj.fallback_leader }),
+        canonical: compact({
+          path,
+          op,
+          can_target_leader: obj.fallback_leader,
+        }),
+        note: 'op:"damage" must use can_target_leader, not fallback_leader (synonym)',
+      });
+    }
+
     if (op === "damage" && obj.distribution === "all") {
       out.push({
         family: "op-key-shape",
@@ -648,6 +663,22 @@ function checkOpKeyShape(card: CardJson): Warning[] {
         }
       }
 
+      if ((obj as any).amount !== undefined) {
+        out.push({
+          family: "op-key-shape",
+          id: card.id,
+          name: card.name,
+          found: compact({ path, op, amount: (obj as any).amount }),
+          canonical: compact({
+            path,
+            op,
+            attack: (obj as any).attack ?? null,
+            defense: (obj as any).defense ?? null,
+          }),
+          note: 'op:"stat" must use attack/defense, not amount',
+        });
+      }
+
       const badRandom =
         obj.random === true ||
         String((obj as any).pick || "").toLowerCase() === "random" ||
@@ -671,6 +702,56 @@ function checkOpKeyShape(card: CardJson): Warning[] {
             select: obj.select ?? 1,
           }),
           note: 'random selection on op:"stat" must use select_mode:"random"',
+        });
+      }
+    }
+
+    if (op === "countdown" && obj.random === true) {
+      out.push({
+        family: "op-key-shape",
+        id: card.id,
+        name: card.name,
+        found: compact({ path, op, random: true }),
+        canonical: compact({ path, op, select_mode: "random" }),
+        note: 'random selection on op:"countdown" must use select_mode:"random"',
+      });
+    }
+
+    if (
+      op === "return" &&
+      String(obj.distribution || "").toLowerCase() === "random"
+    ) {
+      out.push({
+        family: "op-key-shape",
+        id: card.id,
+        name: card.name,
+        found: compact({ path, op, distribution: "random" }),
+        canonical: compact({ path, op, select_mode: "random" }),
+        note: 'random selection on op:"return" must use select_mode:"random"',
+      });
+    }
+
+    if (op === "select" || op === "transform") {
+      const badLegacyRandom =
+        obj.random === true ||
+        String((obj as any).pick || "").toLowerCase() === "random" ||
+        String((obj as any).select_mode || "").toLowerCase() === "random" ||
+        obj.distribution === "random";
+      if (badLegacyRandom) {
+        out.push({
+          family: "op-key-shape",
+          id: card.id,
+          name: card.name,
+          found: compact({
+            path,
+            op,
+            random: obj.random ?? null,
+            pick: (obj as any).pick ?? null,
+            select_mode: (obj as any).select_mode ?? null,
+            distribution: obj.distribution ?? null,
+          }),
+          canonical: compact({ path, op, mode: "random" }),
+          note: `random selection on op:"${op}" must use mode:"random"`,
         });
       }
     }

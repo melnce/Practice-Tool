@@ -113,7 +113,7 @@ describe("targeted damage — leader click and empty-board fallback", () => {
     });
   });
 
-  describe("Ravening Tentacles (10123310) (can_target_leader + fallback_leader)", () => {
+  describe("Ravening Tentacles (10123310) (can_target_leader)", () => {
     it("(a) follower present, click leader → leader −5, follower untouched, self heals 5", () => {
       setupTurn({
         hand: [RAVENING_TENTACLES],
@@ -152,7 +152,7 @@ describe("targeted damage — leader click and empty-board fallback", () => {
     });
   });
 
-  describe("Rage of Serpents (10153310) — fallback_leader + ally leader damage", () => {
+  describe("Rage of Serpents (10153310) — can_target_leader + ally leader damage", () => {
     const printed =
       "Select an enemy follower on the field or the enemy leader and deal it 3 damage. Deal 2 damage to your leader.";
 

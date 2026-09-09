@@ -198,7 +198,7 @@ export function handleSelect(
   const effectiveCount = Math.min(requestedCount, pool.length);
 
   // 6. Auto-selection path (bot or random mode)
-  if (shouldAutoSelect(eff.mode)) {
+  if (shouldAutoSelect(eff as Record<string, unknown>)) {
     const forcedFirst = getForcedFirstPicks({ pool, owner });
     const picks = pickRandomTargets(
       pool,

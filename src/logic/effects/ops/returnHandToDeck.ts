@@ -1,5 +1,6 @@
 // src/logic/effects/ops/returnHandToDeck.ts
 import { state } from "../../../core/gameState.js";
+import { wantsRandomTargetPick } from "../../core/targeting/randomPick.js";
 import { shuffleInPlace } from "../../../core/utils.js";
 import { logEvent } from "../../../core/logger.js";
 import type {
@@ -134,9 +135,12 @@ export function handleReturnHandToDeck(
     return "done";
   }
 
-  const randomSelection =
-    String((eff as any).select_mode || "").toLowerCase() === "random" ||
-    String((eff as any).distribution || "").toLowerCase() === "random";
+  const randomSelection = wantsRandomTargetPick(
+    eff as Record<string, unknown>,
+    {
+      distributionRandom: true,
+    },
+  );
   if (randomSelection) {
     const requested =
       parseInt(

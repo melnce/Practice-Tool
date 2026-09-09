@@ -26,6 +26,7 @@ import {
   reportSelectFizzled,
 } from "../../../core/pendingTarget/index.js";
 import { evaluateCardCondition } from "../../../core/conditions/evaluator.js";
+import { wantsRandomTargetPick } from "../../../core/targeting/randomPick.js";
 import { recomputeAttackFlags } from "../../../core/combat.js";
 
 /**
@@ -87,7 +88,7 @@ export function handleEvolve(
 
     const selectCount = Math.min(spec.select, pool.length);
 
-    if (spec.select_mode === "random") {
+    if (wantsRandomTargetPick(eff as Record<string, unknown>)) {
       const picks: CardInstance[] = [];
       const bag = pool.slice();
       for (let i = 0; i < selectCount && bag.length; i++) {

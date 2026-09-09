@@ -14,6 +14,7 @@ import { resolveEffectAmount } from "../../../core/values.js";
 
 import { completeCrest } from "../../crest.js";
 import { cleanupDead } from "../../../core/cleanup.js";
+import { wantsRandomTargetPick } from "../../../core/targeting/randomPick.js";
 import {
   getCrests,
   getBoard,
@@ -189,7 +190,7 @@ function handleBoardAmuletCountdown(
     picks.push(...pool);
   } else {
     const need = Math.max(1, parseInt(String(rawSelect), 10) || 1);
-    if ((eff as any).select_mode === "random" || (eff as any).random) {
+    if (wantsRandomTargetPick(eff as Record<string, unknown>)) {
       const copy = [...pool];
       for (let i = 0; i < need && copy.length; i++) {
         const idx = state.rng.nextInt(copy.length);

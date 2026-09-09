@@ -2,7 +2,6 @@
 
 import type { Effect } from "../../../../core/types/index.js";
 import { mergePoolCondition } from "../../../core/targeting/poolCondition.js";
-
 /**
  * Target for an evolve operation.
  */

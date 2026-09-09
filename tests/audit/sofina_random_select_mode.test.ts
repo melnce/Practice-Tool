@@ -1,6 +1,6 @@
 /**
  * Sofina (10564110) mode-2: "random unevolved allied follower with Ward".
- * Red-first: select_mode is ignored (shouldAutoSelect reads mode only).
+ * select_mode:"random" and mode:"random" both auto-resolve via wantsRandomTargetPick.
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import "./setup.js";
@@ -45,7 +45,7 @@ describe("Sofina mode-2 random ward evolve (10564110)", () => {
       .build();
   });
 
-  it("pre-fix select_mode leaves pending user selection (fails on main card JSON)", () => {
+  it("select_mode:random auto-resolves nested select (shared random reader)", () => {
     wardFollower("WardA");
     wardFollower("WardB");
     const selectEff = {
@@ -61,10 +61,17 @@ describe("Sofina mode-2 random ward evolve (10564110)", () => {
       effects: [{ op: "evolve", target: "selected:follower" }],
     };
     runEffects([selectEff as any], "first", null);
-    expect(state.pendingTargetEffect).toBeTruthy();
+    expect(state.pendingTargetEffect).toBeFalsy();
+    const evolvedWard = state.players.first.board.filter(
+      (c) =>
+        c?.type === "Follower" &&
+        c.hasEvolved &&
+        (c.hasWard || c.keywordState?.hasWard),
+    );
+    expect(evolvedWard.length).toBe(1);
   });
 
-  it("fixed mode:random auto-resolves under seed and evolves a ward follower", () => {
+  it("mode:random auto-resolves under seed and evolves a ward follower", () => {
     wardFollower("WardA");
     wardFollower("WardB");
     const sofina = getCardById("10564110")!;

@@ -208,7 +208,6 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "until_end_of_turn",
     "until_eot",
     "attacks_per_turn",
-    "amount",
   ]),
   attacks_per_turn: new Set([
     "target",
@@ -331,7 +330,6 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "spill_to_leader",
     "select",
     "include_leader",
-    "fallback_leader",
     "can_target_leader",
     "condition",
     "filter",
@@ -394,15 +392,7 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "condition",
   ]),
   search: new Set(["filter", "count", "keywords", "player"]),
-  discard: new Set([
-    "mode",
-    "count",
-    "filter",
-    "names",
-    "name",
-    "select",
-    "optional",
-  ]),
+  discard: new Set(["mode", "count", "filter", "names", "name"]),
   deck: new Set([
     "action",
     "from_set",
