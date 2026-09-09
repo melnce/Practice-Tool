@@ -90,6 +90,12 @@ Many effects require selecting targets. A card or ability can be played only if 
 
 A "Select …" clause is mandatory: while a legal target exists, the selection cannot be declined or cancelled. The only exception is when no legal target exists (empty hand / empty board), in which case the card still plays (for followers/amulets — see below) and the selection clause fizzles. In this codebase the `optional: true` key on hand-selection cards means "fizzle gracefully on empty zone", **not** "player may decline."
 
+**Owner ruling — A printed "Select" opens a target prompt (2026-09-08):**
+
+> "Both say select so yes you should be able to chooose ofc"
+
+When printed card text says _Select_, the player must be offered a target prompt — the engine must not silently pick the leftmost legal candidate. This is distinct from the forced-selection rule above (you cannot decline once the prompt opens); it governs whether a prompt opens at all. Affected cards at ruling time: Titania, Queen of Fairies (`10214110`, evolve), Ara, Dawnblossom (`10534120`, evolve), Sincerity of the Dewdrop (`10573310`, spell). The engine already excludes the source card from a targeted pool, so Ara's _"another follower"_ needs no `exclude_self` — that key is load-bearing only where there is no targeted pool (`10553110` Lifestealer, `distribution: "all"`).
+
 **Owner ruling — Playability with no "Select" target (2026-08-16):**
 
 > "If it's something like select on the field but there is no target on the field, then you can still play amulets and followers without the effect. Spells tho — if it says select on the field you can't play the spell if there is no target. Radiant Rainbow sometimes is such a dead card…"
@@ -333,7 +339,7 @@ Playing a card follows a fixed sequence:
 Card text specifies the target set (enemy follower, enemy leader, all allies, a random enemy, a card in hand, etc.); the engine enforces it:
 
 - **Enemy / allied:** by controller at the time the effect resolves.
-- **Type:** follower, amulet, or leader only, as stated.
+- **Type:** follower, amulet, or leader only, as stated. **Owner ruling — "A card on the field" includes amulets (2026-09-09):** when a target spec is `:any` (any card on the field), amulets are legal candidates — narrowing comes from the target's own kind, not from a hard-coded follower-only pool. Sincerity of the Dewdrop (`10573310`) prints _"Select a card on the field and transform it into an Imari's Little Buddies"_ with `any:any`; the only card in the pool whose board-route transform targets `:any` at ruling time.
 - **Trait or condition:** e.g. "the enemy follower with the highest attack" (ties broken randomly) or "a random enemy follower" — compute the valid set, then pick.
 - **Random selection:** uniform among valid candidates; with none, that portion does nothing.
 
@@ -539,6 +545,12 @@ A damage instance of **0** still counts as the follower **taking damage** for an
 
 A super-evolved follower's own-turn protection reduces incoming damage to 0 but does **not** cancel the damage event. Every "when this follower takes damage" trigger — Galmieux's 3-damage passive, her crest's Fangs of Ardent Destruction, Azurifrit's leader ping — must fire on such a hit (combat and effect damage alike). The combat path must still call into damage dealing when the attacker is invincible-on-attack; skipping the counter-damage call entirely would starve those triggers.
 
+**Owner ruling — `still_alive` subject is the damage victim (2026-09-08):**
+
+> "ill take galmieux as example here. Galmieux gains the crest that when an ally is damaged and survives the damage then you get a 0 mana spell to hand. ONLY if the unit that was daamged survives -> hence the still alive."
+
+`still_alive` is a property of the **card that took the damage** — the damage event's victim. It is only meaningful where a damage event occurred and the victim remains on the field after that event (not destroyed). It is **trigger-only** — not a pool or card-filter key. For `self_damaged` triggers the subject is the damaged card itself.
+
 **Owner ruling — "Takes N more damage" applies to a 0-damage event (2026-08-31):**
 
 > "id say so yes. since when i attack with a 0 attack in game it deals 0 damage so +1 would be 1. lets keep it until i ever see a situation where that contradicts itself."
@@ -583,7 +595,7 @@ Combat is straightforward but interacts subtly with abilities. This section cove
 
 A card can leave play in several ways:
 
-- **Destroy:** goes to the cemetery (creates a shadow, fires Last Words).
+- **Destroy:** goes to the cemetery (creates a shadow, fires Last Words). **Owner ruling — Engage self-sacrifice is destruction (2026-09-09):** an amulet consumed by its own Engage is **destroyed** and raises `ally_amulet_destroyed`. Owner: _"but i think they should because they say engage destroy"_. Official Cygames Q&A for `10001210`, `10002210`, `10112210`, `10113210`, and `10162220` (can I Engage with no legal target?) — every answer says the amulet is **destroyed** (e.g. _"Yes. Doing so will simply destroy it."_). Consumers at ruling time: Lyanthoth, Eld Tome `10664120` (Faith crest) and Omerio, Winged Revenant `10964120` (sequence trigger); 22 amulets carry `Engage` with `sacrifice: true`.
 - **Banish:** removed from play entirely (no shadow, no Last Words).
 - **Transform:** the card in play becomes a different card; the original ceases to exist — no Last Words, no shadow, and its continuous effects end — while the new card takes its slot in place. The new card is unrelated to the old one (no stat or ability inheritance). **Transform does not count as leaving play or entering play** — neither "when leaves the field" nor "when enters the field" triggers fire. **Owner ruling (2026-09-08):** transform is not a leave; the transformed-in card is not an enter. **Source:** [Shadowverse 効果処理 wiki — 変身と破壊の違い](https://w.atwiki.jp/svkoukasyori/pages/16.html) — Last Words, "when destroyed", and "when leaving the field" do not activate; the count of "cards that entered the field" does not increase (it is not treated as having entered the field).
 - **Return to hand (bounce):** the card goes to its owner's hand; this is not a destroy (no shadow, no Last Words) but does count as leaving play (for conditions like "if 4 allies left play this turn"). A returned follower reverts to base stats unless stated otherwise, frees its field slot, and can cause a hand-overflow destruction if the hand would exceed 9.
