@@ -11,7 +11,10 @@ import { handleCountdown } from "../../../effects/ops/countdown/unified.js";
 import { handleAttacksPerTurn } from "../../../effects/attacks.js";
 import { getTargetingContext } from "../context.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
-import { readPoolNarrowFilter } from "../../targeting/poolCondition.js";
+import {
+  readPoolNarrowFilter,
+  mergeEffectPoolCondition,
+} from "../../targeting/poolCondition.js";
 import {
   evaluateCardCondition,
   type CardCondition,
@@ -75,7 +78,7 @@ export function registerBuffEffects() {
               eff.target || "",
               ctx.owner,
               ctx.sourceCard,
-              eff.condition,
+              mergeEffectPoolCondition(eff as Record<string, unknown>),
               opCtx,
             );
 
@@ -98,11 +101,6 @@ export function registerBuffEffects() {
       targets = targets.filter((c) =>
         evaluateCardCondition(c, narrowFilter as CardCondition),
       );
-    }
-
-    // Apply exclude_self if specified
-    if ((eff as any).exclude_self && ctx.sourceCard) {
-      targets = targets.filter((c: any) => c.uid !== ctx.sourceCard?.uid);
     }
 
     const res = handleKeyword(eff as any, {

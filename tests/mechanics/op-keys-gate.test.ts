@@ -261,7 +261,7 @@ describe("op-keys gate — stat/destroy/keyword card-narrowing in filter", () =>
     });
   }
 
-  it("allows stat condition.class with filter leftmost (Knightly Ardor carve-out)", () => {
+  it("allows stat distribution leftmost with filter.class (Knightly Ardor)", () => {
     const issues = checkOpKeysForCard({
       id: "10423310",
       name: "Knightly Ardor",
@@ -275,8 +275,8 @@ describe("op-keys gate — stat/destroy/keyword card-narrowing in filter", () =>
                   op: "stat",
                   action: "give",
                   target: "ally:follower",
-                  filter: "leftmost",
-                  condition: { class: "Swordcraft" },
+                  filter: { class: "Swordcraft" },
+                  distribution: "leftmost",
                   attacks_per_turn: 2,
                 },
               ],
@@ -287,6 +287,10 @@ describe("op-keys gate — stat/destroy/keyword card-narrowing in filter", () =>
     });
     const narrow = issues.filter((i) => i.message.includes("card-narrowing"));
     expect(narrow).toHaveLength(0);
+    const leftmostIssues = issues.filter((i) =>
+      i.message.includes('filter:"leftmost"'),
+    );
+    expect(leftmostIssues).toHaveLength(0);
   });
 
   it("allows stat condition.tribe with attack_source (Amataz carve-out)", () => {
@@ -385,7 +389,7 @@ describe("op-keys gate — stat duration keyword grant", () => {
           attack: 0,
           defense: 0,
           keywords: ["Barrier"],
-          until_end_of_turn: true,
+          duration: "turn_end",
         },
       ],
     });
@@ -407,7 +411,7 @@ describe("op-keys gate — stat duration keyword grant", () => {
           attack: 0,
           defense: 0,
           keywords: [allowed],
-          until_end_of_turn: true,
+          duration: "turn_end",
         },
       ],
     });
@@ -415,5 +419,112 @@ describe("op-keys gate — stat duration keyword grant", () => {
       i.message.includes("cannot grant keyword"),
     );
     expect(durIssues).toHaveLength(0);
+  });
+});
+
+describe("op-keys gate — self-inclusion spelling (BR1)", () => {
+  it("flags top-level include_self on stat op", () => {
+    const issues = checkOpKeysForCard({
+      id: "BAD_INC",
+      name: "Bad Include",
+      fanfare: [
+        {
+          op: "stat",
+          action: "give",
+          target: "ally:follower",
+          include_self: true,
+        },
+      ],
+    });
+    expect(
+      issues.some((i) => i.message.includes('top-level "include_self"')),
+    ).toBe(true);
+  });
+
+  it("flags top-level exclude_self on keyword op", () => {
+    const issues = checkOpKeysForCard({
+      id: "BAD_EXC",
+      name: "Bad Exclude",
+      fanfare: [
+        {
+          op: "keyword",
+          action: "grant",
+          target: "ally:follower",
+          exclude_self: true,
+          keywords: ["Barrier"],
+        },
+      ],
+    });
+    expect(
+      issues.some((i) => i.message.includes('top-level "exclude_self"')),
+    ).toBe(true);
+  });
+
+  it("flags condition.not_self:false on damage op", () => {
+    const issues = checkOpKeysForCard({
+      id: "BAD_NOT_SELF_FALSE",
+      name: "Bad Not Self False",
+      fanfare: [
+        {
+          op: "damage",
+          target: "all:follower",
+          amount: 2,
+          condition: { not_self: false },
+        },
+      ],
+    });
+    expect(issues.some((i) => i.message.includes("not_self:false"))).toBe(true);
+  });
+
+  it("allows gate exclude_self on Monster Litterateur carve-out", () => {
+    const issues = checkOpKeysForCard({
+      id: "10501110",
+      name: "Monster Litterateur",
+      fanfare: [
+        {
+          op: "gate",
+          condition: "field_matches",
+          exclude_self: true,
+          count: 1,
+          effects: [],
+        },
+      ],
+    });
+    const excIssues = issues.filter((i) =>
+      i.message.includes('top-level "exclude_self"'),
+    );
+    expect(excIssues).toHaveLength(0);
+  });
+});
+
+describe("op-keys gate — stat until_end_of_turn spelling (BR2)", () => {
+  it("flags until_end_of_turn on stat op", () => {
+    const issues = checkOpKeysForCard({
+      id: "BAD_UET",
+      name: "Bad UET",
+      fanfare: [
+        {
+          op: "stat",
+          action: "give",
+          target: "self",
+          attack: 1,
+          until_end_of_turn: true,
+        },
+      ],
+    });
+    expect(issues.some((i) => i.message.includes("until_end_of_turn"))).toBe(
+      true,
+    );
+  });
+});
+
+describe("op-keys gate — select boolean spelling (BR4)", () => {
+  it("flags select:true on summon op", () => {
+    const issues = checkOpKeysForCard({
+      id: "BAD_SEL",
+      name: "Bad Select",
+      fanfare: [{ op: "summon", source: "hand", select: true }],
+    });
+    expect(issues.some((i) => i.message.includes("select:true"))).toBe(true);
   });
 });

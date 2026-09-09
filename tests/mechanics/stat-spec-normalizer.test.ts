@@ -286,6 +286,48 @@ describe("stat spec normalizer — pooled normalizations (BG2 items 3–7)", () 
     expect(card.potential_attack).toBe(4);
     expect(card.potential_defense).toBe(4);
   });
+
+  it("count_allies source honours condition.not_self (Exella shape)", () => {
+    givenGameState({ seed: 1 }).build();
+    const source = allyFollower("Exella", 1, 3);
+    allyFollower("Ally A", 2, 2);
+    allyFollower("Ally B", 2, 2);
+    whenRunEffects(
+      [
+        {
+          op: "stat",
+          action: "give",
+          target: "self",
+          attack_source: "count_allies",
+          condition: { not_self: true },
+        },
+      ] as any,
+      "first",
+      source,
+    );
+    expect(source.attack).toBe(3);
+  });
+
+  it("distribution leftmost picks first pool follower after filters (Knightly Ardor shape)", () => {
+    givenGameState({ seed: 1 }).build();
+    const left = allyFollower("Left SC", 1, 1, { class: "Swordcraft" });
+    allyFollower("Right SC", 3, 3, { class: "Swordcraft" });
+    allyFollower("Left Other", 5, 5, { class: "Forestcraft" });
+    whenRunEffects(
+      [
+        {
+          op: "stat",
+          action: "give",
+          target: "ally:follower",
+          filter: { class: "Swordcraft" },
+          distribution: "leftmost",
+          attacks_per_turn: 2,
+        },
+      ] as any,
+      "first",
+    );
+    expect(left.attacks_per_turn).toBe(2);
+  });
 });
 
 describe("stat spec normalizer — set action guard (BG3)", () => {
