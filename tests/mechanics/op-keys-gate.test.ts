@@ -512,9 +512,9 @@ describe("op-keys gate — stat until_end_of_turn spelling (BR2)", () => {
         },
       ],
     });
-    expect(issues.some((i) => i.message.includes("until_end_of_turn"))).toBe(
-      true,
-    );
+    expect(
+      issues.some((i) => i.message.includes('use duration:"turn_end"')),
+    ).toBe(true);
   });
 });
 
