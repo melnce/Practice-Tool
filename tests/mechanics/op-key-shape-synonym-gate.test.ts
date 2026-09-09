@@ -2,43 +2,8 @@
  * Gate sabotage for BH synonym cleanup — fallback_leader, stat amount, discard keys, random pick.
  */
 import { describe, it, expect } from "vitest";
-import { execSync } from "child_process";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import { checkOpKeyShape } from "../../scripts/check-canonical-form.js";
 import { checkOpKeysForCard } from "../../scripts/op-keys-gate.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const ROOT = path.resolve(path.dirname(__filename), "../..");
-
-function gateFails(card: Record<string, unknown>): boolean {
-  const setPath = path.join(ROOT, "cards/sets/__bh_gate_test__.json");
-  fs.writeFileSync(setPath, JSON.stringify([card], null, 2));
-  try {
-    execSync(
-      "npx tsx scripts/check-canonical-form.ts --gate=op-key-shape --fail",
-      { cwd: ROOT, stdio: "pipe", encoding: "utf-8" },
-    );
-    return false;
-  } catch {
-    return true;
-  } finally {
-    fs.unlinkSync(setPath);
-  }
-}
-
-function gateOutput(card: Record<string, unknown>): string {
-  const setPath = path.join(ROOT, "cards/sets/__bh_gate_test__.json");
-  fs.writeFileSync(setPath, JSON.stringify([card], null, 2));
-  try {
-    return execSync(
-      "npx tsx scripts/check-canonical-form.ts --gate=op-key-shape --fail 2>&1 || true",
-      { cwd: ROOT, encoding: "utf-8" },
-    );
-  } finally {
-    fs.unlinkSync(setPath);
-  }
-}
 
 const base = {
   id: "99999998",
@@ -47,6 +12,10 @@ const base = {
   class: "Neutral",
   cost: "0",
 };
+
+function shapeWarnings(card: Record<string, unknown>) {
+  return checkOpKeyShape(card as Parameters<typeof checkOpKeyShape>[0]);
+}
 
 describe("op-key-shape synonym gate sabotage", () => {
   it("flags fallback_leader on damage", () => {
@@ -62,8 +31,12 @@ describe("op-key-shape synonym gate sabotage", () => {
         },
       ],
     };
-    expect(gateFails(card)).toBe(true);
-    expect(gateOutput(card)).toContain("99999998");
+    const warnings = shapeWarnings(card);
+    expect(warnings.length).toBeGreaterThan(0);
+    expect(warnings.some((w) => w.id === "99999998")).toBe(true);
+    expect(warnings.some((w) => w.note?.includes("fallback_leader"))).toBe(
+      true,
+    );
   });
 
   it("flags stat amount", () => {
@@ -81,8 +54,8 @@ describe("op-key-shape synonym gate sabotage", () => {
         },
       ],
     };
-    expect(gateFails(card)).toBe(true);
-    expect(gateOutput(card)).toContain("amount");
+    const warnings = shapeWarnings(card);
+    expect(warnings.some((w) => w.note?.includes("amount"))).toBe(true);
   });
 
   it("flags countdown random:true", () => {
@@ -98,8 +71,8 @@ describe("op-key-shape synonym gate sabotage", () => {
         },
       ],
     };
-    expect(gateFails(card)).toBe(true);
-    expect(gateOutput(card)).toContain("countdown");
+    const warnings = shapeWarnings(card);
+    expect(warnings.some((w) => w.note?.includes("countdown"))).toBe(true);
   });
 });
 

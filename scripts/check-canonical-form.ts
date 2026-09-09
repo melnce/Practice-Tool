@@ -411,7 +411,7 @@ function checkSpellboostCostKeywordShape(card: CardJson): Warning[] {
   return out;
 }
 
-function checkOpKeyShape(card: CardJson): Warning[] {
+export function checkOpKeyShape(card: CardJson): Warning[] {
   const out: Warning[] = checkSpellboostCostKeywordShape(card);
   walk(card, (obj, path) => {
     const op = String(obj.op ?? "");
@@ -905,4 +905,9 @@ function main(): void {
   process.exit(0);
 }
 
-main();
+const isCli =
+  process.argv[1] &&
+  fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
+if (isCli) {
+  main();
+}
