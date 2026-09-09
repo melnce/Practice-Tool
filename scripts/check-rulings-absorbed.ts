@@ -15,8 +15,8 @@ const RULINGS_PATH = path.join(ROOT, "docs/owner-rulings.md");
 const RULEBOOK_PATH = path.join(ROOT, "docs/svwb_rulebook_formatted.md");
 
 /** Pinned pending population — must match deliberate `pending` markers. */
-/** Pinned after BX2; 6 during BX1 (four BX2 write-throughs + two permanent pending). */
-const EXPECTED_PENDING_COUNT = 6;
+/** Pinned pending population — two rulings not yet written through. */
+const EXPECTED_PENDING_COUNT = 2;
 
 const MARKER_RE =
   /^<!--\s*rulebook:\s*(absorbed\s+#([a-z0-9-]+)|engine-internal\s+—\s+(.+)|pending\s+—\s+(.+))\s*-->$/i;
@@ -68,9 +68,8 @@ function parseRulebookSections(markdown: string): Map<string, RulebookSection> {
 
     const endLine =
       i + 1 < headings.length
-        ? headings
-            .slice(i + 1)
-            .find((h) => h.level <= level)?.line ?? lines.length
+        ? (headings.slice(i + 1).find((h) => h.level <= level)?.line ??
+          lines.length)
         : lines.length;
 
     const content = lines.slice(line + 1, endLine).join("\n");
@@ -122,7 +121,13 @@ function main(): void {
   let failed = false;
 
   for (const heading of rulingHeadings) {
-    const markerLine = lines[heading.line];
+    const headingIndex = heading.line - 1;
+    let markerIndex = headingIndex + 1;
+    while (markerIndex < lines.length && lines[markerIndex].trim() === "") {
+      markerIndex++;
+    }
+
+    const markerLine = lines[markerIndex];
     if (!markerLine?.trim().startsWith("<!-- rulebook:")) {
       console.error(
         `✗ Missing marker immediately below heading (line ${heading.line}): ${heading.title}`,
@@ -131,8 +136,18 @@ function main(): void {
       continue;
     }
 
+    const between = lines.slice(headingIndex + 1, markerIndex);
+    const nonEmptyBetween = between.filter((l) => l.trim() !== "");
+    if (nonEmptyBetween.length > 0) {
+      console.error(
+        `✗ Content between heading and marker (line ${heading.line}): ${heading.title}`,
+      );
+      failed = true;
+      continue;
+    }
+
     const markerMatches = lines
-      .slice(heading.line, heading.line + 3)
+      .slice(markerIndex, markerIndex + 3)
       .filter((l) => l.trim().startsWith("<!-- rulebook:"));
     if (markerMatches.length > 1) {
       console.error(
