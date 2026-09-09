@@ -931,10 +931,7 @@ function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
       if (!nestedAllowed) continue;
 
       for (const nk of Object.keys(val as Record<string, unknown>)) {
-        if (
-          field === "filter" &&
-          POOL_ONLY_CONDITION_KEYS.has(nk)
-        ) {
+        if (field === "filter" && POOL_ONLY_CONDITION_KEYS.has(nk)) {
           issues.push({
             id: card.id,
             name: card.name,
@@ -978,7 +975,9 @@ function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
     }
 
     if (op === "stat") {
-      const duration = resolveStatDuration(eff as Parameters<typeof resolveStatDuration>[0]);
+      const duration = resolveStatDuration(
+        eff as Parameters<typeof resolveStatDuration>[0],
+      );
       if (duration !== "permanent") {
         const grantListRaw = eff.keywords;
         if (grantListRaw != null) {
@@ -987,9 +986,8 @@ function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
             : [grantListRaw];
           for (const kw of grantList) {
             const name =
-              (typeof kw === "string"
-                ? kw
-                : (kw as { name?: string })?.name) || "";
+              (typeof kw === "string" ? kw : (kw as { name?: string })?.name) ||
+              "";
             const key = normalizeKeywordName(name);
             if (!key) continue;
             if (KEYWORDS_SUPPORTING_STAT_DURATION.has(key)) continue;
