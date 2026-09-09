@@ -18,6 +18,9 @@ import {
   recomputeAttackFlags,
 } from "../../src/logic/core/combat.js";
 import { watcherEarth } from "../harness/reactiveTimingMatrix.js";
+import { destroyTarget } from "../../src/logic/effects/ops/destroy/primitives.js";
+import { cleanupDead } from "../../src/logic/core/cleanup.js";
+import { killFollowerForLastWords } from "../harness/l2Dispatch.js";
 import "../../src/logic/core/effects/index.js";
 
 const SINCERITY = "10573310";
@@ -137,15 +140,45 @@ describe("transform amulet to follower (Sincerity)", () => {
       "board",
       "first",
     );
-    const amulet = allyAmulet("CountdownAmulet");
+    getBoard(state, "first").push(leaveWatcher, amuletWatcher);
 
-    whenPlayCard("first", 0);
-    resolvePendingTarget(amulet.uid);
+    const leaveControl = createCard(
+      {
+        name: "CountdownAmulet",
+        type: "Follower",
+        cost: 2,
+        attack: 1,
+        defense: 1,
+      },
+      "board",
+      "first",
+    );
+    leaveControl.peak_defense = 1;
+    getBoard(state, "first").push(leaveControl);
 
+    const destroyControl = allyAmulet("CountdownAmulet");
+    const transformTarget = allyAmulet("VictimAmulet");
+
+    // Before controls: negative-only assertions read 0 (watchers were not on board
+    // in the pre-control draft — dead detectors that could not distinguish a typo).
     expect(watcherEarth("first", leaveWatcher.uid)).toBe(0);
     expect(watcherEarth("first", amuletWatcher.uid)).toBe(0);
+
+    killFollowerForLastWords(leaveControl, "first");
+    expect(watcherEarth("first", leaveWatcher.uid)).toBe(1);
+    expect(watcherEarth("first", amuletWatcher.uid)).toBe(0);
+
+    destroyTarget(destroyControl, "first");
+    cleanupDead();
+    expect(watcherEarth("first", amuletWatcher.uid)).toBe(1);
+
+    whenPlayCard("first", 0);
+    resolvePendingTarget(transformTarget.uid);
+
+    expect(watcherEarth("first", leaveWatcher.uid)).toBe(1);
+    expect(watcherEarth("first", amuletWatcher.uid)).toBe(1);
     expect(
-      getBoard(state, "first").find((c) => c.uid === amulet.uid)?.type,
+      getBoard(state, "first").find((c) => c.uid === transformTarget.uid)?.type,
     ).toBe("Follower");
   }, 60_000);
 });
