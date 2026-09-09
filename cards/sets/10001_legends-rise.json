@@ -236,7 +236,9 @@
         "select": 1,
         "mode": "super",
         "filter": {
-          "unevolved": true,
+          "unevolved": true
+        },
+        "condition": {
           "not_self": true
         }
       }
@@ -2569,7 +2571,7 @@
         "action": "grant",
         "select": 1,
         "target": "ally:follower",
-        "condition": {
+        "filter": {
           "tribe": "Shikigami"
         },
         "keywords": [
@@ -2608,7 +2610,7 @@
             "op": "destroy",
             "distribution": "all",
             "target": "ally:follower",
-            "condition": {
+            "filter": {
               "tribe": "Shikigami"
             }
           },
@@ -5420,7 +5422,7 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:follower",
-        "condition": {
+        "filter": {
           "tribe": "Puppetry"
         },
         "keywords": [
@@ -5699,7 +5701,7 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
+        "filter": {
           "tribe": "Artifact"
         },
         "attack": 1,

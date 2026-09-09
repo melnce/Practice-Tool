@@ -520,7 +520,7 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
+        "filter": {
           "tribe": "Pixie"
         },
         "keywords": ["Bane"]
@@ -3138,7 +3138,7 @@
             "op": "keyword",
             "action": "grant",
             "target": "ally:follower",
-            "condition": {
+            "filter": {
               "tribe": "Puppetry"
             },
             "keywords": ["Storm"]

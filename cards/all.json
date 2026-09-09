@@ -2157,7 +2157,9 @@
         "select": 1,
         "mode": "super",
         "filter": {
-          "unevolved": true,
+          "unevolved": true
+        },
+        "condition": {
           "not_self": true
         }
       }
@@ -4490,7 +4492,7 @@
         "action": "grant",
         "select": 1,
         "target": "ally:follower",
-        "condition": {
+        "filter": {
           "tribe": "Shikigami"
         },
         "keywords": [
@@ -4529,7 +4531,7 @@
             "op": "destroy",
             "distribution": "all",
             "target": "ally:follower",
-            "condition": {
+            "filter": {
               "tribe": "Shikigami"
             }
           },
@@ -7341,7 +7343,7 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:follower",
-        "condition": {
+        "filter": {
           "tribe": "Puppetry"
         },
         "keywords": [
@@ -7620,7 +7622,7 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
+        "filter": {
           "tribe": "Artifact"
         },
         "attack": 1,
@@ -8115,7 +8117,7 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
+        "filter": {
           "tribe": "Pixie"
         },
         "attack": 1,
@@ -10060,7 +10062,7 @@
         "op": "destroy",
         "target": "enemy:follower",
         "select": 1,
-        "condition": {
+        "filter": {
           "is_super_evolved": true
         }
       }
@@ -10702,7 +10704,7 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:hand",
-        "condition": {
+        "filter": {
           "type": "Follower",
           "tribe": "Artifact"
         },
@@ -10746,7 +10748,7 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:hand",
-        "condition": {
+        "filter": {
           "type": "Follower",
           "tribe": "Artifact"
         },
@@ -12651,7 +12653,7 @@
         "op": "destroy",
         "distribution": "all",
         "target": "enemy:follower",
-        "condition": {
+        "filter": {
           "damaged": true
         }
       }
@@ -14416,7 +14418,7 @@
         "action": "give",
         "target": "ally:follower",
         "select": 1,
-        "condition": {
+        "filter": {
           "tribe": "Artifact"
         },
         "attack": 3,
@@ -14493,9 +14495,6 @@
       {
         "op": "destroy",
         "target": "ally:card",
-        "filter": {
-          "not_self": true
-        },
         "select": 1,
         "then": [
           {
@@ -14505,7 +14504,10 @@
             "distribution": "random_hits",
             "count": 1
           }
-        ]
+        ],
+        "condition": {
+          "not_self": true
+        }
       }
     ],
     "keywords": [],
@@ -14564,9 +14566,6 @@
       {
         "op": "destroy",
         "target": "ally:card",
-        "filter": {
-          "not_self": true
-        },
         "select": 1,
         "then": [
           {
@@ -14574,7 +14573,10 @@
             "source": "deck",
             "count": 2
           }
-        ]
+        ],
+        "condition": {
+          "not_self": true
+        }
       }
     ],
     "keywords": [
@@ -15813,7 +15815,7 @@
                 "op": "stat",
                 "action": "give",
                 "target": "ally:follower",
-                "condition": {
+                "filter": {
                   "class": "Swordcraft"
                 },
                 "attack": 1,
@@ -18853,7 +18855,7 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
+        "filter": {
           "tribe": "Pixie"
         },
         "keywords": ["Bane"]
@@ -21471,7 +21473,7 @@
             "op": "keyword",
             "action": "grant",
             "target": "ally:follower",
-            "condition": {
+            "filter": {
               "tribe": "Puppetry"
             },
             "keywords": ["Storm"]
@@ -22778,7 +22780,7 @@
         "op": "destroy",
         "target": "enemy:follower",
         "distribution": "all",
-        "condition": {
+        "filter": {
           "defense_eq": 1
         }
       }
@@ -23291,7 +23293,7 @@
         "op": "destroy",
         "target": "ally:follower",
         "select": 1,
-        "condition": {
+        "filter": {
           "name": "Crystalspawn"
         }
       },
@@ -24239,16 +24241,16 @@
       {
         "op": "destroy",
         "target": "ally:follower",
-        "filter": {
-          "not_self": true
-        },
         "select": 1,
         "then": [
           {
             "op": "evolve",
             "target": "self"
           }
-        ]
+        ],
+        "condition": {
+          "not_self": true
+        }
       }
     ],
     "evolve_trigger_always": true
@@ -26755,7 +26757,7 @@
         "attack": 1,
         "defense": 3,
         "keywords": ["Ward"],
-        "condition": {
+        "filter": {
           "class": "Swordcraft"
         }
       }
@@ -27296,7 +27298,7 @@
         "defense": 2,
         "target": "ally:hand",
         "select": 1,
-        "condition": {
+        "filter": {
           "type": "Follower"
         }
       }
@@ -27966,9 +27968,6 @@
       {
         "op": "destroy",
         "target": "ally:follower",
-        "filter": {
-          "not_self": true
-        },
         "select": 1,
         "then": [
           {
@@ -27977,7 +27976,10 @@
             "count": 1,
             "target": "enemy:follower"
           }
-        ]
+        ],
+        "condition": {
+          "not_self": true
+        }
       }
     ],
     "keywords": [],
@@ -28075,7 +28077,7 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "condition": {
+        "filter": {
           "class": "Abysscraft"
         },
         "exclude_self": true,
@@ -31382,7 +31384,7 @@
         "op": "stat",
         "action": "give",
         "target": "ally:hand",
-        "condition": {
+        "filter": {
           "type": "Follower"
         },
         "select": 1,
@@ -32432,7 +32434,7 @@
         "target": "enemy:follower",
         "distribution": "random",
         "count": 2,
-        "condition": {
+        "filter": {
           "has_keyword": "Ward"
         }
       }
@@ -32489,7 +32491,9 @@
         "target": "ally:follower",
         "select": 1,
         "filter": {
-          "unevolved": true,
+          "unevolved": true
+        },
+        "condition": {
           "not_self": true
         }
       }
@@ -34918,7 +34922,7 @@
                     "target": "ally:card",
                     "distribution": "random",
                     "count": 1,
-                    "condition": {
+                    "filter": {
                       "has_keyword": "LastWords"
                     }
                   },

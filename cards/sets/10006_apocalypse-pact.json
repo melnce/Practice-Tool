@@ -807,7 +807,7 @@
         "op": "destroy",
         "target": "enemy:follower",
         "distribution": "all",
-        "condition": {
+        "filter": {
           "defense_eq": 1
         }
       }
@@ -1320,7 +1320,7 @@
         "op": "destroy",
         "target": "ally:follower",
         "select": 1,
-        "condition": {
+        "filter": {
           "name": "Crystalspawn"
         }
       },
@@ -2268,16 +2268,16 @@
       {
         "op": "destroy",
         "target": "ally:follower",
-        "filter": {
-          "not_self": true
-        },
         "select": 1,
         "then": [
           {
             "op": "evolve",
             "target": "self"
           }
-        ]
+        ],
+        "condition": {
+          "not_self": true
+        }
       }
     ],
     "evolve_trigger_always": true

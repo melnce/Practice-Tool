@@ -1294,7 +1294,7 @@
                 "op": "destroy",
                 "distribution": "all",
                 "target": "enemy:follower",
-                "condition": {
+                "filter": {
                   "damaged": true
                 }
               }
@@ -1666,7 +1666,7 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:follower",
-        "condition": {
+        "filter": {
           "name": "Rulenye & Valnareik"
         },
         "keywords": ["Storm"],

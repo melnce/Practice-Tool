@@ -2329,7 +2329,7 @@
         "op": "stat",
         "action": "give",
         "target": "ally:hand",
-        "condition": {
+        "filter": {
           "type": "Follower"
         },
         "select": 1,
@@ -3379,7 +3379,7 @@
         "target": "enemy:follower",
         "distribution": "random",
         "count": 2,
-        "condition": {
+        "filter": {
           "has_keyword": "Ward"
         }
       }
@@ -3436,7 +3436,9 @@
         "target": "ally:follower",
         "select": 1,
         "filter": {
-          "unevolved": true,
+          "unevolved": true
+        },
+        "condition": {
           "not_self": true
         }
       }
