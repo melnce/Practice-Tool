@@ -1082,7 +1082,7 @@
                 "op": "stat",
                 "action": "give",
                 "target": "ally:follower",
-                "condition": {
+                "filter": {
                   "class": "Swordcraft"
                 },
                 "attack": 1,

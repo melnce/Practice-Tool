@@ -1761,7 +1761,7 @@
         "op": "destroy",
         "distribution": "all",
         "target": "enemy:follower",
-        "condition": {
+        "filter": {
           "damaged": true
         }
       }
@@ -3526,7 +3526,7 @@
         "action": "give",
         "target": "ally:follower",
         "select": 1,
-        "condition": {
+        "filter": {
           "tribe": "Artifact"
         },
         "attack": 3,
@@ -3603,7 +3603,7 @@
       {
         "op": "destroy",
         "target": "ally:card",
-        "filter": {
+        "condition": {
           "not_self": true
         },
         "select": 1,
@@ -3674,7 +3674,7 @@
       {
         "op": "destroy",
         "target": "ally:card",
-        "filter": {
+        "condition": {
           "not_self": true
         },
         "select": 1,

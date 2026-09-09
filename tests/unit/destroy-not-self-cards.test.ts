@@ -1,6 +1,6 @@
 /**
  * Destroy ops with "another allied …" must exclude the source card from selection.
- * Card data uses filter:{not_self:true}; engine merges filter into getPool condition.
+ * Card data uses condition:{not_self:true}; engine merges filter into getPool condition.
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import "../audit/setup.ts";

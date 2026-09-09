@@ -2412,7 +2412,7 @@
                     "target": "ally:card",
                     "distribution": "random",
                     "count": 1,
-                    "condition": {
+                    "filter": {
                       "has_keyword": "LastWords"
                     }
                   },
