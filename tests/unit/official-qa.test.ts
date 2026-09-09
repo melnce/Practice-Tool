@@ -263,20 +263,56 @@ describe("cards/official-meta.json well-formedness", () => {
   });
 });
 
-describe("official Q&A backlog (it.todo per unpinned ruling)", () => {
+describe("official Q&A coverage (pinned / unpinnable / unpinned)", () => {
   const meta = loadCommittedMeta();
   const corpus = loadTestCorpus(path.join(ROOT, "tests"));
   const coverage = coverOfficialQa(meta, corpus);
   const pinned = coverage.filter((r) => r.pinned);
-  const unpinned = coverage.filter((r) => !r.pinned);
+  const unpinnable = coverage.filter((r) => r.unpinnable);
+  const actionableUnpinned = coverage.filter((r) => !r.pinned && !r.unpinnable);
 
-  it(`coverage rows split into pinned (${String(pinned.length)}) and unpinned (${String(unpinned.length)})`, () => {
-    expect(pinned.length + unpinned.length).toBe(coverage.length);
+  const EXPECTED_UNPINNABLE_IDS = [
+    "10012110",
+    "10052310",
+    "10111130",
+    "10113130",
+    "10201310",
+    "10214120",
+    "10552310",
+    "10964120",
+  ];
+
+  it(`pinned ${String(pinned.length)} / unpinnable ${String(unpinnable.length)} / unpinned ${String(actionableUnpinned.length)} (ceiling ${String(pinned.length + unpinnable.length)})`, () => {
+    expect(pinned.length + unpinnable.length + actionableUnpinned.length).toBe(
+      coverage.length,
+    );
+    expect(pinned.length).toBe(141);
+    expect(unpinnable.length).toBe(8);
+    expect(actionableUnpinned.length).toBe(0);
   }, 60_000);
 
-  // One it.todo per unpinned row below — Vitest todo count === unpinned.length
+  it("unpinnable set is exactly the eight one-keyword Q&A rows", () => {
+    expect(unpinnable.map((r) => r.id).sort()).toEqual(
+      [...EXPECTED_UNPINNABLE_IDS].sort(),
+    );
+    for (const row of unpinnable) {
+      expect(row.extractedKeywords).toHaveLength(1);
+    }
+  }, 60_000);
+
+  it("every unpinnable row has min-1 block-scoped behaviour pinned", () => {
+    for (const row of unpinnable) {
+      expect(
+        row.pinnedBlockScopedMin1,
+        `${row.id} ${row.name} — unpinnable without min-1 match is a coverage gap`,
+      ).toBe(true);
+      expect(row.matchedFile, `${row.id} ${row.name}`).toBeTruthy();
+    }
+  }, 60_000);
+
+  // One it.todo per actionable-unpinned row — Vitest todo count === backlog
   // by construction (not a separate counter that could drift).
-  for (const row of unpinned) {
+  for (const row of actionableUnpinned) {
     it.todo(`${row.id} ${row.name} — Q: ${row.question} / A: ${row.answer}`);
   }
 });

@@ -388,6 +388,57 @@ Asked what the key means, the owner answered with Galmieux, verbatim:
 
 **Consequence:** `still_alive` is **trigger-only** — not a pool/card filter key. Its subject is the damage victim; for `self_damaged` triggers this is implemented in `src/logic/core/triggers/handlers/self.ts`.
 
+## A printed "Select" means the player picks (2026-09-08)
+
+Asked whether Titania, Queen of Fairies `10214110` and Ara, Dawnblossom `10534120` should open a target
+prompt on evolve — measured, they opened none and the engine silently transformed the leftmost
+candidate — the owner answered, verbatim:
+
+> "Both say select so yes you should be able to chooose ofc"
+
+**So a card whose printed text says _Select_ must open a target prompt.** Fixed in PR #368: `op:
+"transform"` ignored `select` on its board route and sliced the first N of the pool, while `damage` and
+`destroy` with the identical `target`/`select` shape on the identical route prompted correctly. Three
+cards were affected — Titania `10214110` (evolve), Ara `10534120` (evolve), Sincerity of the Dewdrop
+`10573310` (spell); Vier `10272110` uses the hand route and was already correct.
+
+Corollary measured at the same time: the engine already excludes the source card from a targeted pool,
+so Ara's _"another follower"_ needs no `exclude_self`. That key is load-bearing only where there is no
+targeted pool (`10553110` Lifestealer, `distribution: "all"`).
+
+## "A card on the field" includes amulets (2026-09-09)
+
+Sincerity of the Dewdrop `10573310` prints _"Select a card on the field and transform it into an Imari's
+Little Buddies"_ and targets `any:any`, but the board route of `op:"transform"` narrowed its pool to
+`type === "Follower"`, so an allied amulet was never offered. Asked whether it should be selectable, the
+owner answered, verbatim:
+
+> "Yes it can"
+
+**So `:any` means any card on the field, amulets included.** The narrowing must come from the target's
+own kind, not from a hard-coded type. Sincerity is the only card in the pool whose board-route transform
+target is `:any`; the other five board-route transforms all target `:follower`, where the narrowing was
+already redundant. Fixed in PR #378.
+
+## An amulet destroyed by its own Engage is destroyed (2026-09-09)
+
+Reported from live play: an Engage-sacrifice amulet did not increase Lyanthoth, Eld Tome `10664120`'s
+Faith and did not make Omerio, Winged Revenant `10964120` react. The owner:
+
+> "but i think they should because they say engage destroy"
+
+**Official source, checked at his request.** Cygames' own Q&A answers the "can I engage this with no
+legal target?" question for `10001210`, `10002210`, `10112210`, `10113210` and `10162220`, and every
+answer says the amulet is **destroyed** — e.g. _"Yes. Doing so will simply destroy it."_ The Japanese
+effect-processing spec has no destroy-vs-cost distinction, and no Q&A covers the trigger interaction
+directly.
+
+**So an amulet consumed by its own Engage is destroyed and raises `ally_amulet_destroyed`.** Fixed in
+PR #381: `engage.ts` had a private removal helper that never fired the trigger and never recorded the
+destruction; all three of its call sites — sacrifice, sacrifice-with-selection, and countdown reaching 0
+during the engage — now go through the shared `destroyTarget`. 22 amulets carry `Engage` with
+`sacrifice: true`; the event's only consumers are Omerio's trigger and Lyanthoth's Faith crest.
+
 ## Transform — neither leave nor enter (2026-09-08)
 
 > Transform does **not** count as leaving the field. The transformed-in card does **not** count as entering the field.
