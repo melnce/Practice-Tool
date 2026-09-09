@@ -492,7 +492,8 @@
             "target": "enemy:any",
             "amount": 1
           }
-        ]
+        ],
+        "printed": "Deal 1 damage to all enemies. Combo (3) - Deal 2 damage instead."
       }
     ],
     "fanfare": []
@@ -569,7 +570,8 @@
             "source": "deck",
             "count": 1
           }
-        ]
+        ],
+        "printed": "Draw X cards. X is your Combo."
       }
     ],
     "fanfare": []
@@ -1089,7 +1091,8 @@
                 "target": "enemy:follower",
                 "amount": 7
               }
-            ]
+            ],
+            "printed": "At the end of your turn, if this follower is unevolved, deal 7 damage to all enemy followers. If it's evolved, do this 3 times: \"Deal 7 damage to another random ally or enemy.\""
           }
         ],
         "event": "end_of_turn",
@@ -1425,7 +1428,8 @@
             ],
             "select": 2
           }
-        ]
+        ],
+        "printed": "Earth Rite (2) - Activate 2 random abilities from the following.\n1. Summon a Clay Golem.\n2. Restore 2 defense to your leader.\n3. Gain 3 earth sigils."
       }
     ],
     "fanfare": []
@@ -1838,7 +1842,8 @@
       {
         "op": "damage",
         "target": "all:follower",
-        "amount_source": "followers_on_field"
+        "amount_source": "followers_on_field",
+        "printed": "Deal X damage to all followers. X is the number of followers on the field."
       }
     ],
     "fanfare": []
@@ -2793,7 +2798,8 @@
           {
             "op": "draw",
             "source": "deck",
-            "count": "{ward_allies}"
+            "count": "{ward_allies}",
+            "printed": "Engage: Destroy this card. Draw X cards. X is the number of allied followers on the field with Ward."
           }
         ]
       }

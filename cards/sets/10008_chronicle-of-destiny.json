@@ -226,7 +226,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Deal 3 damage to a random enemy follower.\n2. Reanimate (2).\n3. Give all allied followers on the field +1/+0."
       }
     ]
   },
@@ -286,7 +287,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Select a Mode to activate.\n1. Banish all other followers from the field.\n2. Banish all amulets from the field.\n3. Banish all crests."
       }
     ],
     "spell": []
@@ -343,7 +345,8 @@
         "op": "destroy",
         "target": "enemy:follower",
         "distribution": "random",
-        "count": "{enemy_minus_ally_followers}"
+        "count": "{enemy_minus_ally_followers}",
+        "printed": "Fanfare: Destroy X random enemy followers. X is the number of enemy followers on the field minus the number of allied followers on the field."
       }
     ],
     "spell": []
@@ -1030,7 +1033,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate. If there are at least 2 allied cards on the field, activate all of them instead.\n1. Deal 4 damage to a random enemy follower.\n2. Restore 2 defense to your leader."
       }
     ],
     "fanfare": []
@@ -1237,7 +1241,8 @@
         "target": "enemy:follower",
         "select": 1,
         "amount": 2,
-        "add_amount": "{self.spellboostCount}"
+        "add_amount": "{self.spellboostCount}",
+        "printed": "X starts at 2.\nOn Spellboost: Increase X by 1.\nSelect an enemy follower on the field and deal it X damage."
       }
     ]
   },
@@ -2318,7 +2323,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select 2 Modes to activate.\n1. Deal 1 damage to the enemy leader.\n2. Restore 2 defense to your leader.\n3. Deal 3 damage to a random enemy follower.\n4. Gain 4 shadows."
       }
     ]
   },
@@ -2773,7 +2779,8 @@
             "target": "self",
             "mode": "reduce",
             "amount": 3,
-            "min_cost": 0
+            "min_cost": 0,
+            "printed": "Activates in hand. Whenever an allied follower super-evolves, reduce the cost of this card by 3."
           }
         ]
       }

@@ -446,7 +446,8 @@
         "filter": {
           "type": "Follower",
           "cost_eq": "{combo}"
-        }
+        },
+        "printed": "Fanfare: Draw an X-cost follower. X is your Combo."
       }
     ],
     "keywords": [],
@@ -491,7 +492,8 @@
             "count": 1,
             "distribution": "random"
           }
-        ]
+        ],
+        "printed": "Fanfare: Deal 3 damage to a random enemy follower. Combo (3) - Deal damage to 3 random enemy followers instead."
       }
     ],
     "keywords": [],
@@ -867,7 +869,8 @@
         "action": "give",
         "target": "self",
         "attack_source": "combo",
-        "defense": 0
+        "defense": 0,
+        "printed": "Fanfare: Give this follower +X/+0. X is your Combo."
       }
     ],
     "keywords": ["Storm"],
@@ -1017,7 +1020,8 @@
           "class": "Forestcraft",
           "cost_lte": 2
         },
-        "into": "Bramble Burst"
+        "into": "Bramble Burst",
+        "printed": "Fanfare: Transform all Forestcraft cards in your hand that cost 2 or less into copies of Bramble Burst."
       }
     ],
     "keywords": ["Ward"],
@@ -1504,7 +1508,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Summon a Steelclad Knight and Knight.\n2. Give all allied followers on the field +1/+1."
       }
     ],
     "keywords": [],
@@ -2058,7 +2063,8 @@
             "count": 1
           }
         ],
-        "select": 1
+        "select": 1,
+        "printed": "Select a card in your hand with On Spellboost and spellboost it. Draw a card."
       }
     ],
     "keywords": [],
@@ -2093,7 +2099,8 @@
         "target": "enemy:follower",
         "select": 1,
         "amount": 2,
-        "add_amount": "{self.spellboostCount}"
+        "add_amount": "{self.spellboostCount}",
+        "printed": "X starts at 2.\nOn Spellboost: Increase X by 1.\nSelect an enemy follower on the field and deal it X damage."
       }
     ],
     "triggers": []
@@ -2270,7 +2277,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Gain 4 earth sigils.\n2. Restore 4 defense to your leader.\n3. Earth Rite (3) - Deal 4 damage to all enemy followers."
       }
     ],
     "keywords": [],
@@ -2312,7 +2320,8 @@
             "target": "selected:follower"
           }
         ],
-        "select": 1
+        "select": 1,
+        "printed": "On Spellboost: Reduce the cost of this card by 1.\nSelect an enemy follower on the field, set its defense to 1, and, until the end of your opponent's turn, give it \"Can't attack followers or leaders.\""
       }
     ],
     "keywords": [
@@ -2551,7 +2560,8 @@
         "op": "summon",
         "source": "named",
         "name": "Demonic Shikigami",
-        "count": 1
+        "count": 1,
+        "printed": "On Spellboost: Reduce the cost of this card by 1.\nSummon a Demonic Shikigami."
       }
     ],
     "keywords": [
@@ -3110,7 +3120,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Select another allied follower on the field and give it +2/+2. If you're in Overflow, give +3/+3 instead."
       }
     ],
     "keywords": [],
@@ -3888,7 +3899,8 @@
                 "player": "self",
                 "amount": 2
               }
-            ]
+            ],
+            "printed": "At the end of your turn, restore 2 defense to your leader. If this follower is super-evolved, restore 4 instead and give this follower Barrier."
           }
         ],
         "event": "end_of_turn",
@@ -4182,7 +4194,8 @@
             "op": "destroy",
             "scope": "defender",
             "target": "enemy:follower",
-            "select": 1
+            "select": 1,
+            "printed": "Follower Strike: Destroy the opposing follower."
           }
         ]
       }

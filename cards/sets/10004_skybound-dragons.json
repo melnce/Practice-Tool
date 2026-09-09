@@ -37,7 +37,8 @@
             "count": 2,
             "distribution": "random_distinct"
           }
-        ]
+        ],
+        "printed": "Fanfare: Skybound Art- Deal 5 damage to 2 random enemy followers."
       }
     ]
   },
@@ -329,7 +330,8 @@
             "op": "restore",
             "target": "allies",
             "player": "self",
-            "amount": 3
+            "amount": 3,
+            "printed": "Strike: Restore 3 defense to all allies."
           }
         ]
       }
@@ -709,7 +711,8 @@
             ],
             "select": 1
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate. Super Skybound Art- Activate all of them instead.\n1. Draw a card. Restore 1 defense to your leader.\n2. Give all allied followers on the field +1/+0 and Rush.\n3. Give all allied followers on the field +0/+1 and Ward."
       }
     ]
   },
@@ -1129,7 +1132,8 @@
             "label": "Restore 6 defense to your leader"
           }
         ],
-        "select": 1
+        "select": 1,
+        "printed": "Select a Mode to activate.\n1. Give the leftmost allied Swordcraft follower on the field \"Can attack 2 times per turn\".\n2. Give all allied Swordcraft followers on the field +1/+1 and Barrier.\n3. Recover 2 play points and 1 evolution point.\n4. Restore 6 defense to your leader."
       }
     ],
     "evolve": [],
@@ -1224,7 +1228,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Skybound Art- Evolve all unevolved allied followers on the field.\nSuper Skybound Art- Super-evolve them instead."
       }
     ],
     "evolve": [],
@@ -1473,7 +1478,8 @@
             "label": "Draw 2 cards. Deal 4 damage to 2 random enemy followers and 2 damage to your leader."
           }
         ],
-        "select": 1
+        "select": 1,
+        "printed": "Select a Mode to activate.\n1. Draw a card. Deal 4 damage to a random enemy follower.\n2. Draw 2 cards. Deal 4 damage to 2 random enemy followers and 2 damage to your leader."
       }
     ],
     "evolve": [],
@@ -1874,7 +1880,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Gain Crest: Crescent Tube Ride (Countdown (4). At the end of your turn, give a random allied follower on the field +1/+1.)"
       }
     ],
     "evolve": [],
@@ -2472,7 +2479,8 @@
             "label": "Deal 3 damage to a random enemy follower"
           }
         ],
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select a Mode to activate.\n1. Give this follower and another random allied follower on the field +1/+1.\n2. Deal 3 damage to a random enemy follower."
       }
     ],
     "evolve": [],
@@ -3075,7 +3083,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "printed": "Engage: Destroy this card. Select a Mode to activate.\n1. Destroy a random enemy follower.\n2. Draw 2 cards."
           }
         ]
       }
@@ -3123,7 +3132,8 @@
               "unevolved": true,
               "did_not_attack_this_turn": true
             },
-            "select_mode": "random"
+            "select_mode": "random",
+            "printed": "At the end of your turn, if you've unlocked super-evolution, evolve a random unevolved allied follower on the field that didn't attack this turn."
           }
         ]
       }
@@ -3364,7 +3374,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Select a Mode to activate.\n1. Do this 3 times: \"Deal 4 damage to a random enemy follower.\"\n2. Deal 4 damage to the enemy leader."
       }
     ],
     "evolve": [],
@@ -3484,7 +3495,8 @@
             "target": "enemy:all",
             "amount": 3
           }
-        ]
+        ],
+        "printed": "Deal 3 damage to all enemies.\nSuper Skybound Art- Deal 6 damage instead."
       }
     ],
     "evolve": [],

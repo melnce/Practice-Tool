@@ -323,7 +323,8 @@
             "amount": 4,
             "select": 1
           }
-        ]
+        ],
+        "printed": "Fanfare: Select an enemy follower on the field and deal it 4 damage. Combo (3) - Deal damage to all enemy followers instead."
       }
     ],
     "keywords": [],
@@ -559,7 +560,8 @@
             "source": "deck",
             "count": 1
           }
-        ]
+        ],
+        "printed": "Fuse: Forestcraft cards\nDraw a card. If you've Fused to this card, draw 2 instead."
       }
     ],
     "keywords": [],
@@ -1343,7 +1345,8 @@
         "op": "damage",
         "target": "enemy:follower",
         "amount": "{self.spellboostCount}",
-        "distribution": "split_sequential"
+        "distribution": "split_sequential",
+        "printed": "X starts at 0.\nOn Spellboost: Increase X by 1.\nDeal X damage split between all enemy followers."
       }
     ],
     "triggers": []
@@ -1826,7 +1829,8 @@
                 ]
               }
             ],
-            "select": 1
+            "select": 1,
+            "printed": "Engage (1): Destroy this card. Select an allied follower on the field and give it +1/+1 and \"Last Words: Summon a Pyrewyrm Blade.\""
           }
         ]
       }
@@ -2342,7 +2346,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Select a Mode to activate.\n1. Summon 4 copies of One-Tailed Fox.\n2. Destroy 4 random enemy followers. Restore 4 defense to your leader."
       }
     ],
     "keywords": [],
@@ -2533,7 +2538,8 @@
             "op": "restore",
             "target": "leader",
             "player": "self",
-            "amount": 4
+            "amount": 4,
+            "printed": "Engage (1): Destroy this card. Restore 4 defense to your leader."
           }
         ]
       }
@@ -2655,7 +2661,8 @@
             "amount_source": "selected_defense",
             "target": "enemy:follower"
           }
-        ]
+        ],
+        "printed": "Select an allied follower on the field with Ward and give it +0/+1. Deal X damage to a random enemy follower. X is the selected follower's defense."
       }
     ],
     "keywords": [],

@@ -389,7 +389,8 @@
         "op": "summon",
         "source": "copy",
         "target": "self",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon an exact copy of this card."
       }
     ]
   },
@@ -985,7 +986,8 @@
             ]
           }
         ],
-        "select": 1
+        "select": 1,
+        "printed": "Select an enemy follower on the field and deal it 3 damage. Rally (10) - Give it \"Can't attack followers or leaders\" until the end of your opponent's turn."
       }
     ]
   },
@@ -1108,7 +1110,8 @@
             "count": 1,
             "keywords": ["Rush"]
           }
-        ]
+        ],
+        "printed": "Add a Steelclad Knight to your hand and give it Rush. Rally (10) - Add 2 copies instead."
       }
     ]
   },
@@ -1586,7 +1589,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Gain 4 earth sigils.\n2. Earth Rite (2) - Deal 2 damage to all enemy followers."
       }
     ]
   },
@@ -3275,7 +3279,8 @@
             "name": "Beat Breaker",
             "count": 1
           }
-        ]
+        ],
+        "printed": "Fanfare: Summon a Beat Breaker. If at least 3 differently named allied Artifact followers have entered the field this match, summon 2 instead."
       }
     ]
   },
@@ -3342,7 +3347,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate. If at least 3 differently named allied Artifact followers have entered the field this match, activate all of them instead.\n1. Add an Analyzing Artifact to your hand.\n2. Add an Ancient Artifact to your hand."
       }
     ]
   },
@@ -3579,7 +3585,8 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount_source": "unique_tribe_enters"
+        "amount_source": "unique_tribe_enters",
+        "printed": "Fanfare: Deal X damage to all enemy followers. X is the number of differently named allied Artifact followers that have entered the field this match."
       }
     ]
   },
