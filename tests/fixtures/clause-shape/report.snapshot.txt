@@ -1,0 +1,3070 @@
+# Clause-shape report
+generated: <snapshot>
+multi-shape clauses: 457
+flagged (not in known-exceptions): 457
+
+## add a copy of a random allied follower destroyed this match with the highest base cost to your deck without revealing it. draw a card.
+signatures (2):
+  - op=deck|action="…"|source="…"|filter.keys=type
+  - op=draw|source="…"
+sites: 2
+
+## add a deepwood bounty to your hand. draw a card.
+signatures (2):
+  - op=add_to_hand
+  - op=draw|source="…"
+sites: 2
+
+## add a steelclad knight to your hand and give it rush. rally  - add 2 copies instead.
+signatures (2):
+  - op=add_to_hand|keywords=["…"]
+  - op=gate|condition="rally"
+sites: 3
+
+## add an exact copy of a random card in your opponent's hand to your hand without revealing it and reduce its cost by 1. draw a card.
+signatures (3):
+  - op=add_to_hand|distribution="…"|source="…"
+  - op=cost|target="…"|mode="…"
+  - op=draw|source="…"
+sites: 3
+
+## at the end of your turn, evolve this follower. when this follower evolves, deal 1 damage to all enemy followers.
+signatures (2):
+  - op=damage|target="…"
+  - op=evolve|target="…"
+sites: 2
+
+## at the end of your turn, if this follower is unevolved, deal 7 damage to all enemy followers. if it's evolved, do this 3 times: "deal 7 damage to another random ally or enemy."
+signatures (3):
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=gate|condition="evolved_self"
+sites: 3
+
+## banish a random enemy follower from the field. delay the counts of all your crests by 1.
+signatures (2):
+  - op=banish|distribution="…"|target="…"
+  - op=crest|action="…"|target="…"
+sites: 2
+
+## countdown
+signatures (14):
+  - op=cost|target="…"|mode="…"
+  - op=countdown|action="…"
+  - op=countdown|action="…"|target="…"
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=destroy|distribution="…"|target="…"
+  - op=discard|mode="…"
+  - op=draw|source="…"
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+  - op=restore|target="…"
+  - op=select|target="…"|select=#|filter.keys=type
+  - op=stat|action="…"|target="…"
+  - op=summon|distribution="…"|source="…"|filter.keys=base_cost_lte,hasLastWords,type
+  - op=summon|source="…"
+sites: 39
+
+## crystallize : countdown
+signatures (2):
+  - op=countdown|action="…"
+  - op=summon|source="…"
+sites: 5
+
+## deal 1 damage to all enemies. combo  - deal 2 damage instead.
+signatures (2):
+  - op=damage|target="…"
+  - op=gate|condition="combo"
+sites: 3
+
+## deal 2 damage to 2 random enemy followers and the enemy leader.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+sites: 2
+
+## deal 2 damage to a random enemy follower. combo  - gain crest: magnified malice.
+signatures (4):
+  - op=add_to_hand
+  - op=crest|action="…"|keywords=["…"]
+  - op=damage|distribution="…"|target="…"
+  - op=gate|condition="combo"
+sites: 4
+
+## deal 2 damage to a random enemy follower. combo - gain crest: starry sky.
+signatures (5):
+  - op=add_to_hand
+  - op=crest|action="…"|keywords=["…"]
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=gate|condition="combo"
+sites: 5
+
+## deal 2 damage to all followers. earth rite  - draw a card.
+signatures (3):
+  - op=damage|target="…"
+  - op=draw|source="…"
+  - op=earth_rite
+sites: 3
+
+## deal 2 damage to your leader. gain crest: valiant edge.
+signatures (4):
+  - op=crest|action="…"
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=restore|target="…"
+sites: 4
+
+## deal 3 damage split between all enemy followers. add a fairy to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=damage|distribution="…"|target="…"
+sites: 2
+
+## deal 3 damage split between all enemy followers. if an allied follower attacked a leader on your last turn, deal 6 damage instead.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=gate|condition="ally_attacked_leader_last_turn"
+sites: 3
+
+## deal 3 damage to all enemy followers. summon a holy falcon.
+signatures (2):
+  - op=damage|target="…"
+  - op=summon|source="…"
+sites: 2
+
+## deal 4 damage to a random enemy follower. deal 4 damage to the enemy leader.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+sites: 2
+
+## deal 4 damage to all enemy followers. summon 2 copies of springbloom fairy.
+signatures (2):
+  - op=damage|target="…"
+  - op=summon|source="…"
+sites: 2
+
+## deal 5 damage to a random enemy follower and the enemy leader.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+sites: 2
+
+## deal 5 damage to all followers with the highest defense. if you're in overflow, deal 3 damage to all leaders with the highest defense.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=gate|condition="overflow"
+sites: 3
+
+## deal 6 damage split between all enemy followers. necromancy  - deal 2 damage to the enemy leader.
+signatures (3):
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=gate|condition="necromancy"
+sites: 3
+
+## deal 6 damage to all enemy followers. restore 3 defense to your leader.
+signatures (2):
+  - op=damage|target="…"
+  - op=restore|target="…"
+sites: 2
+
+## deal 8 damage to a random enemy follower with the highest attack. deal 2 damage to the enemy leader. earth rite  - add an earth-shattering bolt to your hand.
+signatures (4):
+  - op=add_to_hand
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=earth_rite
+sites: 4
+
+## destroy a random enemy follower with the highest attack. deal 1 damage to all enemy followers.
+signatures (2):
+  - op=damage|target="…"
+  - op=destroy|distribution="…"|target="…"
+sites: 2
+
+## do this 1 time: "deal 2 damage to a random enemy follower." combo  - do it 2 times instead.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=gate|condition="combo"
+sites: 3
+
+## do this 2 times: "deal 2 damage to a random enemy follower." if you're in overflow, deal 2 damage to the enemy leader.
+signatures (3):
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=gate|condition="overflow"
+sites: 3
+
+## do this 2 times: "deal 4 damage to a random enemy follower."
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=repeat_effect
+sites: 2
+
+## do this x times: "give a random enemy follower on the field -0/-1." x is your combo.
+signatures (2):
+  - op=repeat_effect
+  - op=stat|action="…"|target="…"|select=#
+sites: 2
+
+## draw 2 cards. deal 2 damage to a random enemy follower.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=draw|source="…"
+sites: 2
+
+## draw 2 cards. if you're in overflow, restore 2 defense to your leader.
+signatures (3):
+  - op=draw|source="…"
+  - op=gate|condition="overflow"
+  - op=restore|target="…"
+sites: 3
+
+## draw 2 cards. if you've unlocked super-evolution, restore 2 defense to your leader.
+signatures (3):
+  - op=draw|source="…"
+  - op=gate|condition="super_evo_unlocked"
+  - op=restore|target="…"
+sites: 3
+
+## draw 2 cards. necromancy  - restore 2 defense to your leader.
+signatures (3):
+  - op=draw|source="…"
+  - op=gate|condition="necromancy"
+  - op=restore|target="…"
+sites: 3
+
+## draw 3 cards. if there are no duplicates in your deck, recover 3 play points.
+signatures (3):
+  - op=draw|source="…"
+  - op=gate|condition="highlander"
+  - op=pp|action="…"
+sites: 3
+
+## draw a follower. deal x damage to a random enemy follower. x is the cost of the card you drew.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=search|filter.keys=type
+sites: 2
+
+## draw x cards. x is your combo.
+signatures (2):
+  - op=draw|source="…"
+  - op=repeat_effect
+sites: 2
+
+## engage : destroy this card. draw a card. restore 1 defense to your leader.
+signatures (2):
+  - op=draw|source="…"
+  - op=restore|target="…"
+sites: 2
+
+## engage : destroy this card. replicate the effects of this card's fanfare ability.
+signatures (3):
+  - op=draw|source="…"
+  - op=mode
+  - op=stat|action="…"|target="…"|select=#
+sites: 3
+
+## engage : destroy this card. select an allied follower on the field and give it +1/+1 and "last words: summon a pyrewyrm blade."
+signatures (4):
+  - op=keyword|action="…"|target="…"|keywords=[{effects:[{count:#,name:"…",op:"…",source:"…"}],name:"…"}]
+  - op=select|target="…"|select=#
+  - op=stat|action="…"|target="…"
+  - op=summon|source="…"
+sites: 4
+
+## engage : select an allied follower on the field and give it +1/+1. restore 1 defense to your leader.
+signatures (2):
+  - op=restore|target="…"
+  - op=stat|action="…"|target="…"|select=#
+sites: 2
+
+## engage : summon an otohime's bodyguard. select a card in your hand and discard it.
+signatures (2):
+  - op=discard|mode="…"
+  - op=summon|source="…"
+sites: 2
+
+## engage: destroy this card. return 2 random cards from your hand to deck. draw 2 cards.
+signatures (2):
+  - op=draw|source="…"
+  - op=return|target="…"|select=#
+sites: 2
+
+## engage: destroy this card. select a mode to activate.
+signatures (4):
+  - op=add_to_hand
+  - op=destroy|distribution="…"|target="…"|select=#
+  - op=draw|source="…"
+  - op=mode
+sites: 8
+
+## engage: destroy this card. select an allied follower on the field and transform it into an awed and inspired. draw a card.
+signatures (2):
+  - op=draw|source="…"
+  - op=transform|target="…"|select=#
+sites: 2
+
+## engage: destroy this card. select an enemy follower on the field and deal it 4 damage. restore 1 defense to your leader.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=restore|target="…"
+sites: 2
+
+## enhance : activate all of them instead.
+signatures (5):
+  - op=damage|distribution="…"|target="…"
+  - op=draw|source="…"
+  - op=stat|action="…"|target="…"
+  - op=summon|source="…"
+  - op=summon|source="…"|keywords=["…"]
+sites: 6
+
+## enhance : deal 3 damage to all enemy followers. give this follower "can attack 2 times per turn."
+signatures (2):
+  - op=attacks_per_turn
+  - op=damage|target="…"
+sites: 2
+
+## enhance : destroy all allied shikigami followers. summon a noble shikigami.
+signatures (2):
+  - op=destroy|distribution="…"|target="…"|filter.keys=tribe
+  - op=summon|source="…"
+sites: 2
+
+## enhance : do it 2 times instead.
+signatures (3):
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=repeat_effect
+sites: 3
+
+## enhance : draw 3 cards. restore 3 defense to your leader.
+signatures (2):
+  - op=draw|source="…"
+  - op=restore|target="…"
+sites: 2
+
+## enhance : draw a card. give this follower bane.
+signatures (2):
+  - op=draw|source="…"
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## enhance : draw a swordcraft follower that costs 2 or less and set its cost to 0.
+signatures (2):
+  - op=cost|target="…"|mode="…"
+  - op=search|filter.keys=class,cost_lte,type
+sites: 2
+
+## enhance : evolve this follower and give it storm.
+signatures (3):
+  - op=destroy|distribution="…"|target="…"|filter.keys=has_keyword
+  - op=evolve|target="…"
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+sites: 3
+
+## enhance : evolve this follower.
+signatures (3):
+  - op=damage|distribution="…"|target="…"
+  - op=evolve|target="…"
+  - op=gate|condition="evolved_self"
+sites: 3
+
+## enhance : give this follower +0/+6, bane, and barrier.
+signatures (2):
+  - op=stat|action="…"|target="…"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 3
+
+## enhance : give this follower +2/+2 and ambush.
+signatures (2):
+  - op=stat|action="…"|target="…"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## enhance : give this follower rush and bane.
+signatures (2):
+  - op=add_to_hand
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 3
+
+## enhance : recover 3 play points. add a fearless soldier to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=pp|action="…"
+sites: 2
+
+## enhance : summon 2 copies of adventurous grimoire.
+signatures (2):
+  - op=spellboost|target="…"
+  - op=summon|source="…"
+sites: 2
+
+## enhance : summon 2 copies of fruitfish.
+signatures (2):
+  - op=restore|target="…"
+  - op=summon|source="…"
+sites: 2
+
+## enhance : summon 2 instead. deal 4 damage instead.
+signatures (2):
+  - op=damage|target="…"
+  - op=summon|source="…"
+sites: 2
+
+## enhance: activate all of them instead.
+signatures (3):
+  - op=damage|target="…"
+  - op=evolve|target="…"|mode="…"
+  - op=restore|target="…"
+sites: 3
+
+## enhance: draw a follower that costs 7 or more. recover 7 play points
+signatures (2):
+  - op=pp|action="…"
+  - op=search|filter.keys=cost_gte,type
+sites: 2
+
+## enhance: evolve this follower and give it +1/+1.
+signatures (2):
+  - op=evolve|target="…"
+  - op=stat|action="…"|target="…"
+sites: 2
+
+## enhance: give this follower storm. set your leader's max defense to 1. give your leader "can't take more than 0 damage at a time" until the end of your opponent's turn.
+signatures (3):
+  - op=keyword|action="…"|target="…"|keywords=[{duration:"…",name:"…",value:#}]
+  - op=stat|action="…"|target="…"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 3
+
+## enhance: select a follower in your hand and summon it. return this card to hand.
+signatures (2):
+  - op=return|target="…"
+  - op=summon|source="…"|select=#|filter.keys=type
+sites: 2
+
+## evolve: banish all copies of cutthroat, fluxblade convict from your deck. then, if there are no duplicates in your deck, gain crest: cutthroat, fluxblade convict.
+signatures (4):
+  - op=banish|target="…"|filter.keys=name
+  - op=crest|action="…"
+  - op=evolve|target="…"
+  - op=gate|condition="highlander"
+sites: 4
+
+## evolve: discard your hand. add an exact copy each of 5 random cards in your opponent's deck to your hand without revealing them.
+signatures (2):
+  - op=add_to_hand|distribution="…"|source="…"
+  - op=discard|mode="…"
+sites: 2
+
+## evolve: do this x times: "deal 1 damage to a random enemy follower." x is the number of pixie followers in your hand.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=repeat_effect|filter.keys=tribe
+sites: 2
+
+## evolve: draw a card. select an enemy follower on the field and deal it 1 damage.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=draw|source="…"
+sites: 2
+
+## evolve: earth rite  - select an enemy follower on the field and destroy it.
+signatures (2):
+  - op=destroy|target="…"|select=#
+  - op=earth_rite
+sites: 2
+
+## evolve: gain crest: bergent, rejected artes.
+signatures (2):
+  - op=crest|action="…"
+  - op=summon|source="…"
+sites: 2
+
+## evolve: gain crest: congregant of repose.
+signatures (3):
+  - op=crest|action="…"
+  - op=draw|source="…"|filter.keys=defense_eq,type
+  - op=gate|condition="no_ally_attacked"
+sites: 3
+
+## evolve: gain crest: erralde, signet convict.
+signatures (4):
+  - op=crest|action="…"
+  - op=damage|target="…"
+  - op=gate|condition="ally_matches"
+  - op=restore|target="…"
+sites: 4
+
+## evolve: gain crest: eudie, maiden reborn.
+signatures (4):
+  - op=crest|action="…"
+  - op=draw|source="…"
+  - op=gate|condition="hand_count_lte"
+  - op=restore|target="…"
+sites: 4
+
+## evolve: gain crest: juno, visionary alchemist.
+signatures (3):
+  - op=crest|action="…"
+  - op=earth_rite
+  - op=summon|source="…"
+sites: 3
+
+## evolve: gain crest: marwynn, despair manifest.
+signatures (3):
+  - op=crest|action="…"
+  - op=damage|distribution="…"|target="…"
+  - op=gate|condition="no_ally_attacked"
+sites: 3
+
+## evolve: gain crest: mjerrabaine, great manifest.
+signatures (5):
+  - op=crest|action="…"
+  - op=deck|action="…"
+  - op=discard|mode="…"
+  - op=draw|source="…"
+  - op=set_deckout_victory
+sites: 5
+
+## evolve: gain crest: spirit of wadatsumi.
+signatures (2):
+  - op=crest|action="…"
+  - op=stat|action="…"|target="…"
+sites: 2
+
+## evolve: gain crest: thestae, anathema of distortion.
+signatures (3):
+  - op=crest|action="…"
+  - op=gate|condition="combo"
+  - op=stat|action="…"|target="…"|filter.keys=type
+sites: 3
+
+## evolve: gain crest: wilbert, desolate paladin.
+signatures (2):
+  - op=crest|action="…"
+  - op=stat|action="…"|target="…"
+sites: 2
+
+## evolve: gain crest: zoe, dazzling hope.
+signatures (3):
+  - op=crest|action="…"|keywords=["…"]
+  - op=evolve|target="…"
+  - op=summon|source="…"
+sites: 3
+
+## evolve: give all allied puppetry followers on the field ward and "last words: deal 2 damage to the enemy leader."
+signatures (2):
+  - op=damage|target="…"
+  - op=keyword|action="…"|target="…"|filter.keys=tribe|keywords=[{name:"…"},{effects:[{amount:#,op:"…",target:"…"}],name:"…"}]
+sites: 2
+
+## evolve: if the sum of the 3 highest base costs in your hand is higher than that of your opponent's, destroy all enemy followers.
+signatures (2):
+  - op=destroy|distribution="…"|target="…"
+  - op=gate|condition="hand_top_base_costs_gt_enemy"
+sites: 2
+
+## evolve: necromancy  - do this 2 times: "deal 2 damage to a random enemy follower."
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=gate|condition="necromancy"
+sites: 3
+
+## evolve: reduce your faith's value by 5 to give it "whenever you play an enhanced card, give all allied followers on the field +1/+1."
+signatures (2):
+  - op=crest|action="…"
+  - op=stat|action="…"|target="…"
+sites: 3
+
+## evolve: remove ward from this follower. give it intimidate.
+signatures (2):
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## evolve: select 2 enemy followers on the field and destroy them. deal 2 damage to your leader.
+signatures (2):
+  - op=damage|target="…"
+  - op=destroy|target="…"|select=#
+sites: 2
+
+## evolve: select 3 cards in your hand and discard them. add an exact copy each of the 3 leftmost cards in your hand to your hand without revealing them.
+signatures (2):
+  - op=add_to_hand|distribution="…"|source="…"
+  - op=discard|mode="…"
+sites: 2
+
+## evolve: select a card in your hand and discard it. gain crest: yube, crestpetal.
+signatures (4):
+  - op=add_to_hand
+  - op=crest|action="…"
+  - op=discard|mode="…"
+  - op=stat|action="…"|target="…"
+sites: 4
+
+## evolve: select a card in your hand with on spellboost and spellboost it 4 times.
+signatures (2):
+  - op=select|target="…"|select=#|filter.keys=has_keyword
+  - op=spellboost|target="…"
+sites: 2
+
+## evolve: select a mode to activate.
+signatures (3):
+  - op=draw|source="…"
+  - op=mode
+  - op=pp|action="…"
+sites: 3
+
+## evolve: select an enemy follower on the field and deal it 3 damage. spellboost your hand.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=spellboost|target="…"
+sites: 2
+
+## evolve: select an enemy follower on the field with 4 attack or less, banish it, and summon an exact copy of it.
+signatures (3):
+  - op=banish|target="…"
+  - op=select|target="…"|select=#|filter.keys=attack_lte
+  - op=summon|source="…"|target="…"
+sites: 3
+
+## evolve: select an enemy follower on the field, remove all abilities from it, and deal it 2 damage.
+signatures (3):
+  - op=damage|target="…"
+  - op=keyword|action="…"|target="…"
+  - op=select|target="…"|select=#
+sites: 3
+
+## evolve: summon 2 copies of knight. give all other allied followers on the field +1/+1.
+signatures (2):
+  - op=stat|action="…"|target="…"
+  - op=summon|source="…"
+sites: 2
+
+## evolve: summon a clay golem. deal x damage to all enemy followers. x is the number of allied golem followers on the field.
+signatures (2):
+  - op=damage|target="…"
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: [skybound art] evolve this follower. [super skybound art] deal 3 damage to the enemy leader.
+signatures (4):
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=evolve|target="…"
+  - op=gate|condition="skybound_art"
+sites: 5
+
+## fanfare: activate 2 random abilities from the following.
+signatures (6):
+  - op=damage|target="…"
+  - op=destroy|distribution="…"|target="…"
+  - op=mode|select=#
+  - op=pp|action="…"
+  - op=replicate
+  - op=stat|action="…"|target="…"
+sites: 6
+
+## fanfare: add 3 copies of puppet to your hand. give all puppetry followers in your hand +1/+0.
+signatures (2):
+  - op=add_to_hand
+  - op=stat|action="…"|target="…"|filter.keys=tribe
+sites: 2
+
+## fanfare: add a fairy to your hand. combo  - add a deepwood bounty to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=gate|condition="combo"
+sites: 4
+
+## fanfare: add a fairy to your hand. combo  - give it bane.
+signatures (3):
+  - op=add_to_hand
+  - op=gate|condition="combo"
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+sites: 3
+
+## fanfare: add a jailor of antiquity to your hand. deal x damage to 2 random enemy followers. x is the number of neutral cards in your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=damage|distribution="…"|target="…"
+sites: 2
+
+## fanfare: add a witch's new brew to your hand. if there's a super-evolved allied follower on the field, gain 2 earth sigils.
+signatures (3):
+  - op=add_to_hand
+  - op=gate|condition="super_evolved_allied"
+  - op=summon|source="…"
+sites: 3
+
+## fanfare: combo  - draw 2 cards.
+signatures (2):
+  - op=draw|source="…"
+  - op=gate|condition="combo"
+sites: 2
+
+## fanfare: combo  - draw a card.
+signatures (2):
+  - op=draw|source="…"
+  - op=gate|condition="combo"
+sites: 2
+
+## fanfare: combo  - evolve this follower.
+signatures (2):
+  - op=evolve|target="…"
+  - op=gate|condition="combo"
+sites: 4
+
+## fanfare: combo  - give all other allied followers on the field +1/+1.
+signatures (2):
+  - op=gate|condition="combo"
+  - op=stat|action="…"|target="…"
+sites: 2
+
+## fanfare: combo  - give this follower storm.
+signatures (2):
+  - op=gate|condition="combo"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## fanfare: combo  - select an enemy follower on the field and deal it 3 damage.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=gate|condition="combo"
+sites: 2
+
+## fanfare: combo  - select an enemy follower on the field and set its defense to 1.
+signatures (2):
+  - op=gate|condition="combo"
+  - op=stat|action="…"|target="…"|select=#
+sites: 2
+
+## fanfare: combo  - summon a flowering friendship and evolve it and this follower.
+signatures (3):
+  - op=evolve|target="…"
+  - op=gate|condition="combo"
+  - op=summon|source="…"
+sites: 4
+
+## fanfare: deal 10 damage to all other followers.
+signatures (3):
+  - op=crest|action="…"|keywords=["…"]
+  - op=damage|target="…"
+  - op=gate|condition="skybound_art"
+sites: 4
+
+## fanfare: deal 3 damage to 3 random enemy followers. spellboost your hand 3 times.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=spellboost|target="…"
+sites: 2
+
+## fanfare: deal 3 damage to a random enemy follower. combo  - deal damage to 3 random enemy followers instead.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=gate|condition="combo"
+sites: 3
+
+## fanfare: deal 3 damage to all other followers. if this card's cost isn't 5, draw 2 cards.
+signatures (3):
+  - op=damage|target="…"
+  - op=draw|source="…"
+  - op=gate|condition="self_cost"
+sites: 3
+
+## fanfare: deal 5 damage to all enemy followers. restore 5 defense to your leader.
+signatures (2):
+  - op=damage|target="…"
+  - op=restore|target="…"
+sites: 2
+
+## fanfare: deal 6 damage to all enemy followers. give all other allied followers on the field +2/+4.
+signatures (2):
+  - op=damage|target="…"
+  - op=stat|action="…"|target="…"
+sites: 2
+
+## fanfare: destroy all allied amulets. deal x damage to all enemies. x is the number of amulets destroyed by this ability.
+signatures (2):
+  - op=damage|target="…"
+  - op=destroy|distribution="…"|target="…"
+sites: 2
+
+## fanfare: destroy x random enemy followers. x is the number of other allied cards on the field. destroy all other allied cards on the field.
+signatures (2):
+  - op=destroy|distribution="…"|target="…"
+  - op=destroy|distribution="…"|target="…"|condition.keys=not_self
+sites: 2
+
+## fanfare: discard your hand. select a mode to activate.
+signatures (4):
+  - op=cost|target="…"|mode="…"
+  - op=discard|mode="…"
+  - op=draw|source="…"
+  - op=mode
+sites: 7
+
+## fanfare: do this 1 time: "deal 2 damage to a random enemy follower." if there are at least 2 allied amulets on the field, do it 2 times instead.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=gate|condition="amulet_count"
+sites: 3
+
+## fanfare: do this 1 time: "deal 4 damage to a random enemy follower." if an allied follower attacked a leader on your last turn, do it 2 times instead.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=gate|condition="ally_attacked_leader_last_turn"
+sites: 3
+
+## fanfare: do this 2 times: "return your hand to deck. draw x cards. x is the number of cards you returned. then, if you have at least 4 cards with the same cost in your hand, deal 4 damage to all enemies."
+signatures (5):
+  - op=damage|target="…"
+  - op=draw|source="…"
+  - op=gate|condition="hand_same_cost_gte"
+  - op=repeat_effect
+  - op=return|target="…"|select="…"
+sites: 5
+
+## fanfare: do this 3 times: "reanimate ." deal 2 damage to all enemy followers.
+signatures (3):
+  - op=damage|target="…"
+  - op=repeat_effect
+  - op=summon|source="…"
+sites: 3
+
+## fanfare: do this 6 times: "deal 1 damage to a random enemy follower." give all followers in your opponent's hand +1/+0.
+signatures (4):
+  - op=crest|action="…"
+  - op=damage|distribution="…"|target="…"
+  - op=gate|condition="skybound_art"
+  - op=stat|action="…"|target="…"
+sites: 5
+
+## fanfare: draw 2 cards. deal 2 damage to your leader.
+signatures (2):
+  - op=damage|target="…"
+  - op=draw|source="…"
+sites: 2
+
+## fanfare: draw 2 cards. restore 2 defense to your leader.
+signatures (2):
+  - op=draw|source="…"
+  - op=restore|target="…"
+sites: 2
+
+## fanfare: draw 2 cards. restore 2 defense to your leader. recover 2 play points.
+signatures (3):
+  - op=draw|source="…"
+  - op=pp|action="…"
+  - op=restore|target="…"
+sites: 3
+
+## fanfare: draw 2 cards. summon 2 copies of knight.
+signatures (2):
+  - op=draw|source="…"
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: draw 2 cards. summon an obsessed test subject.
+signatures (2):
+  - op=draw|source="…"
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: draw 2 swordcraft followers. recover 3 play points.
+signatures (2):
+  - op=pp|action="…"
+  - op=search|filter.keys=class,type
+sites: 2
+
+## fanfare: draw a card. restore 3 defense to your leader.
+signatures (2):
+  - op=draw|source="…"
+  - op=restore|target="…"
+sites: 2
+
+## fanfare: draw a card. restore x defense to your leader. x is the number of cards in your hand.
+signatures (2):
+  - op=draw|source="…"
+  - op=restore|target="…"
+sites: 2
+
+## fanfare: draw a spell.
+signatures (2):
+  - op=draw|source="…"|filter.keys=type
+  - op=search|filter.keys=type
+sites: 3
+
+## fanfare: earth rite  - evolve this follower.
+signatures (4):
+  - op=damage|distribution="…"|target="…"
+  - op=earth_rite
+  - op=evolve|target="…"
+  - op=pp|action="…"
+sites: 6
+
+## fanfare: earth rite  - gain crest: lilanthim, anathema of predation.
+signatures (4):
+  - op=crest|action="…"
+  - op=earth_rite
+  - op=evolve|target="…"
+  - op=summon|source="…"
+sites: 4
+
+## fanfare: earth rite  - select a mode to activate.
+signatures (6):
+  - op=damage|target="…"
+  - op=draw|source="…"
+  - op=earth_rite
+  - op=mode
+  - op=restore|target="…"
+  - op=summon|source="…"|keywords=["…"]
+sites: 11
+
+## fanfare: earth rite  - summon a guardian golem.
+signatures (2):
+  - op=earth_rite
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: evolve all unevolved allied followers on the field. deal 2 damage to your leader.
+signatures (2):
+  - op=damage|target="…"
+  - op=evolve|target="…"
+sites: 2
+
+## fanfare: gain 2 earth sigils. add an ars magna to your hand.
+signatures (6):
+  - op=add_to_hand
+  - op=crest|action="…"
+  - op=earth_rite
+  - op=evolve|target="…"
+  - op=gate|condition="skybound_art"
+  - op=summon|source="…"
+sites: 8
+
+## fanfare: gain crest: aria, lady of the woods.
+signatures (2):
+  - op=crest|action="…"
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## fanfare: gain crest: balto, dusk bounty hunter.
+signatures (2):
+  - op=crest|action="…"
+  - op=damage|target="…"
+sites: 2
+
+## fanfare: gain crest: devotee of repose.
+signatures (3):
+  - op=crest|action="…"
+  - op=gate|condition="no_ally_attacked"
+  - op=stat|action="…"|target="…"|select=#|keywords=["…"]
+sites: 3
+
+## fanfare: gain crest: galmieux, ardor manifest.
+signatures (2):
+  - op=add_to_hand
+  - op=crest|action="…"
+sites: 2
+
+## fanfare: gain crest: grimnir, heavenly gale.
+signatures (3):
+  - op=crest|action="…"
+  - op=damage|target="…"
+  - op=gate|condition="super_evolved_allied"
+sites: 3
+
+## fanfare: gain crest: himeka, heir to repose.
+signatures (7):
+  - op=banish|target="…"
+  - op=crest|action="…"
+  - op=gate|condition="board_name"
+  - op=keyword|action="…"|target="…"
+  - op=repeat_effect
+  - op=select|target="…"|mode="…"|filter.keys=attack_lte,exclude_keyword
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 7
+
+## fanfare: gain crest: insomniac witch.
+signatures (2):
+  - op=crest|action="…"|keywords=["…"]
+  - op=damage|target="…"
+sites: 2
+
+## fanfare: gain crest: kukishiro, mistbloom. return 2 random cards from your hand to deck. draw 2 cards.
+signatures (5):
+  - op=crest|action="…"
+  - op=draw|source="…"
+  - op=mode|select=#
+  - op=return|target="…"|select=#
+  - op=summon|source="…"
+sites: 9
+
+## fanfare: gain crest: lhynkal, wandering fool.
+signatures (2):
+  - op=crest|action="…"
+  - op=stat|action="…"|target="…"
+sites: 2
+
+## fanfare: gain crest: neptune, arbiter of tides. summon 2 copies of majestic megalorca.
+signatures (3):
+  - op=crest|action="…"
+  - op=restore|target="…"
+  - op=summon|source="…"
+sites: 3
+
+## fanfare: gain crest: octrice, hollowness manifest.
+signatures (3):
+  - op=add_to_hand
+  - op=crest|action="…"
+  - op=crest|action="…"|keywords=["…"]
+sites: 4
+
+## fanfare: gain crest: supplicant of repose.
+signatures (3):
+  - op=crest|action="…"
+  - op=gate|condition="no_ally_attacked"
+  - op=restore|target="…"
+sites: 3
+
+## fanfare: give this follower +x/+0. x is the number of other allied followers on the field. deal 2 damage to your leader.
+signatures (2):
+  - op=damage|target="…"
+  - op=stat|action="…"|target="…"|condition.keys=not_self
+sites: 2
+
+## fanfare: give this follower +x/+x. if x is at least 2, evolve this follower. x is the number of other allied copies of drache & aluzard, burning blood that have entered the field this match.
+signatures (3):
+  - op=evolve|target="…"
+  - op=gate|condition="named_enter_count"
+  - op=stat|action="…"|target="…"
+sites: 3
+
+## fanfare: give this follower +x/+x. x is the number of other allied cards on the field. destroy all other allied cards on the field.
+signatures (2):
+  - op=destroy|distribution="…"|target="…"
+  - op=stat|action="…"|target="…"|condition.keys=not_self
+sites: 2
+
+## fanfare: if an allied follower attacked a leader on your last turn, give this follower storm.
+signatures (2):
+  - op=gate|condition="ally_attacked_leader_last_turn"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 4
+
+## fanfare: if there are at least 3 allied amulets on the field, evolve this follower and give it barrier.
+signatures (3):
+  - op=evolve|target="…"
+  - op=gate|condition="amulet_count"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 3
+
+## fanfare: if there are at least 3 allied amulets on the field, select an enemy follower on the field and deal it 5 damage.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=gate|condition="amulet_count"
+sites: 2
+
+## fanfare: if there are at least 3 allied amulets on the field, summon a reverend of finance.
+signatures (2):
+  - op=gate|condition="amulet_count"
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: if there are no duplicates in your deck, select an enemy follower on the field and deal it 5 damage.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=gate|condition="highlander"
+sites: 2
+
+## fanfare: if there are no duplicates in your deck, select an enemy follower on the field, deal it 4 damage, and restore 4 defense to your leader.
+signatures (3):
+  - op=damage|target="…"|select=#
+  - op=gate|condition="highlander"
+  - op=restore|target="…"
+sites: 3
+
+## fanfare: if there's a super-evolved allied follower on the field, add a puppet to your hand and give it +3/+0.
+signatures (3):
+  - op=add_to_hand
+  - op=gate|condition="super_evolved_allied"
+  - op=stat|action="…"|target="…"
+sites: 3
+
+## fanfare: if there's a super-evolved allied follower on the field, draw 2 cards.
+signatures (2):
+  - op=draw|source="…"
+  - op=gate|condition="super_evolved_allied"
+sites: 2
+
+## fanfare: if there's a super-evolved allied follower on the field, select an enemy follower on the field and deal it 4 damage.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=gate|condition="super_evolved_allied"
+sites: 2
+
+## fanfare: if there's an allied follower on the field with a base cost of 5 or more, add a depths of the eld axe to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=gate|condition="ally_matches"
+sites: 2
+
+## fanfare: if there's an allied prim, princess's picnic on the field, give this follower +1/+1 and bane.
+signatures (3):
+  - op=gate|condition="board_name"
+  - op=stat|action="…"|target="…"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 3
+
+## fanfare: if there's an evolved allied follower on the field, evolve this follower.
+signatures (3):
+  - op=damage|distribution="…"|target="…"
+  - op=evolve|target="…"
+  - op=gate|condition="evolved_allied"
+sites: 5
+
+## fanfare: if there's another 1-base-cost card on the field, give this follower +1/+1.
+signatures (2):
+  - op=gate|condition="field_matches"
+  - op=stat|action="…"|target="…"
+sites: 2
+
+## fanfare: if this card's cost isn't 2, restore 3 defense to your leader.
+signatures (2):
+  - op=gate|condition="self_cost"
+  - op=restore|target="…"
+sites: 2
+
+## fanfare: if this card's cost isn't 3, summon 2 exact copies of it.
+signatures (2):
+  - op=gate|condition="self_cost"
+  - op=summon|source="…"|target="…"
+sites: 2
+
+## fanfare: if x is at least 10, add a delta cannon to your hand. if x is at least 20, add a send 'em packing to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=gate|condition="spellboost_count"
+sites: 4
+
+## fanfare: if you have 10 max play points, evolve this follower.
+signatures (3):
+  - op=damage|target="…"
+  - op=evolve|target="…"
+  - op=gate|condition="max_pp"
+sites: 5
+
+## fanfare: if you have at least 2 spells in your hand, give this follower +1/+1 and ward.
+signatures (2):
+  - op=gate|condition="hand_matches"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## fanfare: if you're in overflow, add a whitefrost whisper to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=gate|condition="overflow"
+sites: 2
+
+## fanfare: if you're in overflow, draw a card.
+signatures (2):
+  - op=draw|source="…"
+  - op=gate|condition="overflow"
+sites: 2
+
+## fanfare: if you're in overflow, evolve this follower.
+signatures (3):
+  - op=evolve|target="…"
+  - op=gate|condition="overflow"
+  - op=pp|action="…"
+sites: 5
+
+## fanfare: if you're in overflow, give this follower intimidate.
+signatures (2):
+  - op=gate|condition="overflow"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## fanfare: if you're in overflow, give this follower storm.
+signatures (2):
+  - op=gate|condition="overflow"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## fanfare: if you're in overflow, restore 4 defense to your leader.
+signatures (2):
+  - op=gate|condition="overflow"
+  - op=restore|target="…"
+sites: 2
+
+## fanfare: if you've unlocked super-evolution, evolve this follower.
+signatures (2):
+  - op=evolve|target="…"
+  - op=gate|condition="super_evo_unlocked"
+sites: 4
+
+## fanfare: if you've unlocked super-evolution, give this follower +0/+3.
+signatures (2):
+  - op=gate|condition="super_evo_unlocked"
+  - op=stat|action="…"|target="…"
+sites: 2
+
+## fanfare: if you've unlocked super-evolution, give this follower bane.
+signatures (2):
+  - op=gate|condition="super_evo_unlocked"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## fanfare: if you've unlocked super-evolution, give this follower barrier.
+signatures (2):
+  - op=gate|condition="super_evo_unlocked"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## fanfare: if your leader's defense is 10 or less, evolve this follower.
+signatures (2):
+  - op=evolve|target="…"
+  - op=gate|condition="leader_defense_lte"
+sites: 2
+
+## fanfare: if your leader's defense is higher than the enemy leader's defense, summon 2 copies of bat.
+signatures (2):
+  - op=gate|condition="leader_defense_gt_enemy"
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: necromancy  - evolve this follower.
+signatures (4):
+  - op=add_to_hand
+  - op=evolve|target="…"
+  - op=gate|condition="necromancy"
+  - op=summon|source="…"
+sites: 6
+
+## fanfare: necromancy  - give this follower storm.
+signatures (2):
+  - op=gate|condition="necromancy"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## fanfare: necromancy  - reduce the cost of all abysscraft cards in your hand by 2.
+signatures (2):
+  - op=cost|target="…"|mode="…"|filter.keys=class
+  - op=gate|condition="necromancy"
+sites: 2
+
+## fanfare: necromancy  - summon 3 copies of rotting zombie.
+signatures (2):
+  - op=gate|condition="necromancy"
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: necromancy -reanimate, reanimate, and evolve them.
+signatures (2):
+  - op=gate|condition="necromancy"
+  - op=summon|source="…"
+sites: 3
+
+## fanfare: rally  - gain crest: gildaria, anathema of attunement. evolve this follower.
+signatures (5):
+  - op=crest|action="…"
+  - op=damage|target="…"
+  - op=evolve|target="…"
+  - op=gate|condition="rally"
+  - op=summon|source="…"
+sites: 5
+
+## fanfare: rally  - super-evolve this follower.
+signatures (3):
+  - op=evolve|target="…"|mode="…"
+  - op=gate|condition="rally"
+  - op=summon|source="…"|keywords=["…"]
+sites: 3
+
+## fanfare: reduce the cost of all followers in your deck by 3. transform a random spell in your hand into an ersatz elimination. it costs 0 until the end of the turn.
+signatures (3):
+  - op=cost|target="…"|mode="…"|filter.keys=name
+  - op=cost|target="…"|mode="…"|filter.keys=type
+  - op=transform|target="…"|mode="…"|filter.keys=type
+sites: 3
+
+## fanfare: reduce the faith of faith: sham-nacha, heir to entwining by 10 to give it "increase the number of modes you can select by 1."
+signatures (2):
+  - op=crest|action="…"
+  - op=mode_bonus
+sites: 2
+
+## fanfare: reduce your faith's value by 10 to add a depths of the eld lance to your hand and give your faith "whenever an allied follower evolves, deal 1 damage to the enemy leader."
+signatures (3):
+  - op=add_to_hand
+  - op=crest|action="…"
+  - op=damage|target="…"
+sites: 4
+
+## fanfare: restore 3 defense to your leader. recover 3 play points.
+signatures (2):
+  - op=pp|action="…"
+  - op=restore|target="…"
+sites: 2
+
+## fanfare: return your hand to deck. draw x cards. x is the number of cards you returned.
+signatures (2):
+  - op=draw|source="…"
+  - op=return|target="…"|select="…"
+sites: 2
+
+## fanfare: select 2 cards in your hand and discard them. deal 4 damage to all enemies.
+signatures (2):
+  - op=damage|target="…"
+  - op=discard|mode="…"
+sites: 2
+
+## fanfare: select 2 enemy followers on the field and banish them.
+signatures (3):
+  - op=banish|target="…"|select=#
+  - op=evolve|target="…"|mode="…"
+  - op=gate|condition="skybound_art"
+sites: 3
+
+## fanfare: select 2 enemy followers on the field and deal 6 damage to them and the enemy leader.
+signatures (2):
+  - op=damage|target="…"
+  - op=damage|target="…"|select=#
+sites: 2
+
+## fanfare: select 2 enemy followers on the field and deal them 4 damage. gain 2 earth sigils.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: select 2 enemy followers on the field and destroy them. deal 4 damage to your leader.
+signatures (2):
+  - op=damage|target="…"
+  - op=destroy|target="…"|select=#
+sites: 2
+
+## fanfare: select 2 enemy followers on the field, remove all abilities from them, and deal them 9 damage. give the enemy leader "takes 1 more damage."
+signatures (4):
+  - op=damage|target="…"
+  - op=keyword|action="…"|target="…"
+  - op=keyword|action="…"|target="…"|keywords=[{name:"…",value:#}]
+  - op=select|target="…"|select=#
+sites: 4
+
+## fanfare: select a card in your hand and discard it. add 2 copies of spilling red to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=discard|mode="…"
+sites: 2
+
+## fanfare: select a card in your hand and discard it. deal 2 damage to all enemy followers.
+signatures (2):
+  - op=damage|target="…"
+  - op=discard|mode="…"
+sites: 2
+
+## fanfare: select a card in your hand and discard it. deal 6 damage to a random enemy follower.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=discard|mode="…"
+sites: 2
+
+## fanfare: select a card in your hand and discard it. deal x damage to all enemy followers. x is the cost of the selected card.
+signatures (2):
+  - op=damage|target="…"
+  - op=discard|mode="…"
+sites: 2
+
+## fanfare: select a card in your hand and discard it. draw 2 cards.
+signatures (2):
+  - op=discard|mode="…"
+  - op=draw|source="…"
+sites: 2
+
+## fanfare: select a card in your hand and discard it. draw 3 cards.
+signatures (2):
+  - op=discard|mode="…"
+  - op=draw|source="…"
+sites: 2
+
+## fanfare: select a card in your hand and discard it. draw a card. restore 1 defense to your leader.
+signatures (3):
+  - op=discard|mode="…"
+  - op=draw|source="…"
+  - op=restore|target="…"
+sites: 3
+
+## fanfare: select a card in your hand and discard it. draw a spell.
+signatures (2):
+  - op=discard|mode="…"
+  - op=draw|source="…"|filter.keys=type
+sites: 2
+
+## fanfare: select a card in your hand and discard it. restore 3 defense to your leader. if you selected a spell, restore 6 defense instead.
+signatures (3):
+  - op=discard|mode="…"
+  - op=gate|condition="last_discarded_type"
+  - op=restore|target="…"
+sites: 4
+
+## fanfare: select a card in your hand and discard it. summon 3 random differently named amulets from your deck that cost 3 or less.
+signatures (2):
+  - op=discard|mode="…"
+  - op=summon|source="…"|filter.keys=cost_lte,type
+sites: 2
+
+## fanfare: select a card in your hand and return it to deck. add 2 copies of fairy to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=return|target="…"|select=#
+sites: 2
+
+## fanfare: select a card in your hand and return it to deck. draw 2 swordcraft followers.
+signatures (2):
+  - op=return|target="…"|select=#
+  - op=search|filter.keys=class,type
+sites: 2
+
+## fanfare: select a card in your hand and return it to deck. draw a card.
+signatures (2):
+  - op=draw|source="…"
+  - op=return|target="…"|select=#
+sites: 6
+
+## fanfare: select a card in your hand and return it to deck. draw a card. gain an earth sigil.
+signatures (3):
+  - op=draw|source="…"
+  - op=return|target="…"|select=#
+  - op=summon|source="…"
+sites: 3
+
+## fanfare: select a card in your hand and return it to deck. draw a spell.
+signatures (2):
+  - op=return|target="…"|select=#
+  - op=search|filter.keys=type
+sites: 2
+
+## fanfare: select a mode to activate.
+signatures (24):
+  - op=add_to_hand
+  - op=banish|distribution="…"|target="…"
+  - op=banish|distribution="…"|target="…"|condition.keys=not_self
+  - op=crest|action="…"
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=destroy|distribution="…"|target="…"
+  - op=draw|source="…"
+  - op=ep|action="…"
+  - op=evolve|target="…"
+  - op=evolve|target="…"|mode="…"
+  - op=gate|condition="skybound_art"
+  - op=mode
+  - op=mode|select=#
+  - op=pp|action="…"
+  - op=restore|target="…"
+  - op=search|filter.keys=type
+  - op=select|target="…"|select=#|mode="…"|filter.keys=has_keyword,unevolved
+  - op=spellboost|target="…"
+  - op=stat|action="…"|target="…"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+  - op=stat|action="…"|target="…"|select=#
+  - op=summon|source="…"
+  - op=summon|source="…"|keywords=["…"]
+sites: 73
+
+## fanfare: select a mode to activate. deal 3 damage to this follower.
+signatures (3):
+  - op=damage|target="…"
+  - op=mode
+  - op=restore|target="…"
+sites: 5
+
+## fanfare: select a mode to activate. destroy a random enemy follower with the highest attack.
+signatures (4):
+  - op=destroy|distribution="…"|target="…"
+  - op=evolve|target="…"
+  - op=mode
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 4
+
+## fanfare: select an artifact follower in your hand and deal x damage to all enemy followers. x is the selected follower's attack.
+signatures (2):
+  - op=damage|target="…"
+  - op=select|target="…"|select=#|filter.keys=tribe,type
+sites: 2
+
+## fanfare: select an enemy follower on the field and banish it. add a glittering gold to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=banish|target="…"|select=#
+sites: 2
+
+## fanfare: select an enemy follower on the field and banish it. if there are at least 3 allied amulets on the field, restore 3 defense to your leader.
+signatures (3):
+  - op=banish|target="…"|select=#
+  - op=gate|condition="amulet_count"
+  - op=restore|target="…"
+sites: 6
+
+## fanfare: select an enemy follower on the field and deal it 1 damage. gain an earth sigil.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: select an enemy follower on the field and deal it 1 damage. spellboost your hand.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=spellboost|target="…"
+sites: 2
+
+## fanfare: select an enemy follower on the field and deal it 3 damage. gain an earth sigil.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: select an enemy follower on the field and deal it 3 damage. summon a dread pirate's flag.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: select an enemy follower on the field and deal it 3 damage. summon a skeleton.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: select an enemy follower on the field and deal it 4 damage. combo  - deal damage to all enemy followers instead.
+signatures (3):
+  - op=damage|target="…"
+  - op=damage|target="…"|select=#
+  - op=gate|condition="combo"
+sites: 6
+
+## fanfare: select an enemy follower on the field and deal it 4 damage. increase your combo by 1.
+signatures (2):
+  - op=counter|action="…"
+  - op=damage|target="…"|select=#
+sites: 2
+
+## fanfare: select an enemy follower on the field and deal it 5 damage. restore 5 defense to your leader.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=restore|target="…"
+sites: 2
+
+## fanfare: select an enemy follower on the field and deal it 6 damage. deal 2 damage to a random unselected enemy follower.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"|select=#
+sites: 2
+
+## fanfare: select an enemy follower on the field and deal it 7 damage. deal 4 damage to the enemy leader.
+signatures (2):
+  - op=damage|target="…"
+  - op=damage|target="…"|select=#
+sites: 2
+
+## fanfare: select an enemy follower on the field and deal it 7 damage. summon a vastwing dragon.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: select an enemy follower on the field and destroy it. deal 2 damage to the enemy leader.
+signatures (2):
+  - op=damage|target="…"
+  - op=destroy|target="…"|select=#
+sites: 2
+
+## fanfare: select an enemy follower on the field and destroy it. give all other allied followers on the field +1/+1.
+signatures (2):
+  - op=destroy|target="…"|select=#
+  - op=stat|action="…"|target="…"
+sites: 2
+
+## fanfare: select an enemy follower on the field and destroy it. if at least 3 differently named allied artifact followers have entered the field this match, summon an ancient artifact and mystic artifact.
+signatures (3):
+  - op=destroy|target="…"|select=#
+  - op=gate|condition="unique_tribe_enters"
+  - op=summon|source="…"
+sites: 4
+
+## fanfare: select an enemy follower on the field and destroy it. if there are no duplicates in your deck, give this follower storm.
+signatures (3):
+  - op=destroy|target="…"|select=#
+  - op=gate|condition="highlander"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 3
+
+## fanfare: select an enemy follower on the field and destroy it. reanimate .
+signatures (2):
+  - op=destroy|target="…"|select=#
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: select an enemy follower on the field and destroy it. restore 2 defense to your leader.
+signatures (2):
+  - op=destroy|target="…"|select=#
+  - op=restore|target="…"
+sites: 2
+
+## fanfare: select an enemy follower on the field and destroy it. summon a radiant artifact.
+signatures (2):
+  - op=destroy|target="…"|select=#
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: select an enemy follower on the field and give it -0/-x. x is this follower's attack. increase your combo by 1.
+signatures (2):
+  - op=counter|action="…"
+  - op=stat|action="…"|target="…"|select=#
+sites: 2
+
+## fanfare: select an enemy follower on the field and give it "at the end of your turn, destroy this card."
+signatures (2):
+  - op=destroy
+  - op=keyword|action="…"|target="…"|select=#
+sites: 2
+
+## fanfare: select an enemy follower on the field and give it "can't attack followers or leaders" until the end of your opponent's turn. draw a card.
+signatures (2):
+  - op=draw|source="…"
+  - op=stat|action="…"|target="…"|select=#|keywords=["…"]
+sites: 2
+
+## fanfare: select an enemy follower on the field, remove all abilities from it, and deal it 3 damage.
+signatures (3):
+  - op=damage|target="…"
+  - op=keyword|action="…"|target="…"
+  - op=select|target="…"|select=#
+sites: 3
+
+## fanfare: select another allied card on the field. if you selected one, destroy it and deal 2 damage to a random enemy follower.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=destroy|target="…"|select=#|condition.keys=not_self|then=[{amount:#,count:#,distribution:"…",op:"…",target:"…"}]
+sites: 2
+
+## fanfare: select another allied card on the field. if you selected one, destroy it and draw 2 cards.
+signatures (2):
+  - op=destroy|target="…"|select=#|condition.keys=not_self|then=[{count:#,op:"…",source:"…"}]
+  - op=draw|source="…"
+sites: 2
+
+## fanfare: select another allied follower on the field and give it +2/+2. if you're in overflow, give +3/+3 instead.
+signatures (3):
+  - op=gate|condition="overflow"
+  - op=select|target="…"|select=#
+  - op=stat|action="…"|target="…"
+sites: 4
+
+## fanfare: select another allied follower on the field. if you selected one, destroy it and evolve this follower.
+signatures (3):
+  - op=destroy|target="…"|select=#|condition.keys=not_self|then=[{op:"…",target:"…"}]
+  - op=evolve|target="…"
+  - op=summon|source="…"
+sites: 4
+
+## fanfare: select another card on the field and destroy it. if you selected an allied amulet, recover 2 play points.
+signatures (4):
+  - op=destroy|target="…"
+  - op=gate|condition="selected_matches"
+  - op=pp|action="…"
+  - op=select|target="…"|select=#|condition.keys=not_self
+sites: 4
+
+## fanfare: select another follower on the field and give it +2/-2. if both players have 10 max play points, add a sweetness of voracity to your hand.
+signatures (3):
+  - op=add_to_hand
+  - op=gate|condition="both_max_pp"
+  - op=stat|action="…"|target="…"|select=#
+sites: 3
+
+## fanfare: skybound art- deal 5 damage to 2 random enemy followers.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=gate|condition="skybound_art"
+sites: 2
+
+## fanfare: skybound art- evolve all unevolved allied followers on the field.
+signatures (3):
+  - op=evolve|target="…"
+  - op=evolve|target="…"|mode="…"
+  - op=gate|condition="skybound_art"
+sites: 4
+
+## fanfare: skybound art- recover 1 evolution point.
+signatures (2):
+  - op=ep|action="…"
+  - op=gate|condition="skybound_art"
+sites: 2
+
+## fanfare: skybound art- select another unevolved allied follower on the field and evolve it and this follower.
+signatures (3):
+  - op=evolve|target="…"
+  - op=evolve|target="…"|select=#|filter.keys=unevolved
+  - op=gate|condition="skybound_art"
+sites: 3
+
+## fanfare: skybound art- super-evolve this follower.
+signatures (2):
+  - op=evolve|target="…"|mode="…"
+  - op=gate|condition="skybound_art"
+sites: 2
+
+## fanfare: summon 2 copies of steelclad knight. give all other allied swordcraft followers on the field +1/+3 and ward.
+signatures (2):
+  - op=stat|action="…"|target="…"|filter.keys=class|keywords=["…"]
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: summon 3 copies of knight. select a mode to activate.
+signatures (3):
+  - op=mode
+  - op=stat|action="…"|target="…"|keywords=["…"]
+  - op=summon|source="…"
+sites: 4
+
+## fanfare: summon a beat breaker. if at least 3 differently named allied artifact followers have entered the field this match, summon 2 instead.
+signatures (2):
+  - op=gate|condition="unique_tribe_enters"
+  - op=summon|source="…"
+sites: 3
+
+## fanfare: summon a bunny & baron, fate's bullet. rally  - deal 4 damage to the enemy leader.
+signatures (3):
+  - op=damage|target="…"
+  - op=gate|condition="rally"
+  - op=summon|source="…"
+sites: 3
+
+## fanfare: summon a dread pirate's flag. add a gilded goblet to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: summon a dread pirate's flag. advance the counts of all allied copies of dread pirate's flag on the field by 5.
+signatures (2):
+  - op=countdown|action="…"|target="…"|filter.keys=name
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: summon a fairy. add a fairy to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: summon a fairy. gain crest: titania, queen of fairies.
+signatures (3):
+  - op=add_to_hand
+  - op=crest|action="…"
+  - op=summon|source="…"
+sites: 3
+
+## fanfare: summon a knight. add a steelclad knight to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: summon a lycoris, barbs of passion. give all allied followers on the field barrier.
+signatures (2):
+  - op=stat|action="…"|target="…"|condition.keys=include_self|keywords=["…"]
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: summon a majestic megalorca. if you're in overflow, summon 2 instead.
+signatures (2):
+  - op=gate|condition="overflow"
+  - op=summon|source="…"
+sites: 3
+
+## fanfare: summon a mimi, right paw hellhound and coco, left paw hellhound. necromancy  - give all other allied followers on the field +2/+0.
+signatures (3):
+  - op=gate|condition="necromancy"
+  - op=stat|action="…"|target="…"
+  - op=summon|source="…"
+sites: 4
+
+## fanfare: summon a mireille & risette, penitent duo. earth rite - evolve it and this follower.
+signatures (3):
+  - op=earth_rite
+  - op=evolve|target="…"
+  - op=summon|source="…"
+sites: 4
+
+## fanfare: summon a naht's henchman. deal 3 damage to all enemy followers.
+signatures (2):
+  - op=damage|target="…"
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: summon a random follower that costs 2 or less from your deck and super-evolve it.
+signatures (4):
+  - op=attacks_per_turn|target="…"
+  - op=crest|action="…"
+  - op=evolve|target="…"|mode="…"
+  - op=summon|source="…"|filter.keys=cost_lte,type
+sites: 4
+
+## fanfare: summon a soulcure sister and give it +2/-2 and storm.
+signatures (2):
+  - op=stat|action="…"|target="…"|keywords=["…"]
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: summon a striker artifact. add a gear of remembrance to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: summon a substandard puppet and evolve it and this follower.
+signatures (2):
+  - op=evolve|target="…"
+  - op=summon|source="…"
+sites: 3
+
+## fanfare: summon a vastwing dragon. gain crest: dragon's vale elder.
+signatures (2):
+  - op=crest|action="…"
+  - op=summon|source="…"
+sites: 3
+
+## fanfare: summon an anne's summoning. spellboost your hand 3 times.
+signatures (2):
+  - op=spellboost|target="…"
+  - op=summon|source="…"
+sites: 2
+
+## fanfare: super skybound art - give this follower storm.
+signatures (2):
+  - op=gate|condition="skybound_art"
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## fanfare: super skybound art- do this 5 times: "deal 2 damage to a random enemy."
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=gate|condition="skybound_art"
+sites: 2
+
+## gain 1 max play point. then, if you have 10 max play points, draw a card.
+signatures (3):
+  - op=draw|source="…"
+  - op=gate|condition="max_pp"
+  - op=pp|action="…"
+sites: 3
+
+## gain 1 max play point. transform all copies of apathetic gaze in your hand and deck into copies of lazing flame.
+signatures (2):
+  - op=pp|action="…"
+  - op=transform|target="…"|filter.keys=name
+sites: 3
+
+## gain an earth sigil. gain crest: pascale's dance.
+signatures (5):
+  - op=crest|action="…"
+  - op=draw|source="…"
+  - op=earth_rite
+  - op=stat|action="…"|target="…"|mode="…"
+  - op=summon|source="…"
+sites: 5
+
+## gain crest: crescent tube ride . at the end of your turn, give a random allied follower on the field +1/+1.)
+signatures (2):
+  - op=crest|action="…"
+  - op=stat|action="…"|target="…"|select=#
+sites: 2
+
+## gain crest: crystal gazing.
+signatures (3):
+  - op=crest|action="…"|keywords=["…"]
+  - op=damage|target="…"
+  - op=draw|source="…"
+sites: 3
+
+## gain crest: rigor of the nightblossom.
+signatures (4):
+  - op=crest|action="…"
+  - op=draw|source="…"
+  - op=gate|condition="hand_same_cost_gte"
+  - op=summon|source="…"|keywords=["…"]
+sites: 4
+
+## give all allied followers on the field +1/+0. if you've unlocked super-evolution, give all followers in your hand +1/+0.
+signatures (2):
+  - op=gate|condition="super_evo_unlocked"
+  - op=stat|action="…"|target="…"
+sites: 3
+
+## increase the cost of all followers in your hand by 1. destroy all enemy followers.
+signatures (2):
+  - op=cost|target="…"|mode="…"|condition.keys=type
+  - op=destroy|distribution="…"|target="…"
+sites: 2
+
+## intimidate. last words: summon a vaseraga, unyielding scythe. deal 2 damage to your leader.
+signatures (2):
+  - op=damage|target="…"
+  - op=summon|source="…"
+sites: 2
+
+## keywords[0]:x starts at 0.
+signatures (2):
+  - op=gate|condition="spellboost_count"
+  - op=transform|target="…"
+sites: 2
+
+## last words: add a ripper-clawed thief to your hand and remove last words from it.
+signatures (2):
+  - op=add_to_hand
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## last words: destroy a random enemy follower. restore 2 defense to your leader.
+signatures (3):
+  - op=destroy|distribution="…"|target="…"
+  - op=restore|target="…"
+  - op=summon|source="…"
+sites: 3
+
+## last words: draw a card. deal 1 damage to your leader.
+signatures (2):
+  - op=damage|target="…"
+  - op=draw|source="…"
+sites: 2
+
+## last words: earth rite  - deal 3 damage to the enemy leader.
+signatures (2):
+  - op=damage|target="…"
+  - op=earth_rite
+sites: 2
+
+## last words: earth rite  - summon a lilanthim, anathema of edacity.
+signatures (2):
+  - op=earth_rite
+  - op=summon|source="…"
+sites: 2
+
+## last words: gain crest: drache & aluzard, burning blood.
+signatures (3):
+  - op=add_to_hand
+  - op=cost|target="…"|mode="…"
+  - op=crest|action="…"|keywords=["…"]
+sites: 3
+
+## last words: gain crest: illamrita, designated target.
+signatures (3):
+  - op=crest|action="…"|keywords=["…"]
+  - op=evolve|target="…"
+  - op=summon|source="…"
+sites: 3
+
+## last words: gain crest: kagemitsu, enduring warrior.
+signatures (2):
+  - op=crest|action="…"|keywords=["…"]
+  - op=summon|source="…"
+sites: 2
+
+## last words: gain crest: lapis, shining seraph.
+signatures (3):
+  - op=crest|action="…"|keywords=["…"]
+  - op=stat|action="…"|target="…"|keywords=["…"]
+  - op=summon|source="…"
+sites: 3
+
+## last words: summon a comrade of the swordmaster and remove last words from it.
+signatures (2):
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+  - op=summon|source="…"
+sites: 2
+
+## last words: summon a copy each of 4 random differently named allied followers destroyed this match. give all allied followers on the field +3/+3.
+signatures (2):
+  - op=stat|action="…"|target="…"
+  - op=summon|source="…"|filter.keys=type
+sites: 2
+
+## last words: summon a kratos, everyday joy and remove last words from it.
+signatures (2):
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+  - op=summon|source="…"
+sites: 2
+
+## last words: summon a netherworld lieutenant, give it +1/+0 and rush, and remove last words from it.
+signatures (3):
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+  - op=stat|action="…"|target="…"|keywords=["…"]
+  - op=summon|source="…"
+sites: 3
+
+## last words: summon a rotting zombie and remove last words from it.
+signatures (2):
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+  - op=summon|source="…"
+sites: 2
+
+## last words: summon an edeth, voice of heaven and remove last words from it.
+signatures (2):
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+  - op=summon|source="…"
+sites: 2
+
+## on_discard[0]:when this card is discarded, if its cost is 4, add an advent of the eld blades to your hand and set its cost to 2.
+signatures (3):
+  - op=add_to_hand
+  - op=cost|target="…"|mode="…"
+  - op=gate|condition="self_cost"
+sites: 3
+
+## on_discard[0]:when this card is discarded, if its cost is 7, add a beheading eld blades to your hand and set its cost to 5. if this card's cost is 5, add a beheading eld blades to your hand and set its cost to 3.
+signatures (3):
+  - op=add_to_hand
+  - op=cost|target="…"|mode="…"
+  - op=gate|condition="self_cost"
+sites: 3
+
+## on_discard[1]:deal x damage to all enemy followers. x is this card's cost.
+signatures (3):
+  - op=add_to_hand
+  - op=cost|target="…"|mode="…"
+  - op=gate|condition="self_cost"
+sites: 3
+
+## restore 1 defense to your leader. combo  - gain crest: minimized anxiety.
+signatures (4):
+  - op=add_to_hand
+  - op=crest|action="…"|keywords=["…"]
+  - op=gate|condition="combo"
+  - op=restore|target="…"
+sites: 4
+
+## restore 10 defense to your leader. gain crest: maddening benison.
+signatures (3):
+  - op=crest|action="…"|keywords=["…"]
+  - op=damage|target="…"
+  - op=restore|target="…"
+sites: 3
+
+## restore 2 defense to your leader. spellboost your hand.
+signatures (2):
+  - op=restore|target="…"
+  - op=spellboost|target="…"
+sites: 2
+
+## restore 3 defense to your leader. if you're in overflow, draw a card.
+signatures (3):
+  - op=draw|source="…"
+  - op=gate|condition="overflow"
+  - op=restore|target="…"
+sites: 3
+
+## return a random card from your hand to deck. draw 3 cards.
+signatures (2):
+  - op=draw|source="…"
+  - op=return|target="…"|select=#
+sites: 2
+
+## select 2 allied followers on the field and give them +0/+1. draw a card.
+signatures (2):
+  - op=draw|source="…"
+  - op=stat|action="…"|target="…"|select=#
+sites: 2
+
+## select 2 cards in your hand and discard them. deal 3 damage to a random enemy follower and the enemy leader.
+signatures (3):
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=discard|mode="…"
+sites: 3
+
+## select 2 cards in your hand and return them to deck. draw 2 cards.
+signatures (2):
+  - op=draw|source="…"
+  - op=return|target="…"|select=#
+sites: 2
+
+## select a card in your hand and discard it. add a copy each of 2 random differently named allied followers destroyed this match to your hand without revealing them.
+signatures (2):
+  - op=add_to_hand|distribution="…"|source="…"|filter.keys=type
+  - op=discard|mode="…"
+sites: 2
+
+## select a card in your hand and discard it. draw 2 cards.
+signatures (2):
+  - op=discard|mode="…"
+  - op=draw|source="…"
+sites: 2
+
+## select a card in your hand and discard it. draw a card. if there are no duplicates in your deck, draw 3 instead.
+signatures (3):
+  - op=discard|mode="…"
+  - op=draw|source="…"
+  - op=gate|condition="highlander"
+sites: 4
+
+## select a card in your hand and discard it. select an enemy follower on the field and destroy it.
+signatures (2):
+  - op=destroy|target="…"|select=#
+  - op=discard|mode="…"
+sites: 2
+
+## select a card in your hand and reduce its cost by 2. deal 3 damage to all enemy followers.
+signatures (2):
+  - op=cost|target="…"|select=#|mode="…"
+  - op=damage|target="…"
+sites: 2
+
+## select a card in your hand and return it to deck. draw 2 cards. if you've unlocked super-evolution, reduce their costs by 1.
+signatures (4):
+  - op=cost|target="…"|mode="…"
+  - op=draw|source="…"
+  - op=gate|condition="super_evo_unlocked"
+  - op=return|target="…"|select=#
+sites: 7
+
+## select a card in your hand and return it to deck. draw 2 swordcraft followers.
+signatures (2):
+  - op=return|target="…"|select=#
+  - op=search|filter.keys=class,type
+sites: 2
+
+## select a card in your hand with on spellboost and spellboost it. draw a card.
+signatures (3):
+  - op=draw|source="…"
+  - op=select|target="…"|select=#|filter.keys=has_keyword
+  - op=spellboost|target="…"
+sites: 3
+
+## select a card on the field and destroy it. if you selected an allied amulet, deal 2 damage to the enemy leader and add a depths of the eld tome to your hand.
+signatures (5):
+  - op=add_to_hand
+  - op=damage|target="…"
+  - op=destroy|target="…"
+  - op=gate|condition="selected_matches"
+  - op=select|target="…"|select=#
+sites: 5
+
+## select a follower in your hand and increase its cost by 1. destroy a random enemy follower.
+signatures (3):
+  - op=cost|target="…"|mode="…"
+  - op=destroy|distribution="…"|target="…"
+  - op=select|target="…"|select=#|filter.keys=type
+sites: 3
+
+## select a spell in your hand and discard it. do this 2 times: "deal 3 damage to a random enemy follower."
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=discard|mode="…"|filter.keys=type
+sites: 3
+
+## select an allied card on the field and destroy it. deal 4 damage to a random enemy follower.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=destroy|target="…"|select=#
+sites: 2
+
+## select an allied card on the field and destroy it. summon a white psalm, new revelation.
+signatures (2):
+  - op=destroy|target="…"|select=#
+  - op=summon|source="…"
+sites: 2
+
+## select an allied card on the field and return it to hand. deal 2 damage to a random enemy follower.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=return|target="…"|select=#
+sites: 2
+
+## select an allied crystalspawn on the field and destroy it. draw 2 cards.
+signatures (2):
+  - op=destroy|target="…"|select=#|filter.keys=name
+  - op=draw|source="…"
+sites: 2
+
+## select an allied follower on the field and deal it 1 damage. deal 3 damage to a random enemy follower. if you're in overflow, draw a dragoncraft follower.
+signatures (4):
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"|select=#
+  - op=gate|condition="overflow"
+  - op=search|filter.keys=class,type
+sites: 4
+
+## select an allied follower on the field and destroy it. draw 2 cards.
+signatures (2):
+  - op=destroy|target="…"|select=#
+  - op=draw|source="…"
+sites: 2
+
+## select an allied follower on the field and give it "last words: summon a copy of this card."
+signatures (2):
+  - op=keyword|action="…"|target="…"|select=#|keywords=[{effects:[{copy_mode:"…",count:#,mode:"…",op:"…",source:"…"}],name:"…"}]
+  - op=summon|source="…"|mode="…"
+sites: 2
+
+## select an allied follower on the field and give it +0/+1 and ward.
+signatures (3):
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+  - op=select|target="…"|select=#
+  - op=stat|action="…"|target="…"
+sites: 3
+
+## select an allied follower on the field and give it +1/+0 and rush.
+signatures (3):
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+  - op=select|target="…"|select=#
+  - op=stat|action="…"|target="…"
+sites: 3
+
+## select an allied follower on the field and give it ward. deal 4 damage to a random enemy follower.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=keyword|action="…"|target="…"|select=#|keywords=["…"]
+sites: 2
+
+## select an allied follower on the field with a base cost of 5 or more, add a copy of it to your hand without revealing it, and reduce the cost of the copy by 3.
+signatures (3):
+  - op=add_to_hand|source="…"|target="…"
+  - op=cost|target="…"|mode="…"
+  - op=select|target="…"|select=#|filter.keys=base_cost_gte
+sites: 3
+
+## select an allied follower on the field with ward and give it +0/+1. deal x damage to a random enemy follower. x is the selected follower's defense.
+signatures (3):
+  - op=damage|distribution="…"|target="…"
+  - op=select|target="…"|select=#|filter.keys=has_keyword
+  - op=stat|action="…"|target="…"
+sites: 3
+
+## select an artifact follower in your hand and give it rush and "last words: draw a card."
+signatures (2):
+  - op=draw|source="…"
+  - op=keyword|action="…"|target="…"|select=#|filter.keys=tribe,type|keywords=["…",{effects:[{count:#,op:"…",source:"…"}],name:"…"}]
+sites: 2
+
+## select an enemy and deal it 2 damage. restore 1 defense to your leader.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=restore|target="…"
+sites: 2
+
+## select an enemy card on the field, banish it, and add a copy of it to your hand.
+signatures (3):
+  - op=add_to_hand|source="…"|target="…"
+  - op=banish|target="…"
+  - op=select|target="…"|select=#
+sites: 3
+
+## select an enemy follower on the field and deal it 2 damage. if you're in overflow, deal 4 damage instead.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=gate|condition="overflow"
+sites: 3
+
+## select an enemy follower on the field and deal it 3 damage. add a gear of remembrance to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=damage|target="…"|select=#
+sites: 2
+
+## select an enemy follower on the field and deal it 3 damage. rally  - give it "can't attack followers or leaders" until the end of your opponent's turn.
+signatures (4):
+  - op=damage|target="…"
+  - op=gate|condition="rally"
+  - op=select|target="…"|select=#
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 4
+
+## select an enemy follower on the field and deal it 4 damage. combo  - draw a card.
+signatures (3):
+  - op=damage|target="…"|select=#
+  - op=draw|source="…"
+  - op=gate|condition="combo"
+sites: 3
+
+## select an enemy follower on the field and deal it 4 damage. if there's an allied follower on the field with a base cost of 5 or more, draw a card.
+signatures (4):
+  - op=damage|target="…"
+  - op=draw|source="…"
+  - op=gate|condition="ally_matches"
+  - op=select|target="…"|select=#
+sites: 4
+
+## select an enemy follower on the field and deal it 4 damage. if there's an evolved allied follower on the field, draw a card.
+signatures (3):
+  - op=damage|target="…"|select=#
+  - op=draw|source="…"
+  - op=gate|condition="evolved_allied"
+sites: 3
+
+## select an enemy follower on the field and deal it 5 damage. add a valor of the nightblossom to your deck.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=deck|action="…"
+sites: 2
+
+## select an enemy follower on the field and deal it 5 damage. if this card's cost is 3, add a severed ties to your hand and set its cost to 1.
+signatures (4):
+  - op=add_to_hand
+  - op=cost|target="…"|mode="…"
+  - op=damage|target="…"|select=#
+  - op=gate|condition="self_cost"
+sites: 4
+
+## select an enemy follower on the field and deal it 6 damage. if at least 3 differently named allied artifact followers have entered the field this match, recover 1 evolution point.
+signatures (3):
+  - op=damage|target="…"|select=#
+  - op=ep|action="…"
+  - op=gate|condition="unique_tribe_enters"
+sites: 3
+
+## select an enemy follower on the field and deal it 6 damage. rally  - deal x damage to all enemy followers. x is the number of allied followers on the field.
+signatures (3):
+  - op=damage|target="…"
+  - op=damage|target="…"|select=#
+  - op=gate|condition="rally"
+sites: 3
+
+## select an enemy follower on the field and destroy it. add 2 copies of puppet to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=destroy|target="…"|select=#
+sites: 2
+
+## select an enemy follower on the field and destroy it. add a gear of ambition and gear of remembrance to your hand.
+signatures (2):
+  - op=add_to_hand
+  - op=destroy|target="…"|select=#
+sites: 3
+
+## select an enemy follower on the field and destroy it. earth rite  - deal 2 damage to the enemy leader.
+signatures (3):
+  - op=damage|target="…"
+  - op=destroy|target="…"|select=#
+  - op=earth_rite
+sites: 3
+
+## select an enemy follower on the field and destroy it. if there are no duplicates in your deck, destroy all enemy followers instead.
+signatures (3):
+  - op=destroy|distribution="…"|target="…"
+  - op=destroy|target="…"|select=#
+  - op=gate|condition="highlander"
+sites: 3
+
+## select an enemy follower on the field and destroy it. restore 2 defense to your leader.
+signatures (2):
+  - op=destroy|target="…"|select=#
+  - op=restore|target="…"
+sites: 2
+
+## select an enemy follower on the field and destroy it. summon a steelclad knight.
+signatures (2):
+  - op=destroy|target="…"|select=#
+  - op=summon|source="…"
+sites: 2
+
+## select an enemy follower on the field or the enemy leader and deal it 1 damage. add an ephemeral foxfire to your deck. if you're in overflow, draw a card.
+signatures (4):
+  - op=damage|target="…"|select=#
+  - op=deck|action="…"
+  - op=draw|source="…"
+  - op=gate|condition="overflow"
+sites: 4
+
+## select an enemy follower on the field or the enemy leader and deal it 3 damage. deal 2 damage to your leader.
+signatures (2):
+  - op=damage|target="…"
+  - op=damage|target="…"|select=#
+sites: 2
+
+## select an enemy follower on the field or the enemy leader and deal it 5 damage. restore 5 defense to your leader.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=restore|target="…"
+sites: 2
+
+## select an enemy follower on the field, banish it, and summon an exact copy of it.
+signatures (3):
+  - op=banish|target="…"
+  - op=select|target="…"|select=#
+  - op=summon|source="…"|target="…"
+sites: 3
+
+## select an enemy follower on the field, deal it 3 damage, and give it "can't attack followers or leaders" until the end of your opponent's turn.
+signatures (3):
+  - op=damage|target="…"
+  - op=select|target="…"|select=#
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 3
+
+## spell[0]:activates in hand. at the end of your turn, reduce the cost of this card by 1.
+signatures (2):
+  - op=damage|target="…"
+  - op=gate|condition="board_name"
+sites: 3
+
+## spell[0]:activates in hand. whenever you perform earth rite, reduce the cost of this card by 1.
+signatures (2):
+  - op=destroy|target="…"|select=#
+  - op=draw|source="…"
+sites: 2
+
+## spell[0]:deal 3 damage to all enemies.
+signatures (2):
+  - op=damage|target="…"
+  - op=gate|condition="skybound_art"
+sites: 3
+
+## spell[0]:do this 1 time: "deal 3 damage to a random enemy follower. deal 1 damage to both leaders."
+signatures (3):
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=repeat_effect
+sites: 3
+
+## spell[0]:earth rite  - activate 2 random abilities from the following.
+signatures (4):
+  - op=earth_rite
+  - op=mode|select=#
+  - op=restore|target="…"
+  - op=summon|source="…"
+sites: 5
+
+## spell[0]:fuse: forestcraft cards
+signatures (2):
+  - op=draw|source="…"
+  - op=gate|condition="has_fuse_materials"
+sites: 3
+
+## spell[0]:gain crest: majestic conquest.
+signatures (2):
+  - op=crest|action="…"
+  - op=summon|source="…"
+sites: 2
+
+## spell[0]:on spellboost: reduce the cost of this card by 1.
+signatures (5):
+  - op=return|target="…"|select="…"
+  - op=select|target="…"|select=#
+  - op=stat|action="…"|target="…"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+  - op=summon|source="…"
+sites: 5
+
+## spell[0]:select 2 modes to activate.
+signatures (8):
+  - op=add_shadows
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=mode|select=#
+  - op=pp|action="…"
+  - op=restore|target="…"
+  - op=search|filter.keys=cost_eq,type
+  - op=search|filter.keys=type
+sites: 10
+
+## spell[0]:select a mode to activate.
+signatures (17):
+  - op=cost|target="…"|mode="…"
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=destroy|distribution="…"|target="…"
+  - op=destroy|distribution="…"|target="…"|filter.keys=damaged
+  - op=draw|source="…"
+  - op=ep|action="…"
+  - op=mode
+  - op=mode|select=#
+  - op=pp|action="…"
+  - op=restore|target="…"
+  - op=search|filter.keys=type
+  - op=stat|action="…"|distribution="…"|target="…"|filter.keys=class
+  - op=stat|action="…"|target="…"
+  - op=stat|action="…"|target="…"|filter.keys=class|keywords=["…"]
+  - op=summon|source="…"
+  - op=summon|source="…"|keywords=["…"]
+sites: 53
+
+## spell[0]:select a mode to activate. combo  - activate all of them instead.
+signatures (4):
+  - op=add_to_hand
+  - op=damage|distribution="…"|target="…"
+  - op=gate|condition="combo"
+  - op=mode
+sites: 8
+
+## spell[0]:select a mode to activate. if at least 3 differently named allied artifact followers have entered the field this match, activate all of them instead.
+signatures (3):
+  - op=add_to_hand
+  - op=gate|condition="unique_tribe_enters"
+  - op=mode
+sites: 6
+
+## spell[0]:select a mode to activate. if there are at least 2 allied cards on the field, activate all of them instead.
+signatures (3):
+  - op=damage|distribution="…"|target="…"
+  - op=mode
+  - op=restore|target="…"
+sites: 3
+
+## spell[0]:select a mode to activate. if there's an allied card on the field with a base cost of 6 or more, activate all of them instead.
+signatures (3):
+  - op=damage|distribution="…"|target="…"
+  - op=mode
+  - op=restore|target="…"
+sites: 3
+
+## spell[0]:select a mode to activate. super skybound art- activate all of them instead.
+signatures (5):
+  - op=draw|source="…"
+  - op=gate|condition="skybound_art"
+  - op=mode|select=#
+  - op=restore|target="…"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 10
+
+## spell[0]:x starts at 0.
+signatures (2):
+  - op=damage|distribution="…"|target="…"
+  - op=draw|source="…"
+sites: 3
+
+## spell[1]:on spellboost: increase x by 1.
+signatures (3):
+  - op=gate|condition="spellboost_count"
+  - op=pp|action="…"
+  - op=restore|target="…"
+sites: 3
+
+## spell[1]:super skybound art- destroy your crest: corruption.
+signatures (2):
+  - op=crest|action="…"
+  - op=damage|target="…"
+sites: 2
+
+## spell[2]:deal 2 damage to a random enemy follower. add a gilded blade to your hand. if you've fused to this card, draw a card.
+signatures (2):
+  - op=draw|source="…"
+  - op=gate|condition="has_fuse_materials"
+sites: 2
+
+## spell[2]:skybound art- deal 2 damage to the enemy leader.
+signatures (2):
+  - op=damage|target="…"
+  - op=gate|condition="skybound_art"
+sites: 2
+
+## spell[2]:super skybound art- destroy your crest: corruption.
+signatures (2):
+  - op=crest|action="…"
+  - op=damage|target="…"
+sites: 2
+
+## spell[3]:super skybound art- destroy your crest: corruption.
+signatures (2):
+  - op=crest|action="…"
+  - op=gate|condition="skybound_art"
+sites: 2
+
+## summon 2 random differently named followers that cost 2 or less from your deck. give all allied followers on the field +1/+1.
+signatures (2):
+  - op=stat|action="…"|target="…"
+  - op=summon|source="…"|filter.keys=cost_lte,type
+sites: 2
+
+## summon a crystalspawn and give it +x/+x. restore y defense to your leader. deal z damage to the enemy leader. x, y, and z are determined randomly and add up to your faith's value.
+signatures (5):
+  - op=damage|target="…"
+  - op=random_split
+  - op=restore|target="…"
+  - op=stat|action="…"|target="…"
+  - op=summon|source="…"
+sites: 5
+
+## summon a ghost, bat, and skeleton and evolve them.
+signatures (2):
+  - op=evolve|target="…"
+  - op=summon|source="…"
+sites: 6
+
+## summon a ludicrous ordnance, shoddy plaything, and substandard puppet and give them +0/+1.
+signatures (2):
+  - op=stat|action="…"|target="…"
+  - op=summon|source="…"
+sites: 6
+
+## summon a majestic megalorca. if you're in overflow, draw a call of the megalorca.
+signatures (3):
+  - op=gate|condition="overflow"
+  - op=search|filter.keys=name
+  - op=summon|source="…"
+sites: 3
+
+## summon an obsessed test subject and give it +1/+0. add an obsessed test subject to your hand and give it +1/+0.
+signatures (3):
+  - op=add_to_hand
+  - op=stat|action="…"|target="…"
+  - op=summon|source="…"
+sites: 4
+
+## summon an obsessed test subject. do this 2 times: "deal 7 damage to a random enemy follower."
+signatures (3):
+  - op=damage|distribution="…"|target="…"
+  - op=repeat_effect
+  - op=summon|source="…"
+sites: 3
+
+## super-evolve: add a gilded blade and gilded necklace to your hand and set their costs to 0.
+signatures (2):
+  - op=add_to_hand
+  - op=cost|target="…"|mode="…"
+sites: 4
+
+## super-evolve: banish all 1-, 3-, 5-, 7-, and 9-cost cards from your deck. deal x damage split between all enemy followers. x is the number of cards you banished.
+signatures (2):
+  - op=banish|distribution="…"|target="…"|filter.keys=cost_in
+  - op=damage|distribution="…"|target="…"
+sites: 2
+
+## super-evolve: deal x damage to the enemy leader. x is the number of other allied cards on the field. destroy all other allied cards on the field.
+signatures (2):
+  - op=damage|target="…"
+  - op=destroy|distribution="…"|target="…"|condition.keys=not_self
+sites: 2
+
+## super-evolve: destroy a random enemy follower with the highest attack. deal 1 damage to all enemy followers.
+signatures (2):
+  - op=damage|target="…"
+  - op=destroy|distribution="…"|target="…"
+sites: 2
+
+## super-evolve: draw 2 cards. deal 1 damage to both leaders.
+signatures (2):
+  - op=damage|target="…"
+  - op=draw|source="…"
+sites: 2
+
+## super-evolve: draw 2 cards. restore 2 defense to your leader. gain 2 earth sigils.
+signatures (3):
+  - op=draw|source="…"
+  - op=restore|target="…"
+  - op=summon|source="…"
+sites: 3
+
+## super-evolve: earth rite  - summon 2 copies of charming monster.
+signatures (2):
+  - op=earth_rite
+  - op=summon|source="…"
+sites: 2
+
+## super-evolve: fully restore the defense of this follower. do this 3 times: "deal 2 damage to all followers."
+signatures (2):
+  - op=damage|target="…"|condition.keys=include_self
+  - op=restore|target="…"
+sites: 4
+
+## super-evolve: gain crest: charon, stygian oarswoman.
+signatures (2):
+  - op=crest|action="…"
+  - op=summon|source="…"
+sites: 2
+
+## super-evolve: gain crest: elmott, remembrance aflame.
+signatures (2):
+  - op=crest|action="…"
+  - op=damage|target="…"
+sites: 2
+
+## super-evolve: gain crest: great hart of the glacial realm.
+signatures (3):
+  - op=add_to_hand
+  - op=crest|action="…"
+  - op=gate|condition="combo"
+sites: 3
+
+## super-evolve: gain crest: istyndet vs. mitilykket.
+signatures (4):
+  - op=crest|action="…"
+  - op=destroy|distribution="…"|target="…"
+  - op=destroy|distribution="…"|target="…"|filter.keys=has_keyword
+  - op=gate|condition="ally_matches"
+sites: 4
+
+## super-evolve: gain crest: sephie, maven convict.
+signatures (2):
+  - op=crest|action="…"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## super-evolve: gain crest: shymm, love bewitched.
+signatures (2):
+  - op=crest|action="…"
+  - op=stat|action="…"|target="…"
+sites: 2
+
+## super-evolve: gain crest: tico, mysterian spellcrafter.
+signatures (2):
+  - op=crest|action="…"
+  - op=damage|target="…"
+sites: 2
+
+## super-evolve: gain crest: unkei, goldbloom.
+signatures (2):
+  - op=add_to_hand
+  - op=crest|action="…"
+sites: 2
+
+## super-evolve: gain crest: yuel & societte, dancing duo.
+signatures (2):
+  - op=crest|action="…"
+  - op=evolve|target="…"
+sites: 2
+
+## super-evolve: give all other allied followers on the field +0/+2 and aura.
+signatures (2):
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+  - op=stat|action="…"|target="…"
+sites: 2
+
+## super-evolve: give your opponent crest: burnite, anathema of ash.
+signatures (2):
+  - op=crest|action="…"
+  - op=damage|target="…"
+sites: 3
+
+## super-evolve: give your opponent crest: burnite, anathema of flame.
+signatures (2):
+  - op=crest|action="…"
+  - op=damage|target="…"
+sites: 3
+
+## super-evolve: give your opponent crest: krulle, heir to unkilling.
+signatures (2):
+  - op=crest|action="…"
+  - op=stat|action="…"|target="…"
+sites: 2
+
+## super-evolve: if you've fused to this card, select an allied obsessed test subject on the field and give it drain.
+signatures (2):
+  - op=gate|condition="has_fuse_materials"
+  - op=stat|action="…"|target="…"|select=#|filter.keys=name|keywords=["…"]
+sites: 2
+
+## super-evolve: replicate the effects of this card's fanfare ability.
+signatures (6):
+  - op=damage|target="…"
+  - op=mode
+  - op=replicate
+  - op=stat|action="…"|target="…"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+  - op=summon|source="…"|keywords=["…"]
+sites: 17
+
+## super-evolve: select 2 instead.
+signatures (2):
+  - op=damage|target="…"|select=#
+  - op=destroy|target="…"|select=#
+sites: 2
+
+## super-evolve: select a mode to activate.
+signatures (3):
+  - op=damage|distribution="…"|target="…"
+  - op=mode
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 3
+
+## super-evolve: select an allied golem follower on the field, evolve it, and give it +3/+3.
+signatures (3):
+  - op=evolve|target="…"
+  - op=select|target="…"|select=#|filter.keys=tribe
+  - op=stat|action="…"|target="…"
+sites: 3
+
+## super-evolve: select an enemy follower on the field, destroy it, and add a copy of it to your hand.
+signatures (3):
+  - op=add_to_hand|source="…"|target="…"
+  - op=destroy|target="…"
+  - op=select|target="…"|select=#
+sites: 3
+
+## super-evolve: select another allied follower on the field. if you selected one, destroy it and a random enemy follower.
+signatures (2):
+  - op=destroy|distribution="…"|target="…"
+  - op=destroy|target="…"|select=#|condition.keys=not_self|then=[{count:#,distribution:"…",op:"…",target:"…"}]
+sites: 2
+
+## super-evolve: select another card on the field and destroy it. if you selected an allied amulet, deal 3 damage to all enemy followers.
+signatures (4):
+  - op=damage|target="…"
+  - op=destroy|target="…"
+  - op=gate|condition="selected_matches"
+  - op=select|target="…"|select=#|condition.keys=not_self
+sites: 4
+
+## super-evolve: then, if at least 3 differently named allied artifact followers have entered the field this match, give this follower storm.
+signatures (2):
+  - op=gate|condition="unique_tribe_enters"
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## superevolve[0]:fanfare: reanimate  and reanimate .
+signatures (2):
+  - op=crest|action="…"
+  - op=evolve|target="…"|mode="…"
+sites: 2
+
+## triggers[0]:activates in deck. at the start of your turn, if allied followers have evolved at least 6 times this match, invoke this card.
+signatures (3):
+  - op=crest|action="…"
+  - op=restore|target="…"
+  - op=return|target="…"
+sites: 3
+
+## triggers[0]:activates in hand. at the end of your turn, combo  - reduce the cost of this card by 1.
+signatures (2):
+  - op=cost|target="…"|mode="…"
+  - op=gate|condition="combo"
+sites: 2
+
+## triggers[0]:activates in hand. at the end of your turn, if your leader's defense is 12 or less, reduce the cost of this card by 1.
+signatures (2):
+  - op=cost|target="…"|mode="…"
+  - op=gate|condition="leader_defense_lte"
+sites: 2
+
+## triggers[0]:ambush
+signatures (5):
+  - op=cost|target="…"|mode="…"
+  - op=draw|source="…"
+  - op=mode|select=#
+  - op=restore|target="…"
+  - op=stat|action="…"|target="…"|condition.keys=include_self
+sites: 5
+
+## triggers[0]:at the end of your turn, combo  - draw a card.
+signatures (2):
+  - op=draw|source="…"
+  - op=gate|condition="combo"
+sites: 2
+
+## triggers[0]:at the end of your turn, if this follower is evolved, deal 2 damage to all followers.
+signatures (2):
+  - op=damage|target="…"
+  - op=gate|condition="evolved_self"
+sites: 2
+
+## triggers[0]:at the end of your turn, if you have at least 2 spells in your hand, deal 5 damage to all enemy followers.
+signatures (2):
+  - op=damage|target="…"
+  - op=gate|condition="hand_matches"
+sites: 2
+
+## triggers[0]:at the end of your turn, if you've played cards with base costs of 1, 2, 3, 4, 5, 6, 7, and 8 this match, destroy this card.
+signatures (2):
+  - op=destroy
+  - op=gate|condition="played_base_cost_ladder"
+sites: 2
+
+## triggers[0]:aura
+signatures (3):
+  - op=destroy|target="…"
+  - op=restore|target="…"
+  - op=stat|action="…"|target="…"
+sites: 3
+
+## triggers[0]:bane
+signatures (3):
+  - op=gate|condition="super_evolved_self"
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+  - op=restore|target="…"
+sites: 4
+
+## triggers[0]:countdown
+signatures (12):
+  - op=countdown|action="…"
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=damage|target="…"|condition.keys=exclude_tribe
+  - op=destroy
+  - op=draw|source="…"
+  - op=gate|condition="amulet_count"
+  - op=gate|condition="evolved_allied"
+  - op=gate|condition="super_evolved_allied"
+  - op=restore|target="…"
+  - op=sequence
+  - op=stat|action="…"|target="…"
+sites: 18
+
+## triggers[0]:fanfare: if you have 10 max play points, evolve this follower.
+signatures (2):
+  - op=gate|condition="evolved_self"
+  - op=restore|target="…"
+sites: 3
+
+## triggers[0]:fanfare: if you've unlocked super-evolution, evolve this follower.
+signatures (2):
+  - op=damage|target="…"
+  - op=gate|condition="evolved_self"
+sites: 5
+
+## triggers[0]:fanfare: necromancy  - summon 3 copies of rotting zombie.
+signatures (2):
+  - op=damage|target="…"
+  - op=stat|action="…"|target="…"|keywords=["…","…"]
+sites: 2
+
+## triggers[0]:fanfare: select 3 other cards on the field and destroy them.
+signatures (2):
+  - op=add_to_hand
+  - op=crest|action="…"
+sites: 2
+
+## triggers[0]:fanfare: select a card in your hand and discard it. draw a spell.
+signatures (2):
+  - op=gate|condition="evolved_self"
+  - op=summon|source="…"
+sites: 2
+
+## triggers[0]:fanfare: select a mode to activate.
+signatures (2):
+  - op=gate|condition="evolved_self"
+  - op=stat|action="…"|target="…"
+sites: 2
+
+## triggers[0]:fanfare: select an enemy follower on the field and deal it x damage. x is this follower's attack.
+signatures (2):
+  - op=draw|source="…"
+  - op=gate|condition="combo"
+sites: 2
+
+## triggers[0]:fanfare: summon 2 copies of guardian golem.
+signatures (4):
+  - op=earth_rite
+  - op=evolve|target="…"
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+  - op=spellboost|target="…"
+sites: 4
+
+## triggers[0]:fanfare: summon 2 enemy copies of knight.
+signatures (3):
+  - op=damage|target="…"
+  - op=keyword|action="…"|target="…"|keywords=[{name:"…",until_opponent_eot:true}]
+  - op=restore|target="…"
+sites: 3
+
+## triggers[0]:fanfare: summon 3 copies of knight.
+signatures (2):
+  - op=stat|action="…"|target="…"
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 2
+
+## triggers[0]:fanfare: summon 4 copies of steelclad knight.
+signatures (2):
+  - op=keyword|action="…"|target="…"|keywords=["…","…"]
+  - op=stat|action="…"|target="…"
+sites: 2
+
+## triggers[0]:fanfare: summon a bat.
+signatures (2):
+  - op=damage|target="…"
+  - op=keyword|action="…"|target="…"|keywords=[{name:"…"}]
+sites: 2
+
+## triggers[0]:follower strike: give this follower barrier. give the opposing follower "can't attack followers or leaders" and "at the end of your turn, banish this card."
+signatures (3):
+  - op=banish
+  - op=keyword|action="…"|target="…"
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+sites: 4
+
+## triggers[0]:fuse: cards
+signatures (3):
+  - op=gate|condition="pp_at_least"
+  - op=pp|action="…"
+  - op=summon|source="…"
+sites: 3
+
+## triggers[0]:rush
+signatures (9):
+  - op=damage|target="…"
+  - op=destroy
+  - op=destroy|target="…"|select=#
+  - op=keyword|action="…"|target="…"|keywords=["…"]
+  - op=restore|target="…"
+  - op=spellboost|target="…"
+  - op=stat|action="…"|target="…"
+  - op=stat|action="…"|target="…"|keywords=[{charges:#,name:"…"}]
+  - op=summon|source="…"
+sites: 13
+
+## triggers[0]:storm
+signatures (5):
+  - op=banish
+  - op=destroy|distribution="…"|target="…"
+  - op=gate|condition="ally_attacked_leader_last_turn"
+  - op=gate|condition="amulet_count"
+  - op=stat|action="…"|target="…"
+sites: 5
+
+## triggers[0]:ward
+signatures (9):
+  - op=damage|distribution="…"|target="…"
+  - op=damage|target="…"
+  - op=evolve|target="…"
+  - op=gate|condition="evolved_self"
+  - op=gate|condition="super_evolved_allied"
+  - op=restore|target="…"
+  - op=spellboost|target="…"
+  - op=stat|action="…"|target="…"|condition.keys=include_self
+  - op=stat|action="…"|target="…"|keywords=["…"]
+sites: 12
+
+## triggers[0]:when this card enters the field, summon an exact copy of it and give the exact copy -0/-1.
+signatures (2):
+  - op=stat|action="…"|target="…"
+  - op=summon|source="…"|mode="…"|then=[{action:"…",attack:#,defense:#,op:"…",target:"…"}]
+sites: 2
+
+## triggers[0]:when this follower enters the field, if at least 5 other allied copies of obsessed test subject have entered the field this match, give it +3/+3.
+signatures (2):
+  - op=gate|condition="named_enter_count"
+  - op=stat|action="…"|target="…"
+sites: 2
+
+## triggers[0]:whenever an allied amulet is destroyed, activate an ability in sequence from the following.
+signatures (4):
+  - op=damage|distribution="…"|target="…"
+  - op=restore|target="…"
+  - op=sequence
+  - op=summon|source="…"
+sites: 4
+
+## triggers[1]:at the end of your turn, if this follower is evolved, give your opponent crest: slaus, revolving wheel of fortune and banish this card.
+signatures (7):
+  - op=banish|target="…"
+  - op=cost|target="…"|mode="…"
+  - op=crest|action="…"
+  - op=damage|target="…"
+  - op=gate|condition="evolved_self"
+  - op=mode|select=#
+  - op=stat|action="…"|target="…"|condition.keys=include_self
+sites: 7
+
+## whenever an enemy follower enters the field, destroy it and this card.
+signatures (2):
+  - op=destroy
+  - op=destroy|target="…"
+sites: 2
