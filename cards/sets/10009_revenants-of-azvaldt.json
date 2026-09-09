@@ -262,7 +262,8 @@
         "op": "damage",
         "target": "enemy:follower",
         "amount": 9,
-        "select": 1
+        "select": 1,
+        "printed": "Activates in deck. At the end of your turn, if you've played cards with base costs of 1, 2, 3, 4, 5, 6, 7, and 8 this match, Invoke this card.\nFanfare: Select an enemy follower on the field and deal it 9 damage."
       }
     ]
   },
@@ -508,7 +509,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate. Combo (3) - Activate all of them instead.\n1. Deal 4 damage to a random enemy follower.\n2. Add a Deepwood Bounty and Fairy to your hand."
       }
     ]
   },
@@ -1924,7 +1926,8 @@
             "amount": 3,
             "distribution": "split_sequential"
           }
-        ]
+        ],
+        "printed": "Deal 3 damage split between all enemy followers. If an allied follower attacked a leader on your last turn, deal 6 damage instead."
       }
     ]
   },
@@ -1958,7 +1961,8 @@
             "target": "self",
             "keywords": ["Storm"]
           }
-        ]
+        ],
+        "printed": "Fanfare: If an allied follower attacked a leader on your last turn, give this follower Storm."
       }
     ]
   },
@@ -2832,7 +2836,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate. If there's an allied card on the field with a base cost of 6 or more, activate all of them instead.\n1. Deal 3 damage to a random enemy follower.\n2. Restore 2 defense to your leader."
       }
     ]
   },
@@ -3187,7 +3192,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Deal 5 damage to all enemy followers.\n2. Summon 2 copies of Mystic Artifact."
       }
     ]
   },
@@ -3401,7 +3407,8 @@
             "target": "enemy:follower",
             "select": 1
           }
-        ]
+        ],
+        "printed": "Select an enemy follower on the field and destroy it. If there are no duplicates in your deck, destroy all enemy followers instead."
       }
     ]
   },

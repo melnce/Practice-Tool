@@ -5,6 +5,11 @@ import {
   isFreeSliceCard,
   collectClauseRoots,
   measurePrintedCoverage,
+  isBareKeywordLine,
+  STATIC_ABILITY_LINES,
+  hasContiguousEffectSpan,
+  contiguousEffectSpanLiteral,
+  singleRootPrintedLiteral,
 } from "../../scripts/lib/perEffectPrinted.js";
 
 const base = {
@@ -200,6 +205,64 @@ describe("per-effect printed — free slice census", () => {
     };
     expect(isFreeSliceCard(indomitable)).toBe(true);
     expect(collectClauseRoots(indomitable)).toHaveLength(1);
+  });
+});
+
+describe("per-effect printed — static ability lines (DA1)", () => {
+  it("pins the closed static-ability vocabulary", () => {
+    expect([...STATIC_ABILITY_LINES].sort()).toEqual(
+      [
+        "Can attack 2 times per turn.",
+        "Can attack 3 times per turn.",
+        "Can't attack followers or leaders.",
+        "Can't be destroyed by abilities.",
+        "Can't be played.",
+        "Can't take more than 3 damage at a time.",
+        "Ignores Ward.",
+      ].sort(),
+    );
+  });
+
+  it("treats static ability lines as non-effect (bare keyword) lines", () => {
+    for (const line of STATIC_ABILITY_LINES) {
+      expect(isBareKeywordLine(line)).toBe(true);
+    }
+  });
+
+  it("makes the four formerly non-contiguous single-root cards contiguous", () => {
+    const descriptions = [
+      "Fanfare: Transform all Forestcraft cards in your hand that cost 2 or less into copies of Bramble Burst.\nWard.\nCan attack 2 times per turn.",
+      "Fanfare: Skybound Art- Deal 5 damage to 2 random enemy followers.\nWard \nCan't take more than 3 damage at a time.",
+      "Fanfare: Summon an exact copy of this card.\nRush\nWard\nCan't take more than 3 damage at a time.",
+      "Fanfare: If an allied follower attacked a leader on your last turn, give this follower Storm.\nRush\nIgnores Ward.",
+    ];
+    for (const description of descriptions) {
+      expect(hasContiguousEffectSpan(description)).toBe(true);
+      expect(contiguousEffectSpanLiteral(description)).toMatch(/^Fanfare:/);
+    }
+  });
+});
+
+describe("per-effect printed — single-root span (DA2)", () => {
+  it("derives the full effect span for Opulent Rose Queen", () => {
+    const card = {
+      id: "10114120",
+      name: "Opulent Rose Queen",
+      description:
+        "Fanfare: Transform all Forestcraft cards in your hand that cost 2 or less into copies of Bramble Burst.\nWard.\nCan attack 2 times per turn.",
+      fanfare: [
+        {
+          op: "transform",
+          target: "ally:hand",
+          filter: { class: "Forestcraft", cost_lte: 2 },
+          into: "Bramble Burst",
+        },
+      ],
+      keywords: ["Ward"],
+    };
+    expect(singleRootPrintedLiteral(card)).toBe(
+      "Fanfare: Transform all Forestcraft cards in your hand that cost 2 or less into copies of Bramble Burst.",
+    );
   });
 });
 

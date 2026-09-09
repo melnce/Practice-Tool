@@ -96,7 +96,8 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Bane"]
+            "keywords": ["Bane"],
+            "printed": "Activates in hand. When an enemy follower super-evolves, give this follower Bane."
           }
         ]
       }
@@ -130,7 +131,8 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": ["Storm"],
+            "printed": "Activates in hand. When an enemy follower super-evolves, give this follower Storm."
           }
         ]
       }
@@ -985,7 +987,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "printed": "Engage: Destroy this card. Select a Mode to activate.\n1. Add a Gilded Blade and Gilded Necklace to your hand.\n2. Add a Gilded Goblet and Gilded Boots to your hand."
           }
         ]
       }
@@ -1611,7 +1614,8 @@
             "target": "enemy:follower",
             "count": 1
           }
-        ]
+        ],
+        "printed": "Select a follower in your hand and increase its cost by 1. Destroy a random enemy follower."
       }
     ],
     "keywords": [],
@@ -2758,7 +2762,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select 2 Modes to activate.\n1. Recover 1 play point.\n2. Draw a follower.\n3. Draw a 3-cost spell.\n4. Deal 4 damage to a random enemy follower."
       }
     ],
     "keywords": [],
@@ -2866,7 +2871,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Select a Mode to activate.\n1. Add a Scream Diffusion to your hand.\n2. Add a Wings of Desire to your hand."
       }
     ],
     "keywords": [],

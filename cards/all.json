@@ -123,7 +123,8 @@
             "action": "remove",
             "target": "enemy:follower",
             "keywords": ["Ward"],
-            "select": 1
+            "select": 1,
+            "printed": "Engage: Destroy this card. Select an enemy follower on the field and remove Ward from it."
           }
         ]
       }
@@ -754,7 +755,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Select a Mode to activate.\n1. Spellboost your hand 2 times.\n2. Earth Rite (1) - Give this follower +2/+2 and Ward"
       }
     ],
     "evolve": [],
@@ -1104,7 +1106,8 @@
             "select": 1,
             "amount": 2
           }
-        ]
+        ],
+        "printed": "Select an enemy follower on the field and deal it 2 damage. If you're in Overflow, deal 4 damage instead."
       }
     ],
     "triggers": [],
@@ -1348,7 +1351,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Draw a follower.\n2. Reanimate (2)."
       }
     ],
     "keywords": [],
@@ -2389,7 +2393,8 @@
         "filter": {
           "type": "Follower",
           "cost_eq": "{combo}"
-        }
+        },
+        "printed": "Fanfare: Draw an X-cost follower. X is your Combo."
       }
     ],
     "keywords": [],
@@ -2434,7 +2439,8 @@
             "count": 1,
             "distribution": "random"
           }
-        ]
+        ],
+        "printed": "Fanfare: Deal 3 damage to a random enemy follower. Combo (3) - Deal damage to 3 random enemy followers instead."
       }
     ],
     "keywords": [],
@@ -2810,7 +2816,8 @@
         "action": "give",
         "target": "self",
         "attack_source": "combo",
-        "defense": 0
+        "defense": 0,
+        "printed": "Fanfare: Give this follower +X/+0. X is your Combo."
       }
     ],
     "keywords": ["Storm"],
@@ -2960,7 +2967,8 @@
           "class": "Forestcraft",
           "cost_lte": 2
         },
-        "into": "Bramble Burst"
+        "into": "Bramble Burst",
+        "printed": "Fanfare: Transform all Forestcraft cards in your hand that cost 2 or less into copies of Bramble Burst."
       }
     ],
     "keywords": ["Ward"],
@@ -3447,7 +3455,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Summon a Steelclad Knight and Knight.\n2. Give all allied followers on the field +1/+1."
       }
     ],
     "keywords": [],
@@ -4001,7 +4010,8 @@
             "count": 1
           }
         ],
-        "select": 1
+        "select": 1,
+        "printed": "Select a card in your hand with On Spellboost and spellboost it. Draw a card."
       }
     ],
     "keywords": [],
@@ -4036,7 +4046,8 @@
         "target": "enemy:follower",
         "select": 1,
         "amount": 2,
-        "add_amount": "{self.spellboostCount}"
+        "add_amount": "{self.spellboostCount}",
+        "printed": "X starts at 2.\nOn Spellboost: Increase X by 1.\nSelect an enemy follower on the field and deal it X damage."
       }
     ],
     "triggers": []
@@ -4213,7 +4224,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Gain 4 earth sigils.\n2. Restore 4 defense to your leader.\n3. Earth Rite (3) - Deal 4 damage to all enemy followers."
       }
     ],
     "keywords": [],
@@ -4255,7 +4267,8 @@
             "target": "selected:follower"
           }
         ],
-        "select": 1
+        "select": 1,
+        "printed": "On Spellboost: Reduce the cost of this card by 1.\nSelect an enemy follower on the field, set its defense to 1, and, until the end of your opponent's turn, give it \"Can't attack followers or leaders.\""
       }
     ],
     "keywords": [
@@ -4494,7 +4507,8 @@
         "op": "summon",
         "source": "named",
         "name": "Demonic Shikigami",
-        "count": 1
+        "count": 1,
+        "printed": "On Spellboost: Reduce the cost of this card by 1.\nSummon a Demonic Shikigami."
       }
     ],
     "keywords": [
@@ -5053,7 +5067,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Select another allied follower on the field and give it +2/+2. If you're in Overflow, give +3/+3 instead."
       }
     ],
     "keywords": [],
@@ -5831,7 +5846,8 @@
                 "player": "self",
                 "amount": 2
               }
-            ]
+            ],
+            "printed": "At the end of your turn, restore 2 defense to your leader. If this follower is super-evolved, restore 4 instead and give this follower Barrier."
           }
         ],
         "event": "end_of_turn",
@@ -6125,7 +6141,8 @@
             "op": "destroy",
             "scope": "defender",
             "target": "enemy:follower",
-            "select": 1
+            "select": 1,
+            "printed": "Follower Strike: Destroy the opposing follower."
           }
         ]
       }
@@ -8014,7 +8031,8 @@
             "amount": 4,
             "select": 1
           }
-        ]
+        ],
+        "printed": "Fanfare: Select an enemy follower on the field and deal it 4 damage. Combo (3) - Deal damage to all enemy followers instead."
       }
     ],
     "keywords": [],
@@ -8250,7 +8268,8 @@
             "source": "deck",
             "count": 1
           }
-        ]
+        ],
+        "printed": "Fuse: Forestcraft cards\nDraw a card. If you've Fused to this card, draw 2 instead."
       }
     ],
     "keywords": [],
@@ -9034,7 +9053,8 @@
         "op": "damage",
         "target": "enemy:follower",
         "amount": "{self.spellboostCount}",
-        "distribution": "split_sequential"
+        "distribution": "split_sequential",
+        "printed": "X starts at 0.\nOn Spellboost: Increase X by 1.\nDeal X damage split between all enemy followers."
       }
     ],
     "triggers": []
@@ -9517,7 +9537,8 @@
                 ]
               }
             ],
-            "select": 1
+            "select": 1,
+            "printed": "Engage (1): Destroy this card. Select an allied follower on the field and give it +1/+1 and \"Last Words: Summon a Pyrewyrm Blade.\""
           }
         ]
       }
@@ -10033,7 +10054,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Select a Mode to activate.\n1. Summon 4 copies of One-Tailed Fox.\n2. Destroy 4 random enemy followers. Restore 4 defense to your leader."
       }
     ],
     "keywords": [],
@@ -10224,7 +10246,8 @@
             "op": "restore",
             "target": "leader",
             "player": "self",
-            "amount": 4
+            "amount": 4,
+            "printed": "Engage (1): Destroy this card. Restore 4 defense to your leader."
           }
         ]
       }
@@ -10346,7 +10369,8 @@
             "amount_source": "selected_defense",
             "target": "enemy:follower"
           }
-        ]
+        ],
+        "printed": "Select an allied follower on the field with Ward and give it +0/+1. Deal X damage to a random enemy follower. X is the selected follower's defense."
       }
     ],
     "keywords": [],
@@ -11075,7 +11099,8 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Bane"]
+            "keywords": ["Bane"],
+            "printed": "Activates in hand. When an enemy follower super-evolves, give this follower Bane."
           }
         ]
       }
@@ -11109,7 +11134,8 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": ["Storm"],
+            "printed": "Activates in hand. When an enemy follower super-evolves, give this follower Storm."
           }
         ]
       }
@@ -11964,7 +11990,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "printed": "Engage: Destroy this card. Select a Mode to activate.\n1. Add a Gilded Blade and Gilded Necklace to your hand.\n2. Add a Gilded Goblet and Gilded Boots to your hand."
           }
         ]
       }
@@ -12590,7 +12617,8 @@
             "target": "enemy:follower",
             "count": 1
           }
-        ]
+        ],
+        "printed": "Select a follower in your hand and increase its cost by 1. Destroy a random enemy follower."
       }
     ],
     "keywords": [],
@@ -13737,7 +13765,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select 2 Modes to activate.\n1. Recover 1 play point.\n2. Draw a follower.\n3. Draw a 3-cost spell.\n4. Deal 4 damage to a random enemy follower."
       }
     ],
     "keywords": [],
@@ -13845,7 +13874,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Select a Mode to activate.\n1. Add a Scream Diffusion to your hand.\n2. Add a Wings of Desire to your hand."
       }
     ],
     "keywords": [],
@@ -14873,7 +14903,8 @@
             "count": 2,
             "distribution": "random_distinct"
           }
-        ]
+        ],
+        "printed": "Fanfare: Skybound Art- Deal 5 damage to 2 random enemy followers."
       }
     ]
   },
@@ -15165,7 +15196,8 @@
             "op": "restore",
             "target": "allies",
             "player": "self",
-            "amount": 3
+            "amount": 3,
+            "printed": "Strike: Restore 3 defense to all allies."
           }
         ]
       }
@@ -15545,7 +15577,8 @@
             ],
             "select": 1
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate. Super Skybound Art- Activate all of them instead.\n1. Draw a card. Restore 1 defense to your leader.\n2. Give all allied followers on the field +1/+0 and Rush.\n3. Give all allied followers on the field +0/+1 and Ward."
       }
     ]
   },
@@ -15965,7 +15998,8 @@
             "label": "Restore 6 defense to your leader"
           }
         ],
-        "select": 1
+        "select": 1,
+        "printed": "Select a Mode to activate.\n1. Give the leftmost allied Swordcraft follower on the field \"Can attack 2 times per turn\".\n2. Give all allied Swordcraft followers on the field +1/+1 and Barrier.\n3. Recover 2 play points and 1 evolution point.\n4. Restore 6 defense to your leader."
       }
     ],
     "evolve": [],
@@ -16060,7 +16094,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Skybound Art- Evolve all unevolved allied followers on the field.\nSuper Skybound Art- Super-evolve them instead."
       }
     ],
     "evolve": [],
@@ -16309,7 +16344,8 @@
             "label": "Draw 2 cards. Deal 4 damage to 2 random enemy followers and 2 damage to your leader."
           }
         ],
-        "select": 1
+        "select": 1,
+        "printed": "Select a Mode to activate.\n1. Draw a card. Deal 4 damage to a random enemy follower.\n2. Draw 2 cards. Deal 4 damage to 2 random enemy followers and 2 damage to your leader."
       }
     ],
     "evolve": [],
@@ -16710,7 +16746,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Gain Crest: Crescent Tube Ride (Countdown (4). At the end of your turn, give a random allied follower on the field +1/+1.)"
       }
     ],
     "evolve": [],
@@ -17308,7 +17345,8 @@
             "label": "Deal 3 damage to a random enemy follower"
           }
         ],
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select a Mode to activate.\n1. Give this follower and another random allied follower on the field +1/+1.\n2. Deal 3 damage to a random enemy follower."
       }
     ],
     "evolve": [],
@@ -17911,7 +17949,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "printed": "Engage: Destroy this card. Select a Mode to activate.\n1. Destroy a random enemy follower.\n2. Draw 2 cards."
           }
         ]
       }
@@ -17959,7 +17998,8 @@
               "unevolved": true,
               "did_not_attack_this_turn": true
             },
-            "select_mode": "random"
+            "select_mode": "random",
+            "printed": "At the end of your turn, if you've unlocked super-evolution, evolve a random unevolved allied follower on the field that didn't attack this turn."
           }
         ]
       }
@@ -18200,7 +18240,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Select a Mode to activate.\n1. Do this 3 times: \"Deal 4 damage to a random enemy follower.\"\n2. Deal 4 damage to the enemy leader."
       }
     ],
     "evolve": [],
@@ -18320,7 +18361,8 @@
             "target": "enemy:all",
             "amount": 3
           }
-        ]
+        ],
+        "printed": "Deal 3 damage to all enemies.\nSuper Skybound Art- Deal 6 damage instead."
       }
     ],
     "evolve": [],
@@ -18949,7 +18991,8 @@
             "target": "enemy:any",
             "amount": 1
           }
-        ]
+        ],
+        "printed": "Deal 1 damage to all enemies. Combo (3) - Deal 2 damage instead."
       }
     ],
     "fanfare": []
@@ -19026,7 +19069,8 @@
             "source": "deck",
             "count": 1
           }
-        ]
+        ],
+        "printed": "Draw X cards. X is your Combo."
       }
     ],
     "fanfare": []
@@ -19546,7 +19590,8 @@
                 "target": "enemy:follower",
                 "amount": 7
               }
-            ]
+            ],
+            "printed": "At the end of your turn, if this follower is unevolved, deal 7 damage to all enemy followers. If it's evolved, do this 3 times: \"Deal 7 damage to another random ally or enemy.\""
           }
         ],
         "event": "end_of_turn",
@@ -19882,7 +19927,8 @@
             ],
             "select": 2
           }
-        ]
+        ],
+        "printed": "Earth Rite (2) - Activate 2 random abilities from the following.\n1. Summon a Clay Golem.\n2. Restore 2 defense to your leader.\n3. Gain 3 earth sigils."
       }
     ],
     "fanfare": []
@@ -20295,7 +20341,8 @@
       {
         "op": "damage",
         "target": "all:follower",
-        "amount_source": "followers_on_field"
+        "amount_source": "followers_on_field",
+        "printed": "Deal X damage to all followers. X is the number of followers on the field."
       }
     ],
     "fanfare": []
@@ -21250,7 +21297,8 @@
           {
             "op": "draw",
             "source": "deck",
-            "count": "{ward_allies}"
+            "count": "{ward_allies}",
+            "printed": "Engage: Destroy this card. Draw X cards. X is the number of allied followers on the field with Ward."
           }
         ]
       }
@@ -22232,7 +22280,8 @@
         "target": "self",
         "pick": "random",
         "count": 3,
-        "keywords": ["Storm", "Bane", "Intimidate", "Drain", "Aura", "Barrier"]
+        "keywords": ["Storm", "Bane", "Intimidate", "Drain", "Aura", "Barrier"],
+        "printed": "Fanfare: Give this follower 3 random abilities from the following.\n1. Storm.\n2. Bane.\n3. Intimidate.\n4. Drain.\n5. Aura.\n6. Barrier."
       }
     ],
     "spell": []
@@ -22642,7 +22691,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Destroy a random enemy follower with the highest attack.\n2. Summon a Springbloom Fairy."
       }
     ]
   },
@@ -24452,7 +24502,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Recover 1 evolution point.\n2. Deal 2 damage to all enemy followers."
       }
     ],
     "fanfare": []
@@ -24723,7 +24774,8 @@
                 "op": "summon",
                 "source": "named",
                 "name": "Venerating Dyer",
-                "count": 1
+                "count": 1,
+                "printed": "Crystallize (1): Countdown (3)\nLast Words: Summon a Venerating Dyer."
               }
             ]
           }
@@ -25205,7 +25257,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select an enemy follower on the field and deal it 4 damage. If there's an allied follower on the field with a base cost of 5 or more, draw a card."
       }
     ]
   },
@@ -25969,7 +26022,8 @@
         "op": "summon",
         "source": "copy",
         "target": "self",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon an exact copy of this card."
       }
     ]
   },
@@ -26565,7 +26619,8 @@
             ]
           }
         ],
-        "select": 1
+        "select": 1,
+        "printed": "Select an enemy follower on the field and deal it 3 damage. Rally (10) - Give it \"Can't attack followers or leaders\" until the end of your opponent's turn."
       }
     ]
   },
@@ -26688,7 +26743,8 @@
             "count": 1,
             "keywords": ["Rush"]
           }
-        ]
+        ],
+        "printed": "Add a Steelclad Knight to your hand and give it Rush. Rally (10) - Add 2 copies instead."
       }
     ]
   },
@@ -27166,7 +27222,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Gain 4 earth sigils.\n2. Earth Rite (2) - Deal 2 damage to all enemy followers."
       }
     ]
   },
@@ -28855,7 +28912,8 @@
             "name": "Beat Breaker",
             "count": 1
           }
-        ]
+        ],
+        "printed": "Fanfare: Summon a Beat Breaker. If at least 3 differently named allied Artifact followers have entered the field this match, summon 2 instead."
       }
     ]
   },
@@ -28922,7 +28980,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate. If at least 3 differently named allied Artifact followers have entered the field this match, activate all of them instead.\n1. Add an Analyzing Artifact to your hand.\n2. Add an Ancient Artifact to your hand."
       }
     ]
   },
@@ -29159,7 +29218,8 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount_source": "unique_tribe_enters"
+        "amount_source": "unique_tribe_enters",
+        "printed": "Fanfare: Deal X damage to all enemy followers. X is the number of differently named allied Artifact followers that have entered the field this match."
       }
     ]
   },
@@ -29450,7 +29510,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Deal 3 damage to a random enemy follower.\n2. Reanimate (2).\n3. Give all allied followers on the field +1/+0."
       }
     ]
   },
@@ -29510,7 +29571,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Select a Mode to activate.\n1. Banish all other followers from the field.\n2. Banish all amulets from the field.\n3. Banish all crests."
       }
     ],
     "spell": []
@@ -29567,7 +29629,8 @@
         "op": "destroy",
         "target": "enemy:follower",
         "distribution": "random",
-        "count": "{enemy_minus_ally_followers}"
+        "count": "{enemy_minus_ally_followers}",
+        "printed": "Fanfare: Destroy X random enemy followers. X is the number of enemy followers on the field minus the number of allied followers on the field."
       }
     ],
     "spell": []
@@ -30254,7 +30317,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate. If there are at least 2 allied cards on the field, activate all of them instead.\n1. Deal 4 damage to a random enemy follower.\n2. Restore 2 defense to your leader."
       }
     ],
     "fanfare": []
@@ -30461,7 +30525,8 @@
         "target": "enemy:follower",
         "select": 1,
         "amount": 2,
-        "add_amount": "{self.spellboostCount}"
+        "add_amount": "{self.spellboostCount}",
+        "printed": "X starts at 2.\nOn Spellboost: Increase X by 1.\nSelect an enemy follower on the field and deal it X damage."
       }
     ]
   },
@@ -31542,7 +31607,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select 2 Modes to activate.\n1. Deal 1 damage to the enemy leader.\n2. Restore 2 defense to your leader.\n3. Deal 3 damage to a random enemy follower.\n4. Gain 4 shadows."
       }
     ]
   },
@@ -31997,7 +32063,8 @@
             "target": "self",
             "mode": "reduce",
             "amount": 3,
-            "min_cost": 0
+            "min_cost": 0,
+            "printed": "Activates in hand. Whenever an allied follower super-evolves, reduce the cost of this card by 3."
           }
         ]
       }
@@ -32960,7 +33027,8 @@
         "op": "damage",
         "target": "enemy:follower",
         "amount": 9,
-        "select": 1
+        "select": 1,
+        "printed": "Activates in deck. At the end of your turn, if you've played cards with base costs of 1, 2, 3, 4, 5, 6, 7, and 8 this match, Invoke this card.\nFanfare: Select an enemy follower on the field and deal it 9 damage."
       }
     ]
   },
@@ -33206,7 +33274,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate. Combo (3) - Activate all of them instead.\n1. Deal 4 damage to a random enemy follower.\n2. Add a Deepwood Bounty and Fairy to your hand."
       }
     ]
   },
@@ -34622,7 +34691,8 @@
             "amount": 3,
             "distribution": "split_sequential"
           }
-        ]
+        ],
+        "printed": "Deal 3 damage split between all enemy followers. If an allied follower attacked a leader on your last turn, deal 6 damage instead."
       }
     ]
   },
@@ -34656,7 +34726,8 @@
             "target": "self",
             "keywords": ["Storm"]
           }
-        ]
+        ],
+        "printed": "Fanfare: If an allied follower attacked a leader on your last turn, give this follower Storm."
       }
     ]
   },
@@ -35530,7 +35601,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate. If there's an allied card on the field with a base cost of 6 or more, activate all of them instead.\n1. Deal 3 damage to a random enemy follower.\n2. Restore 2 defense to your leader."
       }
     ]
   },
@@ -35885,7 +35957,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Deal 5 damage to all enemy followers.\n2. Summon 2 copies of Mystic Artifact."
       }
     ]
   },
@@ -36099,7 +36172,8 @@
             "target": "enemy:follower",
             "select": 1
           }
-        ]
+        ],
+        "printed": "Select an enemy follower on the field and destroy it. If there are no duplicates in your deck, destroy all enemy followers instead."
       }
     ]
   },

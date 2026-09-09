@@ -1,5 +1,5 @@
 # Vocabulary report
-generated: <snapshot>
+generated: 2026-09-09T18:38:31.361Z
 
 ## op:add_shadows
   amount: total=3 (collectible=3, token=0)
@@ -28,7 +28,7 @@ generated: <snapshot>
   count: total=1 (collectible=0, token=1)
   distribution: total=4 (collectible=3, token=1)
   filter: total=7 (collectible=7, token=0)
-  printed: total=4 (collectible=4, token=0)
+  printed: total=5 (collectible=4, token=1)
   scope: total=5 (collectible=4, token=1)
   select: total=14 (collectible=14, token=0)
   store_count_as: total=1 (collectible=1, token=0)
@@ -44,6 +44,7 @@ generated: <snapshot>
   filter: total=5 (collectible=5, token=0)
   min_cost: total=8 (collectible=8, token=0)
   mode: total=43 (collectible=39, token=4)
+  printed: total=1 (collectible=1, token=0)
   select: total=2 (collectible=2, token=0)
   target: total=43 (collectible=39, token=4)
   until_eot: total=8 (collectible=7, token=1)
@@ -62,7 +63,7 @@ generated: <snapshot>
   action: total=5 (collectible=4, token=1)
   amount: total=5 (collectible=4, token=1)
   key: total=5 (collectible=4, token=1)
-  printed: total=1 (collectible=1, token=0)
+  printed: total=2 (collectible=1, token=1)
 
 ## op:crest
   action: total=79 (collectible=78, token=1)
@@ -79,7 +80,7 @@ generated: <snapshot>
   on_success_effects: total=4 (collectible=4, token=0)
   passives: total=1 (collectible=1, token=0)
   player: total=6 (collectible=6, token=0)
-  printed: total=8 (collectible=8, token=0)
+  printed: total=9 (collectible=9, token=0)
   target: total=1 (collectible=0, token=1)
   triggers: total=54 (collectible=54, token=0)
 
@@ -95,7 +96,7 @@ generated: <snapshot>
   filter: total=1 (collectible=1, token=0)
   include_leader: total=2 (collectible=2, token=0)
   pick: total=1 (collectible=1, token=0)
-  printed: total=21 (collectible=12, token=9)
+  printed: total=28 (collectible=18, token=10)
   rank: total=1 (collectible=1, token=0)
   select: total=72 (collectible=66, token=6)
   spill_to_leader: total=4 (collectible=3, token=1)
@@ -125,7 +126,7 @@ generated: <snapshot>
   exclude: total=2 (collectible=2, token=0)
   filter: total=9 (collectible=8, token=1)
   only_if_damaged: total=1 (collectible=1, token=0)
-  printed: total=13 (collectible=9, token=4)
+  printed: total=15 (collectible=11, token=4)
   scope: total=9 (collectible=6, token=3)
   select: total=52 (collectible=50, token=2)
   stat: total=4 (collectible=4, token=0)
@@ -145,14 +146,14 @@ generated: <snapshot>
   distinct_by: total=1 (collectible=1, token=0)
   filter: total=5 (collectible=5, token=0)
   player: total=2 (collectible=2, token=0)
-  printed: total=9 (collectible=7, token=2)
+  printed: total=10 (collectible=8, token=2)
   source: total=141 (collectible=137, token=4)
 
 ## op:earth_rite
   amount: total=1 (collectible=1, token=0)
   cost: total=20 (collectible=20, token=0)
   effects: total=21 (collectible=21, token=0)
-  printed: total=1 (collectible=1, token=0)
+  printed: total=2 (collectible=2, token=0)
 
 ## op:ep
   action: total=7 (collectible=7, token=0)
@@ -163,12 +164,13 @@ generated: <snapshot>
   condition: total=3 (collectible=2, token=1)
   filter: total=6 (collectible=6, token=0)
   mode: total=9 (collectible=9, token=0)
-  printed: total=5 (collectible=3, token=2)
+  printed: total=6 (collectible=4, token=2)
   select: total=7 (collectible=6, token=1)
   select_mode: total=2 (collectible=2, token=0)
   target: total=70 (collectible=68, token=2)
 
 ## op:fuse
+  printed: total=2 (collectible=0, token=2)
   type: total=2 (collectible=0, token=2)
 
 ## op:gate
@@ -184,7 +186,7 @@ generated: <snapshot>
   has_keyword: total=1 (collectible=1, token=0)
   is_ally: total=3 (collectible=2, token=1)
   name: total=5 (collectible=3, token=2)
-  printed: total=37 (collectible=35, token=2)
+  printed: total=55 (collectible=53, token=2)
   requirement: total=16 (collectible=16, token=0)
   tribe: total=5 (collectible=5, token=0)
   type: total=8 (collectible=7, token=1)
@@ -197,7 +199,7 @@ generated: <snapshot>
   keywords: total=65 (collectible=61, token=4)
   name_filter: total=2 (collectible=2, token=0)
   pick: total=1 (collectible=1, token=0)
-  printed: total=6 (collectible=5, token=1)
+  printed: total=8 (collectible=7, token=1)
   select: total=15 (collectible=14, token=1)
   target: total=71 (collectible=67, token=4)
   triggers: total=3 (collectible=3, token=0)
@@ -207,6 +209,7 @@ generated: <snapshot>
   activate_all_if_ally_board_gte: total=1 (collectible=1, token=0)
   options: total=57 (collectible=55, token=2)
   pick: total=6 (collectible=6, token=0)
+  printed: total=24 (collectible=22, token=2)
   select: total=14 (collectible=14, token=0)
   unique: total=2 (collectible=2, token=0)
 
@@ -222,6 +225,7 @@ generated: <snapshot>
 ## op:random_split
   effects: total=1 (collectible=0, token=1)
   parts: total=1 (collectible=0, token=1)
+  printed: total=1 (collectible=0, token=1)
   total: total=1 (collectible=0, token=1)
 
 ## op:repeat_effect
@@ -229,7 +233,7 @@ generated: <snapshot>
   count_source: total=4 (collectible=4, token=0)
   effects: total=10 (collectible=9, token=1)
   filter: total=1 (collectible=1, token=0)
-  printed: total=2 (collectible=1, token=1)
+  printed: total=3 (collectible=2, token=1)
 
 ## op:replicate
   zone: total=52 (collectible=52, token=0)
@@ -238,7 +242,7 @@ generated: <snapshot>
   amount: total=105 (collectible=94, token=11)
   amount_source: total=4 (collectible=4, token=0)
   player: total=105 (collectible=94, token=11)
-  printed: total=7 (collectible=3, token=4)
+  printed: total=10 (collectible=5, token=5)
   store_restored_as: total=1 (collectible=1, token=0)
   target: total=109 (collectible=98, token=11)
 
@@ -254,14 +258,14 @@ generated: <snapshot>
   count: total=23 (collectible=23, token=0)
   filter: total=23 (collectible=23, token=0)
   keywords: total=1 (collectible=1, token=0)
-  printed: total=5 (collectible=5, token=0)
+  printed: total=6 (collectible=6, token=0)
 
 ## op:select
   condition: total=2 (collectible=2, token=0)
   effects: total=28 (collectible=24, token=4)
   filter: total=11 (collectible=10, token=1)
   mode: total=2 (collectible=2, token=0)
-  printed: total=7 (collectible=4, token=3)
+  printed: total=16 (collectible=12, token=4)
   select: total=27 (collectible=23, token=4)
   target: total=28 (collectible=24, token=4)
 
@@ -293,7 +297,7 @@ generated: <snapshot>
   mode: total=1 (collectible=1, token=0)
   name: total=1 (collectible=1, token=0)
   name_filter: total=4 (collectible=3, token=1)
-  printed: total=18 (collectible=16, token=2)
+  printed: total=22 (collectible=19, token=3)
   select: total=39 (collectible=38, token=1)
   select_mode: total=10 (collectible=9, token=1)
   stat: total=1 (collectible=1, token=0)
@@ -312,7 +316,7 @@ generated: <snapshot>
   mode: total=8 (collectible=8, token=0)
   name: total=276 (collectible=270, token=6)
   owner: total=3 (collectible=3, token=0)
-  printed: total=32 (collectible=30, token=2)
+  printed: total=35 (collectible=33, token=2)
   select: total=7 (collectible=7, token=0)
   sort: total=1 (collectible=1, token=0)
   source: total=319 (collectible=313, token=6)
@@ -327,7 +331,7 @@ generated: <snapshot>
   into: total=11 (collectible=11, token=0)
   into_source: total=2 (collectible=2, token=0)
   mode: total=1 (collectible=1, token=0)
-  printed: total=4 (collectible=4, token=0)
+  printed: total=5 (collectible=5, token=0)
   select: total=6 (collectible=6, token=0)
   target: total=13 (collectible=13, token=0)
 
@@ -335,7 +339,7 @@ generated: <snapshot>
   (none)
 
 ## per-effect printed coverage (metric)
-  clause roots: 1631; populated: 211; cards: 211
+  clause roots: 1631; populated: 296; cards: 296
 
 ## conditional keys
   stat.name: when attack_source or defense_source is named_enter_count (same predicate as op-keys-gate statNameAllowed) — Names the card whose allied copies are counted — required for named_enter_count buffs (10844110 Drache & Aluzard, Burning Blood)

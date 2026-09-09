@@ -121,7 +121,8 @@
         "target": "self",
         "pick": "random",
         "count": 3,
-        "keywords": ["Storm", "Bane", "Intimidate", "Drain", "Aura", "Barrier"]
+        "keywords": ["Storm", "Bane", "Intimidate", "Drain", "Aura", "Barrier"],
+        "printed": "Fanfare: Give this follower 3 random abilities from the following.\n1. Storm.\n2. Bane.\n3. Intimidate.\n4. Drain.\n5. Aura.\n6. Barrier."
       }
     ],
     "spell": []
@@ -531,7 +532,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Destroy a random enemy follower with the highest attack.\n2. Summon a Springbloom Fairy."
       }
     ]
   },
@@ -2341,7 +2343,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Recover 1 evolution point.\n2. Deal 2 damage to all enemy followers."
       }
     ],
     "fanfare": []
@@ -2612,7 +2615,8 @@
                 "op": "summon",
                 "source": "named",
                 "name": "Venerating Dyer",
-                "count": 1
+                "count": 1,
+                "printed": "Crystallize (1): Countdown (3)\nLast Words: Summon a Venerating Dyer."
               }
             ]
           }
@@ -3094,7 +3098,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select an enemy follower on the field and deal it 4 damage. If there's an allied follower on the field with a base cost of 5 or more, draw a card."
       }
     ]
   },

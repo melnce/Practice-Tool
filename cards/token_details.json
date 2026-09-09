@@ -834,7 +834,8 @@
             "op": "counter",
             "action": "add",
             "key": "earth",
-            "amount": 1
+            "amount": 1,
+            "printed": "Earth Sigil\nEngage (1): Gain an earth sigil."
           }
         ]
       }
@@ -975,7 +976,8 @@
             "action": "give",
             "target": "self",
             "attack_source": "shikigami_deaths",
-            "defense_source": "shikigami_deaths"
+            "defense_source": "shikigami_deaths",
+            "printed": "When this follower enters the field, give it +X/+Y. X/Y is the total base attack/defense of allied Shikigami followers destroyed this turn."
           }
         ]
       }
@@ -1146,7 +1148,8 @@
             "target": "enemy:leader",
             "amount": "{Z}"
           }
-        ]
+        ],
+        "printed": "Summon a Crystalspawn and give it +X/+X. Restore Y defense to your leader. Deal Z damage to the enemy leader. X, Y, and Z are determined randomly and add up to your faith's value."
       }
     ],
     "specific_effects": [
@@ -1329,7 +1332,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Destroy all damaged enemy followers.\n2. Increase the cost of all cards in your opponent's hand by 1 until the end of their turn."
       }
     ],
     "evolve": [],
@@ -1479,7 +1483,8 @@
         "effects": [
           {
             "op": "banish",
-            "scope": "self"
+            "scope": "self",
+            "printed": "When this card leaves the field, banish it.\nAt the end of your turn, banish this card."
           }
         ]
       }
@@ -1892,7 +1897,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a card on the field and destroy it. If you selected an allied amulet, deal 2 damage to the enemy leader and add a Depths of the Eld Tome to your hand."
       }
     ]
   },
@@ -2066,7 +2072,8 @@
     "fuse": [
       {
         "op": "fuse",
-        "type": "fortifier"
+        "type": "fortifier",
+        "printed": "Fuse: Artifact cards\nWhen you Fuse to this card, transform it based on the total cost of the cards fused.\n1: Ominous Artifact α\n2: Ominous Artifact β\n3 or more: Ominous Artifact γ"
       }
     ],
     "evolve": [],
@@ -2093,7 +2100,8 @@
     "fuse": [
       {
         "op": "fuse",
-        "type": "fortifier"
+        "type": "fortifier",
+        "printed": "Fuse: Artifact cards\nWhen you Fuse to this card, transform it based on the total cost of the cards fused.\n1: Ominous Artifact α\n2: Ominous Artifact β\n3 or more: Ominous Artifact γ"
       }
     ],
     "evolve": [],
@@ -2164,7 +2172,8 @@
             "op": "restore",
             "target": "leader",
             "player": "self",
-            "amount": 3
+            "amount": 3,
+            "printed": "Fuse: Ominous Artifact β and Ominous Artifact γ\nWhen you've Fused both to this card, transform it into a Masterwork Artifact Ω.\nAt the end of your turn, restore 3 defense to your leader."
           }
         ]
       }
@@ -2369,7 +2378,8 @@
           {
             "op": "damage",
             "target": "defender",
-            "amount": "{self.attack}"
+            "amount": "{self.attack}",
+            "printed": "Follower Strike: Deal X damage to the opposing follower. X is this follower's attack."
           }
         ]
       }
@@ -2587,7 +2597,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select a Mode to activate.\n1. Draw a card.\n2. Deal 2 damage to a random enemy follower."
       }
     ]
   },
