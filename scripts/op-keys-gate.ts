@@ -69,6 +69,19 @@ export const POOL_CONDITION_KEYS = new Set([
 /** Pool-only keys — belong in condition, not filter. */
 export const POOL_ONLY_CONDITION_KEYS = new Set(["not_self", "include_self"]);
 
+/** Ops where top-level exclude_self / include_self mean pool self-inclusion (not gate). */
+export const POOL_SELF_INCLUSION_OPS = new Set([
+  "stat",
+  "keyword",
+  "transform",
+]);
+
+/** Gate exclude_self is a count condition, not pool narrowing — never migrate. */
+export const GATE_EXCLUDE_SELF_CARVEOUT_CARD_IDS = new Set([
+  "10501110", // Monster Litterateur — field_matches gate
+  "10931110", // Obsessed Test Subject — named_enter_count gate
+]);
+
 /**
  * Ops where CARD_CONDITION_KEYS must live in filter (not condition).
  * Banish splits condition→getPool vs filter→applyFilters; select merges both
@@ -86,9 +99,6 @@ export const OPS_CARD_NARROWING_IN_FILTER = new Set([
 function statCardNarrowingInConditionAllowed(
   eff: Record<string, unknown>,
 ): boolean {
-  // filter:"leftmost" is a positional selector — condition holds the narrowing
-  // (10423310 Knightly Ardor mode 1).
-  if (typeof eff.filter === "string") return true;
   // attack_source/defense_source: filter is the counted set, not pool narrowing
   // (10114130 Amataz: X = Pixie followers in hand).
   if (eff.attack_source != null || eff.defense_source != null) return true;
@@ -217,8 +227,6 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "has_keyword",
     "filter",
     "condition",
-    "exclude_self",
-    "include_self",
     "distribution",
     "stat",
     "pick",
@@ -227,7 +235,6 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "select",
     "select_count",
     "count",
-    "until_end_of_turn",
     "until_eot",
     "attacks_per_turn",
   ]),
@@ -256,8 +263,6 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "distribution",
     "condition",
     "filter",
-    "exclude_self",
-    "until_end_of_turn",
     "name_filter",
     "triggers",
   ]),
@@ -334,7 +339,6 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "condition",
     "select",
     "distribution",
-    "exclude_self",
     "target_card_name",
   ]),
   damage: new Set([
@@ -730,6 +734,93 @@ function statNameAllowed(eff: Record<string, unknown>): boolean {
   );
 }
 
+function checkSelfInclusionSpelling(
+  card: CardJson,
+  opPath: string,
+  eff: Record<string, unknown>,
+): Issue[] {
+  const issues: Issue[] = [];
+  const op = String(eff.op);
+
+  if (POOL_SELF_INCLUSION_OPS.has(op) && eff.exclude_self === true) {
+    issues.push({
+      id: card.id,
+      name: card.name,
+      kind: "error",
+      message: `${op} op at ${opPath} uses top-level "exclude_self" — use condition.not_self:true (pool narrowing) — ${descSnippet(card.description)}`,
+    });
+  }
+
+  if (POOL_SELF_INCLUSION_OPS.has(op) && eff.include_self === true) {
+    issues.push({
+      id: card.id,
+      name: card.name,
+      kind: "error",
+      message: `${op} op at ${opPath} uses top-level "include_self" — use condition.include_self:true (pool narrowing) — ${descSnippet(card.description)}`,
+    });
+  }
+
+  if (op === "gate" && eff.exclude_self === true) {
+    if (!GATE_EXCLUDE_SELF_CARVEOUT_CARD_IDS.has(card.id)) {
+      issues.push({
+        id: card.id,
+        name: card.name,
+        kind: "error",
+        message: `${op} op at ${opPath} uses top-level "exclude_self" outside documented gate carve-out (10501110 Monster Litterateur, 10931110 Obsessed Test Subject) — ${descSnippet(card.description)}`,
+      });
+    }
+    return issues;
+  }
+
+  const cond = eff.condition;
+  if (cond && typeof cond === "object" && !Array.isArray(cond)) {
+    const c = cond as Record<string, unknown>;
+    if (c.not_self === false) {
+      issues.push({
+        id: card.id,
+        name: card.name,
+        kind: "error",
+        message: `${op} op at ${opPath}.condition uses not_self:false — use condition.include_self:true — ${descSnippet(card.description)}`,
+      });
+    }
+  }
+
+  return issues;
+}
+
+function checkStatDurationSpelling(
+  card: CardJson,
+  opPath: string,
+  eff: Record<string, unknown>,
+): Issue[] {
+  if (String(eff.op) !== "stat") return [];
+  if (eff.until_end_of_turn !== true) return [];
+  return [
+    {
+      id: card.id,
+      name: card.name,
+      kind: "error",
+      message: `stat op at ${opPath} uses until_end_of_turn:true — use duration:"turn_end" — ${descSnippet(card.description)}`,
+    },
+  ];
+}
+
+function checkSelectBooleanSpelling(
+  card: CardJson,
+  opPath: string,
+  eff: Record<string, unknown>,
+): Issue[] {
+  if (eff.select !== true) return [];
+  return [
+    {
+      id: card.id,
+      name: card.name,
+      kind: "error",
+      message: `${String(eff.op)} op at ${opPath} uses select:true — use select:1 — ${descSnippet(card.description)}`,
+    },
+  ];
+}
+
 export function collectOpsInTree(
   node: unknown,
   pathStr: string,
@@ -920,6 +1011,10 @@ function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
         message: `stat op at ${opPath} carries top-level "${bad}" on hand route — use filter.${bad} — ${descSnippet(card.description)}`,
       });
     }
+
+    issues.push(...checkSelfInclusionSpelling(card, opPath, eff));
+    issues.push(...checkStatDurationSpelling(card, opPath, eff));
+    issues.push(...checkSelectBooleanSpelling(card, opPath, eff));
 
     for (const field of ["condition", "filter", "filters"] as const) {
       const val = eff[field];

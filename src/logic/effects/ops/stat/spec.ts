@@ -30,6 +30,17 @@ function filterTribe(eff: StatOp): string | undefined {
   return typeof tribe === "string" ? tribe : undefined;
 }
 
+function excludeSelfFromCount(
+  eff: StatOp,
+  sourceCard: CardInstance | null,
+): boolean {
+  const cond = eff.condition;
+  if (cond && typeof cond === "object" && !Array.isArray(cond)) {
+    if ((cond as Record<string, unknown>).not_self === true) return true;
+  }
+  return false;
+}
+
 function resolveAttackSourceDelta(
   eff: StatOp,
   owner: Player,
@@ -50,10 +61,9 @@ function resolveAttackSourceDelta(
     ).length;
   } else if (src === "count_allies") {
     const board = getBoard(state, owner);
+    const skipSelf = excludeSelfFromCount(eff, sourceCard);
     delta += board.filter(
-      (c) =>
-        c.type === "Follower" &&
-        (!eff.exclude_self || c.uid !== sourceCard?.uid),
+      (c) => c.type === "Follower" && (!skipSelf || c.uid !== sourceCard?.uid),
     ).length;
   } else if (src === "shikigami_deaths") {
     const pool = isFirstPlayer(owner)
@@ -92,10 +102,9 @@ function resolveDefenseSourceDelta(
     ).length;
   } else if (src === "count_allies") {
     const board = getBoard(state, owner);
+    const skipSelf = excludeSelfFromCount(eff, sourceCard);
     delta += board.filter(
-      (c) =>
-        c.type === "Follower" &&
-        (!eff.exclude_self || c.uid !== sourceCard?.uid),
+      (c) => c.type === "Follower" && (!skipSelf || c.uid !== sourceCard?.uid),
     ).length;
   } else if (src === "shikigami_deaths") {
     const pool = isFirstPlayer(owner)

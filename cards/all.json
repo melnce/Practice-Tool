@@ -3237,7 +3237,7 @@
             "target": "self",
             "attack": 1,
             "defense": 0,
-            "until_end_of_turn": true
+            "duration": "turn_end"
           }
         ]
       }
@@ -3698,8 +3698,10 @@
         "filter": {
           "class": "Swordcraft"
         },
-        "exclude_self": true,
-        "keywords": ["Barrier"]
+        "keywords": ["Barrier"],
+        "condition": {
+          "not_self": true
+        }
       }
     ],
     "fanfare": [
@@ -6245,7 +6247,7 @@
             "target": "self",
             "attack": 1,
             "defense": 0,
-            "until_end_of_turn": true
+            "duration": "turn_end"
           }
         ]
       }
@@ -7398,7 +7400,7 @@
         "filter": {
           "type": "Artifact"
         },
-        "select": true,
+        "select": 1,
         "max_cost": 5
       }
     ],
@@ -8422,7 +8424,9 @@
                 "target": "ally:follower",
                 "attack": 1,
                 "defense": 1,
-                "include_self": true
+                "condition": {
+                  "include_self": true
+                }
               }
             ]
           }
@@ -9895,7 +9899,9 @@
         "action": "give",
         "target": "self",
         "attack_source": "count_allies",
-        "exclude_self": true
+        "condition": {
+          "not_self": true
+        }
       },
       {
         "op": "damage",
@@ -10884,7 +10890,7 @@
         "filter": {
           "type": "Artifact"
         },
-        "select": true,
+        "select": 1,
         "max_cost": 5
       }
     ],
@@ -11162,9 +11168,11 @@
         "action": "give",
         "target": "all:follower",
         "select": 1,
-        "include_self": true,
         "attack": 2,
-        "defense": -2
+        "defense": -2,
+        "condition": {
+          "include_self": true
+        }
       }
     ],
     "superevolve": [],
@@ -12866,7 +12874,7 @@
         "op": "damage",
         "target": "all:follower",
         "condition": {
-          "not_self": false
+          "include_self": true
         },
         "amount": 3
       }
@@ -12971,7 +12979,7 @@
         "op": "damage",
         "target": "all:follower",
         "condition": {
-          "not_self": false
+          "include_self": true
         },
         "amount": 2
       },
@@ -12979,7 +12987,7 @@
         "op": "damage",
         "target": "all:follower",
         "condition": {
-          "not_self": false
+          "include_self": true
         },
         "amount": 2
       },
@@ -12987,7 +12995,7 @@
         "op": "damage",
         "target": "all:follower",
         "condition": {
-          "not_self": false
+          "include_self": true
         },
         "amount": 2
       }
@@ -12997,7 +13005,7 @@
         "op": "damage",
         "target": "all:follower",
         "condition": {
-          "not_self": false
+          "include_self": true
         },
         "amount": 2
       },
@@ -13005,7 +13013,7 @@
         "op": "damage",
         "target": "all:follower",
         "condition": {
-          "not_self": false
+          "include_self": true
         },
         "amount": 2
       },
@@ -13013,7 +13021,7 @@
         "op": "damage",
         "target": "all:follower",
         "condition": {
-          "not_self": false
+          "include_self": true
         },
         "amount": 2
       }
@@ -14386,7 +14394,9 @@
         "target": "self",
         "attack_source": "count_allies",
         "defense_source": "count_allies",
-        "exclude_self": true
+        "condition": {
+          "not_self": true
+        }
       },
       {
         "op": "destroy",
@@ -15212,7 +15222,9 @@
         "action": "give",
         "target": "ally:follower",
         "keywords": ["Barrier"],
-        "include_self": true
+        "condition": {
+          "include_self": true
+        }
       }
     ],
     "evolve": [],
@@ -15800,11 +15812,11 @@
                 "op": "stat",
                 "action": "give",
                 "target": "ally:follower",
-                "filter": "leftmost",
-                "condition": {
+                "filter": {
                   "class": "Swordcraft"
                 },
-                "attacks_per_turn": 2
+                "attacks_per_turn": 2,
+                "distribution": "leftmost"
               }
             ],
             "label": "Give the leftmost allied Swordcraft follower \"Can attack 2 times per turn\""
@@ -18262,7 +18274,7 @@
                     "target": "attacker",
                     "attack": -3,
                     "defense": 0,
-                    "until_end_of_turn": true
+                    "duration": "turn_end"
                   }
                 ]
               }
@@ -18487,7 +18499,6 @@
           {
             "op": "countdown",
             "action": "advance",
-            "target": "self",
             "amount": 1
           }
         ]
@@ -20363,7 +20374,7 @@
                 "target": "attacker",
                 "attack": 1,
                 "defense": 0,
-                "until_end_of_turn": true
+                "duration": "turn_end"
               }
             ]
           },
@@ -20692,8 +20703,10 @@
         "op": "transform",
         "target": "all:follower",
         "distribution": "all",
-        "exclude_self": true,
-        "into": "Skeleton"
+        "into": "Skeleton",
+        "condition": {
+          "not_self": true
+        }
       }
     ],
     "spell": []
@@ -21791,7 +21804,9 @@
                     "target": "ally:follower",
                     "attack": 2,
                     "defense": 2,
-                    "include_self": true
+                    "condition": {
+                      "include_self": true
+                    }
                   }
                 ]
               },
@@ -21858,7 +21873,9 @@
                                 "target": "ally:follower",
                                 "attack": -2,
                                 "defense": -2,
-                                "include_self": true
+                                "condition": {
+                                  "include_self": true
+                                }
                               }
                             ]
                           },
@@ -23136,8 +23153,10 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:follower",
-        "exclude_self": true,
-        "keywords": ["Rush"]
+        "keywords": ["Rush"],
+        "condition": {
+          "not_self": true
+        }
       }
     ],
     "keywords": [],
@@ -24495,7 +24514,6 @@
           {
             "op": "countdown",
             "action": "advance",
-            "target": "self",
             "amount": 1
           }
         ]
@@ -28080,9 +28098,11 @@
         "filter": {
           "class": "Abysscraft"
         },
-        "exclude_self": true,
         "attack": 2,
-        "defense": 2
+        "defense": 2,
+        "condition": {
+          "not_self": true
+        }
       }
     ],
     "keywords": [],
@@ -29607,7 +29627,9 @@
         "action": "give",
         "target": "ally:follower",
         "keywords": ["Barrier"],
-        "include_self": true
+        "condition": {
+          "include_self": true
+        }
       }
     ]
   },
@@ -29713,7 +29735,9 @@
             "target": "ally:follower",
             "attack": 1,
             "defense": 1,
-            "include_self": true
+            "condition": {
+              "include_self": true
+            }
           }
         ]
       }
@@ -32198,9 +32222,11 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:follower",
-        "exclude_self": true,
         "select": 1,
-        "keywords": ["Ambush"]
+        "keywords": ["Ambush"],
+        "condition": {
+          "not_self": true
+        }
       }
     ],
     "keywords": ["Ward"],
@@ -34248,7 +34274,7 @@
                 "target": "self",
                 "attack": 1,
                 "defense": 0,
-                "until_end_of_turn": true
+                "duration": "turn_end"
               }
             ]
           }
@@ -35164,7 +35190,6 @@
           {
             "op": "countdown",
             "action": "advance",
-            "target": "self",
             "amount": 3
           }
         ]
@@ -35263,7 +35288,6 @@
               {
                 "op": "countdown",
                 "action": "advance",
-                "target": "self",
                 "amount": 1
               }
             ]

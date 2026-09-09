@@ -204,12 +204,6 @@ function handleGrant(
     );
   }
 
-  if (eff.exclude_self && ctx.sourceCard) {
-    targets = targets.filter(
-      (t: CardInstance) => t.uid !== ctx.sourceCard?.uid,
-    );
-  }
-
   if (!targets.length) return { kind: "done" };
 
   const __selRaw = eff.select ?? eff.select_count;

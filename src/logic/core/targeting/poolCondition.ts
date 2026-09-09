@@ -19,7 +19,7 @@ import { readEnv } from "../../../core/env.js";
  * | summon/add_to_hand/deck with source:"destroyed_match" | filters a **history log**, not a live zone | destroyedHistory.ts:19-25 |
  * | summon from hand/graveyard | a **dispatch discriminant** — filter.type picks handler | summon/handlers.ts:120,206 |
  * | countdown | aliased into **board_name**, a name lookup | countdown/unified.ts:87,172 |
- * | stat with filter:"leftmost" | a **positional selector** applied after the pool | stat/utils.ts:87; card 10423310 |
+ * | stat with distribution:"leftmost" | a **positional selector** applied after the pool | stat/utils.ts:79; card 10423310 |
  */
 export function readPoolNarrowFilter(
   eff: Record<string, unknown>,

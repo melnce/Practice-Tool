@@ -34,12 +34,10 @@ function matchingPrintedLines(description: string): string[] {
 }
 
 function hasSelfInclusion(eff: Record<string, unknown>): boolean {
-  if (eff.include_self === true) return true;
   const cond = eff.condition;
   if (cond && typeof cond === "object" && !Array.isArray(cond)) {
     const c = cond as Record<string, unknown>;
     if (c.include_self === true) return true;
-    if (c.not_self === false) return true;
   }
   return false;
 }

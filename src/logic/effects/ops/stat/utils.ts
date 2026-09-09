@@ -75,8 +75,9 @@ export function filterBuffCandidates(
     );
   }
 
-  // Leftmost filtering (string form only; object filters go through getPool condition)
-  if (eff.filter === "leftmost" && candidates.length > 0) {
+  // Positional selector (distribution:"leftmost" — 10423310 Knightly Ardor mode 1)
+  const distribution = String((eff as any).distribution || "").toLowerCase();
+  if (distribution === "leftmost" && candidates.length > 0) {
     const first = candidates[0];
     candidates = first ? [first] : [];
   }
