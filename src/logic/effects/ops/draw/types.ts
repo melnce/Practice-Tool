@@ -2,6 +2,9 @@
 // Types for the DRAW operation - deck only, thins deck.
 // For token generation, use "add" op
 // For card duplication, use "copy" op
+//
+// `source` on op:"draw" is accepted for symmetry with the normalised spec
+// (always "deck"); the normaliser does not read it from card JSON.
 
 import type { Effect } from "../../../../core/types/index.js";
 import { readPoolNarrowFilter } from "../../../core/targeting/poolCondition.js";

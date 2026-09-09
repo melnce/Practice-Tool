@@ -4,6 +4,7 @@ import { getCardDetails } from "../../../data/cardDatabase.js";
 import { applyKeywordsFromList } from "../../core/keywords.js";
 import { normalizeCardStats } from "../../../core/cardStats.js";
 import { normalizeInstanceEnteringHandAsCopy } from "./add_to_hand/normalizeHandCopy.js";
+import { wantsRandomTargetPick } from "../../core/targeting/randomPick.js";
 
 import { logEvent } from "../../../core/logger.js";
 import type {
@@ -111,7 +112,6 @@ export function handleTransform(
     zone = "board";
   }
 
-  const mode = (eff.mode || "all") as TransformMode;
   const into = String(eff.into || eff.name || "").trim();
   const intoSourceRaw = (eff as any).into_source;
   const intoSource =
@@ -199,7 +199,7 @@ export function handleTransform(
 
   switch (zone) {
     case "hand":
-      if (mode === "random") {
+      if (wantsRandomTargetPick(eff as Record<string, unknown>)) {
         transformRandomInHand(eff, owner, into);
       } else {
         return transformInHandByFilter(eff, owner, ctx);

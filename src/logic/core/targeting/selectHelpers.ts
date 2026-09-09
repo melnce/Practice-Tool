@@ -4,6 +4,7 @@
  */
 import type { CardInstance, Effect } from "../../../core/types/index.js";
 import type { RNG } from "../../../core/rng.js";
+import { wantsRandomTargetPick } from "./randomPick.js";
 
 // -----------------------------------------------------------------------------
 // Configuration Parsing
@@ -95,8 +96,14 @@ export function pickRandomTargets(
 /**
  * Determine if selection should be automatic (bot or random mode).
  */
-export function shouldAutoSelect(mode?: string): boolean {
-  if (mode === "random") return true;
+export function shouldAutoSelect(
+  modeOrEff?: string | Record<string, unknown>,
+): boolean {
+  if (modeOrEff && typeof modeOrEff === "object") {
+    if (wantsRandomTargetPick(modeOrEff)) return true;
+    modeOrEff = String(modeOrEff.mode ?? "");
+  }
+  if (modeOrEff === "random") return true;
   if (typeof window !== "undefined" && (window as any).__BOT_AUTO_TARGETING__) {
     return true;
   }

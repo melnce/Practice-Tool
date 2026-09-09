@@ -1085,7 +1085,6 @@
         "action": "give",
         "target": "ally:follower",
         "select": 1,
-        "amount": 1,
         "attack": 1,
         "defense": 1
       }
@@ -1702,8 +1701,7 @@
         "target": "enemy:follower",
         "amount": 5,
         "select": 1,
-        "can_target_leader": true,
-        "fallback_leader": true
+        "can_target_leader": true
       },
       {
         "op": "restore",
@@ -4055,8 +4053,7 @@
         "target": "enemy:follower",
         "amount": 3,
         "select": 1,
-        "can_target_leader": true,
-        "fallback_leader": true
+        "can_target_leader": true
       },
       {
         "op": "damage",
@@ -4560,7 +4557,6 @@
             "action": "give",
             "target": "ally:follower",
             "select": 1,
-            "amount": 1,
             "attack": 1,
             "defense": 1
           },

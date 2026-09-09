@@ -830,18 +830,6 @@ export const DANGLING_PENDING_AUDIT: readonly DanglingPendingAuditEntry[] = [
     assertionsWouldStillPass: null,
     finding: null,
   },
-  {
-    id: 72,
-    file: "tests/audit/sofina_random_select_mode.test.ts",
-    testName:
-      "Sofina mode-2 random ward evolve (10564110) > pre-fix select_mode leaves pending user selection (fails on main card JSON)",
-    classification: "A",
-    reason:
-      "Regression guard: legacy select_mode must leave pending user selection (pre-fix JSON shape).",
-    unresolvedClause: null,
-    assertionsWouldStillPass: null,
-    finding: null,
-  },
 ];
 
 export const DANGLING_PENDING_SUMMARY = {
