@@ -55,23 +55,77 @@ function hasEarthOnBoard(state: GameState, owner: Player, n = 1) {
   );
 }
 
-function hasOverflowInTree(effs: unknown): boolean {
+type GateEffect = Effect & {
+  op: "gate";
+  condition?: string;
+  cost?: number;
+  requirement?: number | string;
+  count?: number | string;
+};
+
+/** Scan an effect tree for the first gate matching `matches`. */
+function findGateInEffects(
+  effs: unknown,
+  matches: (gate: GateEffect) => boolean,
+): GateEffect | null {
+  if (!Array.isArray(effs)) return null;
+  for (const e of effs) {
+    if (!e || typeof e !== "object") continue;
+    if (e.op === "gate" && matches(e as GateEffect)) return e as GateEffect;
+    if (Array.isArray(e.effects)) {
+      const found = findGateInEffects(e.effects, matches);
+      if (found) return found;
+    }
+    if (e.op === "mode" && Array.isArray(e.options)) {
+      for (const opt of e.options) {
+        const found = findGateInEffects(opt.effects || [], matches);
+        if (found) return found;
+      }
+    }
+  }
+  return null;
+}
+
+/** Find a gate on a card, scanning fanfare + spell with nesting. */
+function findGateOnCard(
+  card: CardInstance,
+  matches: (gate: GateEffect) => boolean,
+): GateEffect | null {
+  const fanfare = Array.isArray(card.fanfare) ? card.fanfare : [];
+  const spell = Array.isArray((card as any).spell) ? (card as any).spell : [];
+  return (
+    findGateInEffects(fanfare, matches) || findGateInEffects(spell, matches)
+  );
+}
+
+function hasOverflowMarkersInTree(effs: unknown): boolean {
   if (!Array.isArray(effs)) return false;
   for (const e of effs) {
     if (!e || typeof e !== "object") continue;
-    if (
-      (e.op === "gate" && (e as any).condition === "overflow") ||
-      e.amount_overflow !== undefined ||
-      e.overflow_amount !== undefined
-    )
+    if (e.amount_overflow !== undefined || e.overflow_amount !== undefined)
       return true;
-    if (Array.isArray(e.effects) && hasOverflowInTree(e.effects)) return true;
+    if (Array.isArray(e.effects) && hasOverflowMarkersInTree(e.effects))
+      return true;
     if (e.op === "mode" && Array.isArray(e.options)) {
-      if (e.options.some((opt: any) => hasOverflowInTree(opt.effects || [])))
+      if (
+        e.options.some((opt: any) =>
+          hasOverflowMarkersInTree(opt.effects || []),
+        )
+      )
         return true;
     }
   }
   return false;
+}
+
+function cardHasOverflowEffects(card: CardInstance): boolean {
+  return (
+    findGateOnCard(card, (g) => g.condition === "overflow") !== null ||
+    hasOverflowMarkersInTree(card.fanfare) ||
+    hasOverflowMarkersInTree(
+      Array.isArray((card as any).spell) ? (card as any).spell : [],
+    )
+  );
 }
 
 function hasSuperEvoAllyOnBoard(state: GameState, owner: Player) {
@@ -122,76 +176,41 @@ export function computeHandGlow(card: CardInstance, ctx: any): HandGlowResult {
   );
   const earthReady = erCost > 0 && hasEarthOnBoard(state, owner, erCost);
 
-  const hasOverflowEffects =
-    hasOverflowInTree(Array.isArray(card.fanfare) ? card.fanfare : []) ||
-    hasOverflowInTree(
-      Array.isArray((card as any).spell) ? (card as any).spell : [],
-    );
+  const hasOverflowEffects = cardHasOverflowEffects(card);
   const overflowReady = hasOverflowEffects && isOverflow(owner);
 
-  const hasNecroGate =
-    Array.isArray(card.fanfare) &&
-    card.fanfare.some(
-      (eff) => eff.op === "gate" && (eff as any).condition === "necromancy",
-    );
+  const necroGate = findGateOnCard(card, (g) => g.condition === "necromancy");
   const necromancyReady =
-    hasNecroGate &&
-    hasNecromancy(
-      owner,
-      (
-        card.fanfare?.find(
-          (eff: Effect) =>
-            eff.op === "gate" && (eff as any).condition === "necromancy",
-        ) as any
-      )?.cost || 0,
-    );
+    necroGate !== null && hasNecromancy(owner, necroGate.cost || 0);
 
-  const hasSkybound =
-    (Array.isArray(card.fanfare) &&
-      card.fanfare.some(
-        (eff) => eff.op === "gate" && (eff as any).condition === "skybound_art",
-      )) ||
-    (Array.isArray((card as any).spell) &&
-      (card as any).spell.some(
-        (eff: any) => eff.op === "gate" && eff.condition === "skybound_art",
-      ));
+  const skyboundGate = findGateOnCard(
+    card,
+    (g) => g.condition === "skybound_art",
+  );
   let skyboundReady = false;
-  if (hasSkybound) {
-    const gateEff =
-      card.fanfare?.find(
-        (eff) => eff.op === "gate" && (eff as any).condition === "skybound_art",
-      ) ||
-      (card as any).spell?.find(
-        (eff: any) => eff.op === "gate" && eff.condition === "skybound_art",
-      );
-    const req = parseInt(gateEff?.requirement || gateEff?.count || 10, 10);
+  if (skyboundGate) {
+    const req = parseInt(
+      String(skyboundGate.requirement || skyboundGate.count || 10),
+      10,
+    );
     const gauge =
       (state.roundCount || 1) + (card.skyboundArtEvolvesWitnessed || 0);
     skyboundReady = gauge >= req;
   }
 
   const hasSuperEvoGate =
-    (Array.isArray(card.fanfare) &&
-      card.fanfare.some(
-        (e) =>
-          e.op === "gate" &&
-          /super[_-]?evolved?[_-]?alli/i.test((e as any).condition || ""),
-      )) ||
+    findGateOnCard(card, (g) =>
+      /super[_-]?evolved?[_-]?alli/i.test(g.condition || ""),
+    ) !== null ||
     /super[- ]?evolved allied follower/i.test(card?.description || "");
 
   const hasSuperUnlockGate =
-    Array.isArray(card.fanfare) &&
-    card.fanfare.some(
-      (e) => e.op === "gate" && (e as any).condition === "super_evo_unlocked",
-    );
+    findGateOnCard(card, (g) => g.condition === "super_evo_unlocked") !== null;
 
   const superUnlockReady = hasSuperUnlockGate && handleSuperEvoGate(owner);
 
   const hasBothMaxPPGate =
-    Array.isArray(card.fanfare) &&
-    card.fanfare.some(
-      (e) => e.op === "gate" && (e as any).condition === "both_max_pp",
-    );
+    findGateOnCard(card, (g) => g.condition === "both_max_pp") !== null;
   const bothMaxPPReady =
     hasBothMaxPPGate &&
     state.players.first.maxPP >= 10 &&
