@@ -33,6 +33,22 @@ const KEYWORD_LINE_RE =
 const KEYWORD_ONLY_LINE_RE =
   /^(ward|storm|rush|bane|drain|ambush|intimidation|aura|barrier)\b/i;
 
+/**
+ * Permanent property lines on card descriptions — not effects, not bare keywords.
+ * Enumerated (not pattern-matched); pin in tests/mechanics/per-effect-printed.test.ts.
+ */
+export const STATIC_ABILITY_LINES = [
+  "Can attack 2 times per turn.",
+  "Can attack 3 times per turn.",
+  "Can't attack followers or leaders.",
+  "Can't be destroyed by abilities.",
+  "Can't be played.",
+  "Can't take more than 3 damage at a time.",
+  "Ignores Ward.",
+] as const;
+
+const STATIC_ABILITY_LINE_SET = new Set<string>(STATIC_ABILITY_LINES);
+
 /** Reused from check-printed-literals.ts: separator normalisation only (card data has no annotations). */
 export function normalizePrintedForCompare(text: string): string {
   const withSeparators = normalizeSeparators(text);
@@ -42,6 +58,7 @@ export function normalizePrintedForCompare(text: string): string {
 export function isBareKeywordLine(line: string): boolean {
   const t = line.trim();
   if (!t) return false;
+  if (STATIC_ABILITY_LINE_SET.has(t)) return true;
   if (KEYWORD_ONLY_LINE_RE.test(t)) return true;
   const kwMatch = t.match(KEYWORD_LINE_RE);
   if (!kwMatch) return false;
@@ -116,6 +133,65 @@ export function freeSlicePrintedLiteral(card: CardJson): string | null {
   if (lines.length === 1) return lines[0]!;
   const sentences = splitNonKeywordSentences(card.description ?? "");
   return sentences[0] ?? null;
+}
+
+/** Effect lines: description lines that are neither bare keywords nor static abilities. */
+export function effectDescriptionLines(description: string): string[] {
+  return splitDescriptionLines(description).filter(
+    (line) => !isBareKeywordLine(line),
+  );
+}
+
+/** True when every effect line forms one contiguous block (no non-effect line between). */
+export function hasContiguousEffectSpan(description: string): boolean {
+  const lines = splitDescriptionLines(description);
+  const effectIndices = lines
+    .map((line, i) => (isBareKeywordLine(line) ? -1 : i))
+    .filter((i) => i >= 0);
+  if (effectIndices.length === 0) return false;
+  const min = effectIndices[0]!;
+  const max = effectIndices[effectIndices.length - 1]!;
+  for (let i = min; i <= max; i++) {
+    if (isBareKeywordLine(lines[i]!)) return false;
+  }
+  return true;
+}
+
+/** Contiguous verbatim span of effect lines (newline-joined), or null if non-contiguous. */
+export function contiguousEffectSpanLiteral(
+  description: string,
+): string | null {
+  const lines = splitDescriptionLines(description);
+  const effectIndices = lines
+    .map((line, i) => (isBareKeywordLine(line) ? -1 : i))
+    .filter((i) => i >= 0);
+  if (effectIndices.length === 0) return null;
+  const min = effectIndices[0]!;
+  const max = effectIndices[effectIndices.length - 1]!;
+  for (let i = min; i <= max; i++) {
+    if (isBareKeywordLine(lines[i]!)) return null;
+  }
+  return lines.slice(min, max + 1).join("\n");
+}
+
+/** One clause root with no populated `printed` yet. */
+export function isSingleRootUnprintedCard(card: CardJson): boolean {
+  const roots = collectClauseRoots(card);
+  if (roots.length !== 1) return false;
+  const printed = roots[0]!.eff.printed;
+  return !(typeof printed === "string" && printed.length > 0);
+}
+
+/**
+ * Phase 2a — mechanical `printed` for exactly-one-root cards: the contiguous
+ * span of effect lines (description minus leading/trailing non-effect lines).
+ */
+export function singleRootPrintedLiteral(card: CardJson): string | null {
+  if (!isSingleRootUnprintedCard(card)) return null;
+  const description = card.description ?? "";
+  if (isFreeSliceCard(card)) return freeSlicePrintedLiteral(card);
+  if (!hasContiguousEffectSpan(description)) return null;
+  return contiguousEffectSpanLiteral(description);
 }
 
 export function findSubstringSpan(

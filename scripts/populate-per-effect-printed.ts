@@ -1,7 +1,9 @@
 #!/usr/bin/env tsx
 /**
- * Phase 1 — populate `printed` on the free slice (one clause root, one sentence).
- * Mechanical generation; validator is the proof. Rejections are findings, not fixes.
+ * Populate per-op `printed` literals mechanically:
+ * - Phase 1: free slice (one clause root, one sentence).
+ * - Phase 2a: single-root cards — contiguous span of effect lines.
+ * Validator is the proof. Rejections are findings, not fixes.
  */
 
 import fs from "fs";
@@ -11,9 +13,10 @@ import { TOKEN_JSON } from "./lib/loadAllCardData.js";
 import { writeFormattedJson } from "./lib/formatJson.js";
 import {
   collectClauseRoots,
-  freeSlicePrintedLiteral,
   checkPerEffectPrintedForCard,
   isFreeSliceCard,
+  isSingleRootUnprintedCard,
+  singleRootPrintedLiteral,
 } from "./lib/perEffectPrinted.js";
 import type { CardJson } from "./lib/loadCards.js";
 
@@ -93,17 +96,20 @@ function loadEditableCards(): Map<
 
 async function main() {
   const editable = loadEditableCards();
-  let candidateCount = 0;
+  let freeSliceCandidates = 0;
+  let singleRootCandidates = 0;
   let populatedCount = 0;
   const rejected: string[] = [];
   const touchedFiles = new Set<string>();
 
   for (const { card } of editable.values()) {
-    if (!isFreeSliceCard(card)) continue;
-    candidateCount++;
+    if (!isSingleRootUnprintedCard(card)) continue;
 
-    const literal = freeSlicePrintedLiteral(card);
+    const literal = singleRootPrintedLiteral(card);
     const roots = collectClauseRoots(card);
+    if (isFreeSliceCard(card)) freeSliceCandidates++;
+    else singleRootCandidates++;
+
     if (!literal || roots.length !== 1) {
       rejected.push(
         `${card.id} ${card.name}: could not derive literal (roots=${roots.length})`,
@@ -151,7 +157,8 @@ async function main() {
     await writeFormattedJson(filePath, cards);
   }
 
-  console.log(`Free-slice candidates: ${candidateCount}`);
+  console.log(`Free-slice candidates: ${freeSliceCandidates}`);
+  console.log(`Single-root (phase 2a) candidates: ${singleRootCandidates}`);
   console.log(`Populated: ${populatedCount}`);
   console.log(`Validator rejected: ${rejected.length}`);
   if (rejected.length) {
