@@ -1,0 +1,219 @@
+#!/usr/bin/env tsx
+/**
+ * scripts/check-rulings-absorbed.ts
+ *
+ * Verifies every `## ` heading in docs/owner-rulings.md carries exactly one
+ * `<!-- rulebook: … -->` marker and that `absorbed` markers point at real
+ * rulebook sections that mention the ruling date.
+ */
+
+import * as fs from "fs";
+import * as path from "path";
+
+const ROOT = process.cwd();
+const RULINGS_PATH = path.join(ROOT, "docs/owner-rulings.md");
+const RULEBOOK_PATH = path.join(ROOT, "docs/svwb_rulebook_formatted.md");
+
+/** Pinned pending population — must match deliberate `pending` markers. */
+/** Pinned after BX2; 6 during BX1 (four BX2 write-throughs + two permanent pending). */
+const EXPECTED_PENDING_COUNT = 6;
+
+const MARKER_RE =
+  /^<!--\s*rulebook:\s*(absorbed\s+#([a-z0-9-]+)|engine-internal\s+—\s+(.+)|pending\s+—\s+(.+))\s*-->$/i;
+
+const DATE_RE = /\d{4}-\d{2}-\d{2}/;
+
+interface Heading {
+  line: number;
+  title: string;
+  date: string;
+}
+
+interface RulebookSection {
+  anchor: string;
+  level: number;
+  title: string;
+  content: string;
+}
+
+function githubSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/<[^>]*>/g, "")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
+
+function parseRulebookSections(markdown: string): Map<string, RulebookSection> {
+  const lines = markdown.split("\n");
+  const headings: { level: number; title: string; line: number }[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(/^(#{1,6})\s+(.+)$/);
+    if (m) {
+      headings.push({ level: m[1].length, title: m[2].trim(), line: i });
+    }
+  }
+
+  const sections = new Map<string, RulebookSection>();
+  const slugCounts = new Map<string, number>();
+
+  for (let i = 0; i < headings.length; i++) {
+    const { level, title, line } = headings[i];
+    let baseSlug = githubSlug(title);
+    const count = slugCounts.get(baseSlug) ?? 0;
+    slugCounts.set(baseSlug, count + 1);
+    const anchor = count === 0 ? baseSlug : `${baseSlug}-${count}`;
+
+    const endLine =
+      i + 1 < headings.length
+        ? headings
+            .slice(i + 1)
+            .find((h) => h.level <= level)?.line ?? lines.length
+        : lines.length;
+
+    const content = lines.slice(line + 1, endLine).join("\n");
+    sections.set(anchor, { anchor, level, title, content });
+  }
+
+  return sections;
+}
+
+function parseRulingHeadings(markdown: string): Heading[] {
+  const lines = markdown.split("\n");
+  const headings: Heading[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(/^## (.+)$/);
+    if (!m) continue;
+
+    const title = m[1].trim();
+    if (title.startsWith("Still open")) continue;
+
+    const dateMatch = title.match(DATE_RE);
+    if (!dateMatch) {
+      throw new Error(
+        `Could not extract date from ruling heading at line ${i + 1}: ${title}`,
+      );
+    }
+
+    headings.push({ line: i + 1, title, date: dateMatch[0] });
+  }
+
+  return headings;
+}
+
+function sectionContainsDate(section: RulebookSection, date: string): boolean {
+  return section.content.includes(date);
+}
+
+function main(): void {
+  const rulings = fs.readFileSync(RULINGS_PATH, "utf-8");
+  const rulebook = fs.readFileSync(RULEBOOK_PATH, "utf-8");
+  const lines = rulings.split("\n");
+  const rulingHeadings = parseRulingHeadings(rulings);
+  const rulebookSections = parseRulebookSections(rulebook);
+
+  let absorbed = 0;
+  let engineInternal = 0;
+  let pending = 0;
+  const pendingRows: string[] = [];
+  let failed = false;
+
+  for (const heading of rulingHeadings) {
+    const markerLine = lines[heading.line];
+    if (!markerLine?.trim().startsWith("<!-- rulebook:")) {
+      console.error(
+        `✗ Missing marker immediately below heading (line ${heading.line}): ${heading.title}`,
+      );
+      failed = true;
+      continue;
+    }
+
+    const markerMatches = lines
+      .slice(heading.line, heading.line + 3)
+      .filter((l) => l.trim().startsWith("<!-- rulebook:"));
+    if (markerMatches.length > 1) {
+      console.error(
+        `✗ Multiple markers below heading (line ${heading.line}): ${heading.title}`,
+      );
+      failed = true;
+      continue;
+    }
+
+    const parsed = MARKER_RE.exec(markerLine.trim());
+    if (!parsed) {
+      console.error(
+        `✗ Invalid marker syntax (line ${heading.line + 1}): ${markerLine.trim()}`,
+      );
+      failed = true;
+      continue;
+    }
+
+    if (parsed[1].toLowerCase().startsWith("absorbed")) {
+      const anchor = parsed[2];
+      const section = rulebookSections.get(anchor);
+      if (!section) {
+        console.error(
+          `✗ Absorbed anchor #${anchor} does not exist in rulebook — heading: ${heading.title}`,
+        );
+        failed = true;
+        continue;
+      }
+      if (!sectionContainsDate(section, heading.date)) {
+        console.error(
+          `✗ Absorbed anchor #${anchor} section does not mention ruling date ${heading.date} — heading: ${heading.title}`,
+        );
+        failed = true;
+        continue;
+      }
+      absorbed++;
+    } else if (parsed[1].toLowerCase().startsWith("engine-internal")) {
+      const reason = parsed[3]?.trim();
+      if (!reason) {
+        console.error(
+          `✗ engine-internal marker missing reason — heading: ${heading.title}`,
+        );
+        failed = true;
+        continue;
+      }
+      engineInternal++;
+    } else if (parsed[1].toLowerCase().startsWith("pending")) {
+      const reason = parsed[4]?.trim();
+      if (!reason) {
+        console.error(
+          `✗ pending marker missing reason — heading: ${heading.title}`,
+        );
+        failed = true;
+        continue;
+      }
+      pending++;
+      pendingRows.push(`  - ${heading.title} — ${reason}`);
+    } else {
+      console.error(`✗ Unknown marker state — heading: ${heading.title}`);
+      failed = true;
+    }
+  }
+
+  if (pending !== EXPECTED_PENDING_COUNT) {
+    console.error(
+      `✗ Pending count ${pending} does not match expected ${EXPECTED_PENDING_COUNT}`,
+    );
+    failed = true;
+  }
+
+  if (pendingRows.length > 0) {
+    console.log("Pending rulings:");
+    for (const row of pendingRows) console.log(row);
+  }
+
+  const total = rulingHeadings.length;
+  console.log(
+    `rulings ${total}: absorbed ${absorbed} / engine-internal ${engineInternal} / pending ${pending}`,
+  );
+
+  if (failed) process.exit(1);
+}
+
+main();
