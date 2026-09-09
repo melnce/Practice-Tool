@@ -1,4 +1,4 @@
-> **In-repo mirror:** The canonical owner-rulings document lives in the owner's Claude project knowledge base. This file is the copy agents in this repo read. Keep both in sync — edit the Claude knowledge base and this mirror together.
+> **This file is canonical.** Owner rulings are recorded here, in the repo, where they are versioned, reviewable in a PR, readable by every agent, and gated by `npm run check:rulings-absorbed`. A ruling that exists only in a chat transcript, a session document, or a code comment is not recorded. Earlier project-side copies of this document are frozen archives and must not be treated as authoritative.
 
 # Owner rulings — Shadowverse Worlds Beyond Practice Tool
 
