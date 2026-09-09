@@ -14495,6 +14495,9 @@
       {
         "op": "destroy",
         "target": "ally:card",
+        "condition": {
+          "not_self": true
+        },
         "select": 1,
         "then": [
           {
@@ -14504,10 +14507,7 @@
             "distribution": "random_hits",
             "count": 1
           }
-        ],
-        "condition": {
-          "not_self": true
-        }
+        ]
       }
     ],
     "keywords": [],
@@ -14566,6 +14566,9 @@
       {
         "op": "destroy",
         "target": "ally:card",
+        "condition": {
+          "not_self": true
+        },
         "select": 1,
         "then": [
           {
@@ -14573,10 +14576,7 @@
             "source": "deck",
             "count": 2
           }
-        ],
-        "condition": {
-          "not_self": true
-        }
+        ]
       }
     ],
     "keywords": [
@@ -24241,16 +24241,16 @@
       {
         "op": "destroy",
         "target": "ally:follower",
+        "condition": {
+          "not_self": true
+        },
         "select": 1,
         "then": [
           {
             "op": "evolve",
             "target": "self"
           }
-        ],
-        "condition": {
-          "not_self": true
-        }
+        ]
       }
     ],
     "evolve_trigger_always": true
@@ -27968,6 +27968,9 @@
       {
         "op": "destroy",
         "target": "ally:follower",
+        "condition": {
+          "not_self": true
+        },
         "select": 1,
         "then": [
           {
@@ -27976,10 +27979,7 @@
             "count": 1,
             "target": "enemy:follower"
           }
-        ],
-        "condition": {
-          "not_self": true
-        }
+        ]
       }
     ],
     "keywords": [],

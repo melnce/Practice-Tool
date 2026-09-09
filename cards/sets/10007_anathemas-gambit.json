@@ -2545,6 +2545,9 @@
       {
         "op": "destroy",
         "target": "ally:follower",
+        "condition": {
+          "not_self": true
+        },
         "select": 1,
         "then": [
           {
@@ -2553,10 +2556,7 @@
             "count": 1,
             "target": "enemy:follower"
           }
-        ],
-        "condition": {
-          "not_self": true
-        }
+        ]
       }
     ],
     "keywords": [],

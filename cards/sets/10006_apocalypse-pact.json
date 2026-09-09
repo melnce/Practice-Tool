@@ -2268,16 +2268,16 @@
       {
         "op": "destroy",
         "target": "ally:follower",
+        "condition": {
+          "not_self": true
+        },
         "select": 1,
         "then": [
           {
             "op": "evolve",
             "target": "self"
           }
-        ],
-        "condition": {
-          "not_self": true
-        }
+        ]
       }
     ],
     "evolve_trigger_always": true
