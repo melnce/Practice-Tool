@@ -552,7 +552,9 @@
         "action": "give",
         "target": "ally:follower",
         "keywords": ["Barrier"],
-        "include_self": true
+        "condition": {
+          "include_self": true
+        }
       }
     ]
   },
@@ -658,7 +660,9 @@
             "target": "ally:follower",
             "attack": 1,
             "defense": 1,
-            "include_self": true
+            "condition": {
+              "include_self": true
+            }
           }
         ]
       }
@@ -3143,9 +3147,11 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:follower",
-        "exclude_self": true,
         "select": 1,
-        "keywords": ["Ambush"]
+        "keywords": ["Ambush"],
+        "condition": {
+          "not_self": true
+        }
       }
     ],
     "keywords": ["Ward"],

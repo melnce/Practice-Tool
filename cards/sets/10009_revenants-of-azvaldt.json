@@ -1738,7 +1738,7 @@
                 "target": "self",
                 "attack": 1,
                 "defense": 0,
-                "until_end_of_turn": true
+                "duration": "turn_end"
               }
             ]
           }
@@ -2654,7 +2654,6 @@
           {
             "op": "countdown",
             "action": "advance",
-            "target": "self",
             "amount": 3
           }
         ]
@@ -2753,7 +2752,6 @@
               {
                 "op": "countdown",
                 "action": "advance",
-                "target": "self",
                 "amount": 1
               }
             ]

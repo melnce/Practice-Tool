@@ -2657,9 +2657,11 @@
         "filter": {
           "class": "Abysscraft"
         },
-        "exclude_self": true,
         "attack": 2,
-        "defense": 2
+        "defense": 2,
+        "condition": {
+          "not_self": true
+        }
       }
     ],
     "keywords": [],

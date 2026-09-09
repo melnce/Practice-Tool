@@ -789,7 +789,9 @@
                 "target": "ally:follower",
                 "attack": 1,
                 "defense": 1,
-                "include_self": true
+                "condition": {
+                  "include_self": true
+                }
               }
             ]
           }
@@ -2262,7 +2264,9 @@
         "action": "give",
         "target": "self",
         "attack_source": "count_allies",
-        "exclude_self": true
+        "condition": {
+          "not_self": true
+        }
       },
       {
         "op": "damage",
@@ -3251,7 +3255,7 @@
         "filter": {
           "type": "Artifact"
         },
-        "select": true,
+        "select": 1,
         "max_cost": 5
       }
     ],
