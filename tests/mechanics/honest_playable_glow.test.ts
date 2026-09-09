@@ -282,6 +282,273 @@ describe("Glow preflight cache", () => {
   });
 });
 
+const HARK_TO_NIGHT_SONG = {
+  id: "10753310",
+  name: "Hark to the Night Song",
+  type: "Spell" as const,
+  cost: 3,
+  spell: [
+    {
+      op: "damage",
+      target: "enemy:follower",
+      amount: 6,
+      distribution: "split_sequential",
+    },
+    {
+      op: "gate",
+      condition: "necromancy",
+      cost: 6,
+      effects: [{ op: "damage", target: "enemy:leader", amount: 2 }],
+    },
+  ],
+};
+
+const ADVENT_ELD_SIGHT = {
+  id: "10651310",
+  name: "Advent of the Eld Sight",
+  type: "Spell" as const,
+  cost: 3,
+  spell: [
+    { op: "draw", source: "deck", count: 2 },
+    {
+      op: "gate",
+      condition: "necromancy",
+      cost: 4,
+      effects: [{ op: "restore", target: "leader", player: "self", amount: 2 }],
+    },
+  ],
+};
+
+const BLINK_STEP = {
+  id: "10772310",
+  name: "Blink Step",
+  type: "Spell" as const,
+  cost: 2,
+  spell: [
+    {
+      op: "stat",
+      action: "give",
+      target: "ally:follower",
+      attack: 1,
+      defense: 0,
+    },
+    {
+      op: "gate",
+      condition: "super_evo_unlocked",
+      effects: [
+        { op: "stat", action: "give", target: "hand", attack: 1, defense: 0 },
+      ],
+    },
+  ],
+};
+
+const STRIKE_DRAGONEWT = {
+  id: "10041310",
+  name: "Strike of the Dragonewt",
+  type: "Spell" as const,
+  cost: 1,
+  spell: [
+    {
+      op: "gate",
+      condition: "overflow",
+      effects: [
+        {
+          op: "damage",
+          target: "enemy:follower",
+          select: 1,
+          amount: 4,
+        },
+      ],
+      else_effects: [
+        {
+          op: "damage",
+          target: "enemy:follower",
+          select: 1,
+          amount: 2,
+        },
+      ],
+    },
+  ],
+};
+
+const CHAOS_LEGION = {
+  id: "10473310",
+  name: "Chaos Legion",
+  type: "Spell" as const,
+  cost: 6,
+  spell: [
+    {
+      op: "gate",
+      condition: "skybound_art",
+      count: 15,
+      effects: [{ op: "damage", target: "enemy:all", amount: 6 }],
+      else_effects: [{ op: "damage", target: "enemy:all", amount: 3 }],
+    },
+  ],
+};
+
+const DEVIOUS_LESSER_MUMMY = {
+  id: "10051130",
+  name: "Devious Lesser Mummy",
+  type: "Follower" as const,
+  cost: 2,
+  fanfare: [
+    {
+      op: "gate",
+      condition: "necromancy",
+      cost: 4,
+      effects: [{ op: "keyword", keyword: "Storm" }],
+    },
+  ],
+};
+
+function setupGateGlowTest(opts: {
+  cardSpec: Parameters<typeof createCard>[0];
+  roundCount?: number;
+  shadows?: number;
+  maxPP?: number;
+  pp?: number;
+  enemyFollower?: boolean;
+}) {
+  resetUidCounter();
+  resetGlowPreflightCache();
+  givenGameState({
+    seed: 42,
+    activePlayer: "first",
+    roundCount: opts.roundCount ?? 6,
+  })
+    .withFirstPP(opts.pp ?? 10, opts.maxPP ?? 10)
+    .withFirstShadows(opts.shadows ?? 0)
+    .build();
+  state.gameStarted = true;
+  state.phase = "main";
+  state.activePlayer = "first";
+  if (opts.enemyFollower) {
+    state.players.second.board = [createCard(FILLER_SPEC, "board", "second")];
+  }
+  return createCard(opts.cardSpec, "hand", "first");
+}
+
+describe("Hand glow — spell[] gate conditions", () => {
+  beforeEach(() => {
+    resetGlowPreflightCache();
+  });
+
+  it("10753310: enhance-ready when shadows ≥ 6, playable-glow below", () => {
+    const ready = setupGateGlowTest({
+      cardSpec: HARK_TO_NIGHT_SONG,
+      shadows: 11,
+    });
+    expect(computeHandGlow(ready, glowCtx(ready)).glowClass).toBe(
+      "enhance-ready",
+    );
+
+    const notReady = setupGateGlowTest({
+      cardSpec: HARK_TO_NIGHT_SONG,
+      shadows: 5,
+    });
+    expect(computeHandGlow(notReady, glowCtx(notReady)).glowClass).toBe(
+      "playable-glow",
+    );
+  });
+
+  it("10651310: enhance-ready when shadows ≥ 4, playable-glow below", () => {
+    const ready = setupGateGlowTest({
+      cardSpec: ADVENT_ELD_SIGHT,
+      shadows: 6,
+    });
+    expect(computeHandGlow(ready, glowCtx(ready)).glowClass).toBe(
+      "enhance-ready",
+    );
+
+    const notReady = setupGateGlowTest({
+      cardSpec: ADVENT_ELD_SIGHT,
+      shadows: 3,
+    });
+    expect(computeHandGlow(notReady, glowCtx(notReady)).glowClass).toBe(
+      "playable-glow",
+    );
+  });
+
+  it("10772310 super_evo_unlocked: enhance-ready at round 7+, playable-glow before", () => {
+    const ready = setupGateGlowTest({
+      cardSpec: BLINK_STEP,
+      roundCount: 7,
+    });
+    expect(computeHandGlow(ready, glowCtx(ready)).glowClass).toBe(
+      "enhance-ready",
+    );
+
+    const notReady = setupGateGlowTest({
+      cardSpec: BLINK_STEP,
+      roundCount: 5,
+    });
+    expect(computeHandGlow(notReady, glowCtx(notReady)).glowClass).toBe(
+      "playable-glow",
+    );
+  });
+
+  it("10041310 overflow spell: enhance-ready in overflow, playable-glow below", () => {
+    const ready = setupGateGlowTest({
+      cardSpec: STRIKE_DRAGONEWT,
+      maxPP: 7,
+      pp: 7,
+      enemyFollower: true,
+    });
+    expect(computeHandGlow(ready, glowCtx(ready)).glowClass).toBe(
+      "enhance-ready",
+    );
+
+    const notReady = setupGateGlowTest({
+      cardSpec: STRIKE_DRAGONEWT,
+      maxPP: 6,
+      pp: 6,
+      enemyFollower: true,
+    });
+    expect(computeHandGlow(notReady, glowCtx(notReady)).glowClass).toBe(
+      "playable-glow",
+    );
+  });
+
+  it("10473310 skybound_art spell: enhance-ready at gauge ≥ 15, playable-glow below", () => {
+    const ready = setupGateGlowTest({
+      cardSpec: CHAOS_LEGION,
+      roundCount: 15,
+      pp: 10,
+    });
+    expect(computeHandGlow(ready, glowCtx(ready)).glowClass).toBe(
+      "enhance-ready",
+    );
+
+    const notReady = setupGateGlowTest({
+      cardSpec: CHAOS_LEGION,
+      roundCount: 10,
+      pp: 10,
+    });
+    expect(computeHandGlow(notReady, glowCtx(notReady)).glowClass).toBe(
+      "playable-glow",
+    );
+  });
+
+  it("10051130 fanfare necromancy: still enhance-ready when shadows met (sabotage control)", () => {
+    const ready = setupGateGlowTest({
+      cardSpec: DEVIOUS_LESSER_MUMMY,
+      shadows: 6,
+    });
+    expect(computeHandGlow(ready, glowCtx(ready)).glowClass).toBe(
+      "enhance-ready",
+    );
+
+    const notReady = setupGateGlowTest({
+      cardSpec: DEVIOUS_LESSER_MUMMY,
+      shadows: 2,
+    });
+    expect(computeHandGlow(notReady, glowCtx(notReady)).glowClass).toBe(
+      "playable-glow",
+    );
+  });
+});
+
 describe("Sham-Nacha faith threshold glow", () => {
   beforeEach(() => {
     resetUidCounter();
