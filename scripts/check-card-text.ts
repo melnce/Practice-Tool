@@ -116,6 +116,8 @@ const ADD_TO_HAND_ALLOWED = new Set([
   "distribution",
   "select",
   "condition",
+  // Per-op card-data field; not test-side `const printed` (see perEffectPrinted.ts).
+  "printed",
 ]);
 
 function isCantPlaySpellExempt(card: CardJson): boolean {

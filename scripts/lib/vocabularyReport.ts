@@ -16,6 +16,7 @@ import {
   CONDITIONAL_DOCUMENTED_TOP_LEVEL_KEYS,
   type ConditionalDocumentedKey,
 } from "./vocabularyRegistry.js";
+import { measurePrintedCoverage } from "./perEffectPrinted.js";
 
 export type KeyCount = {
   key: string;
@@ -34,6 +35,11 @@ export type VocabularyReport = {
   generatedAt: string;
   ops: OpKeyReport[];
   undocumentedSummary: Array<{ op: string; key: string; total: number }>;
+  printedCoverage: {
+    clauseRoots: number;
+    populated: number;
+    cardsWithPrinted: number;
+  };
 };
 
 function collectTopLevelKeys(
@@ -57,12 +63,13 @@ export function buildVocabularyReport(
   entries: Iterable<CardDataEntry> = loadUniqueCardsById().values(),
   conditionalKeys: ConditionalDocumentedKey[] | "default" = "default",
 ): VocabularyReport {
+  const entryList = [...entries];
   const byOp = new Map<
     string,
     Map<string, { collectible: number; token: number }>
   >();
 
-  for (const entry of entries) {
+  for (const entry of entryList) {
     const { card } = entry;
     const isToken = isTokenEntry(entry);
     const found: { path: string; eff: Record<string, unknown> }[] = [];
@@ -124,10 +131,14 @@ export function buildVocabularyReport(
     (a, b) => b.total - a.total || a.op.localeCompare(b.op),
   );
 
+  const uniqueCards = entryList.map((e) => e.card);
+  const printedCoverage = measurePrintedCoverage(uniqueCards);
+
   return {
     generatedAt: new Date().toISOString(),
     ops,
     undocumentedSummary,
+    printedCoverage,
   };
 }
 
@@ -160,6 +171,12 @@ export function formatVocabularyReport(report: VocabularyReport): string {
     lines.push("## undocumented summary");
     lines.push("  (none)");
   }
+
+  lines.push("");
+  lines.push("## per-effect printed coverage (metric)");
+  lines.push(
+    `  clause roots: ${report.printedCoverage.clauseRoots}; populated: ${report.printedCoverage.populated}; cards: ${report.printedCoverage.cardsWithPrinted}`,
+  );
 
   lines.push("");
   lines.push("## conditional keys");
