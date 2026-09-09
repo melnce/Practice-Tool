@@ -98,7 +98,7 @@ console.log("After Apply 2 keywordState:", JSON.stringify(card2.keywordState));
 
 // Blue ends turn
 console.log("Blue ending turn...");
-endTurnBlue(); // Calls clearExpiredCantAttackAtEOT("blue")
+endTurnBlue(); // Calls clearExpiredTemporaryKeywordsAtEOT("first")
 // ks.cantAttackOwner = "blue". endedPlayer="blue".
 // If my fix works (owner !== endedPlayer), blue !== blue is FALSE. Should NOT clear.
 console.log(
@@ -116,8 +116,8 @@ if (card2.keywordState.cantAttack === true) {
 console.log("Red ending turn...");
 // Assume Red Turn Logic...
 // In script we just call the helper manually to verify logic
-import { clearExpiredCantAttackAtEOT } from "../src/logic/core/keywords/eot";
-clearExpiredCantAttackAtEOT("red"); // As if Red ended turn
+import { clearExpiredTemporaryKeywordsAtEOT } from "../src/logic/core/keywords/eot";
+clearExpiredTemporaryKeywordsAtEOT("second"); // As if second player ended turn
 
 console.log(
   "After Red End Turn keywordState:",

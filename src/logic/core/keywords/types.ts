@@ -81,6 +81,12 @@ export interface KeywordState {
   cantAttackUntilOpponentEOT?: boolean;
   cantAttackOwner?: Player | null;
 
+  // Temporary Ambush expiry metadata (hasAmbush stays on card root)
+  ambushExpiresOnTurn?: number;
+  ambushIsTemporary?: boolean;
+  ambushUntilOpponentEOT?: boolean;
+  ambushOwner?: Player | null;
+
   // Barrier
   hasBarrier?: boolean;
 }

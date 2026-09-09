@@ -3,6 +3,8 @@ import type { CardInstance, Player } from "../../../../core/types/index.js";
 import type { StatOp } from "./types.js";
 import { resolveDynamicValue } from "../../../core/values.js";
 import { readEnv } from "../../../../core/env.js";
+import { normalizeKeywordName } from "../../../core/keywords/registry.js";
+import { KEYWORDS_SUPPORTING_STAT_DURATION } from "../../../core/keywords/apply.js";
 
 /** Canonical resolved duration for stat ops. */
 export type StatDuration = "permanent" | "turn_end" | "opponent_turn_end";
@@ -26,6 +28,7 @@ export function resolveStatDuration(eff: StatOp): StatDuration {
 
 const warnedStatSetDuration = new Set<string>();
 const warnedOpponentTurnEndNumeric = new Set<string>();
+const warnedStatKeywordDuration = new Set<string>();
 
 /**
  * Rejects opponent_turn_end on stat ops that carry a non-zero numeric delta.
@@ -71,6 +74,38 @@ export function rejectStatSetWithDuration(
   if (!warnedStatSetDuration.has(warnKey)) {
     console.warn(msg);
     warnedStatSetDuration.add(warnKey);
+  }
+}
+
+/**
+ * Rejects non-permanent stat durations on keyword grants whose handler cannot consume expiry.
+ * Throws in NODE_ENV=test; warn-once in production (never isDev).
+ */
+export function rejectStatKeywordWithoutExpirySupport(
+  eff: StatOp,
+  routeLabel = "stat",
+): void {
+  const duration = resolveStatDuration(eff);
+  if (duration === "permanent") return;
+  const grantListRaw = eff.keywords;
+  if (!grantListRaw) return;
+  const grantList = Array.isArray(grantListRaw) ? grantListRaw : [grantListRaw];
+  for (const kw of grantList) {
+    const name = (typeof kw === "string" ? kw : kw?.name) || "";
+    const key = normalizeKeywordName(name);
+    if (!key) continue;
+    if (KEYWORDS_SUPPORTING_STAT_DURATION.has(key)) continue;
+    const warnKey = `${routeLabel}:${key}+${duration}`;
+    const msg =
+      `[stat] duration:"${duration}" cannot grant keyword "${name}" on route ${routeLabel} — ` +
+      `handler does not consume expiry. Effect: ${JSON.stringify(eff)}`;
+    if (readEnv("NODE_ENV") === "test") {
+      throw new Error(msg);
+    }
+    if (!warnedStatKeywordDuration.has(warnKey)) {
+      console.warn(msg);
+      warnedStatKeywordDuration.add(warnKey);
+    }
   }
 }
 

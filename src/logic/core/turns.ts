@@ -9,7 +9,7 @@ import {
   runStartOfTurnBoundary,
   drainTurnBoundaryQueue,
 } from "./turnBoundary.js";
-import { clearExpiredCantAttackAtEOT } from "./keywords/eot.js";
+import { clearExpiredTemporaryKeywordsAtEOT } from "./keywords/eot.js";
 import { recomputeAttackFlags } from "./combat.js";
 import { resetEngageFlagsAtTurnStart } from "../effects/ops/engage.js";
 import { handleInvoke } from "../effects/ops/summon.js";
@@ -245,7 +245,7 @@ function _endTurnCore(endingPlayer: Player) {
 
     cleanupDead();
 
-    clearExpiredCantAttackAtEOT(endingPlayer);
+    clearExpiredTemporaryKeywordsAtEOT(endingPlayer);
     applyBleedAllBoardsAtEndOfTurn();
     clearExpiredLeaderEffects(endingPlayer);
     commitAllyAttackedLeaderTurnSnapshot(state, endingPlayer);
