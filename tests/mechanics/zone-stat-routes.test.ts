@@ -5,6 +5,9 @@
  * stat implementation that did not share the engine's vocabulary before this PR.
  */
 import { describe, it, expect, beforeEach } from "vitest";
+import { execSync } from "node:child_process";
+import path from "node:path";
+import fs from "node:fs";
 import "./setup.js";
 import {
   givenGameState,
@@ -14,7 +17,10 @@ import {
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { getHand, getDeck } from "../../src/core/playerHelpers.js";
+import { checkZoneStatRouteGuards } from "../../scripts/lib/op-key-shape-route-guards.js";
 import "../../src/logic/core/effects/index.js";
+
+const ROOT = path.resolve(import.meta.dirname, "../..");
 
 function setupBase() {
   resetUidCounter();
@@ -71,7 +77,13 @@ describe("zone stat routes — BN1 normalizeStatSpec (honour)", () => {
   it("deck route resolves attack_source combo", () => {
     state.players.first.playsThisTurn = 2;
     const deckCard = createCard(
-      { name: "DeckFollower", type: "Follower", cost: 2, attack: 1, defense: 3 },
+      {
+        name: "DeckFollower",
+        type: "Follower",
+        cost: 2,
+        attack: 1,
+        defense: 3,
+      },
       "deck",
       "first",
     );
@@ -230,15 +242,27 @@ describe("zone stat routes — BN6 shared filter reader (honour)", () => {
       "first",
     );
 
-    expect(Number(getHand(state, "first").find((c) => c.uid === neutral.uid)!.attack)).toBe(2);
     expect(
-      Number(getHand(state, "first").find((c) => c.class === "Dragoncraft")!.attack),
+      Number(
+        getHand(state, "first").find((c) => c.uid === neutral.uid)!.attack,
+      ),
+    ).toBe(2);
+    expect(
+      Number(
+        getHand(state, "first").find((c) => c.class === "Dragoncraft")!.attack,
+      ),
     ).toBe(3);
   });
 
   it("deck route honours filter.type (Thestae shape)", () => {
     const follower = createCard(
-      { name: "DeckFollower", type: "Follower", cost: 2, attack: 1, defense: 1 },
+      {
+        name: "DeckFollower",
+        type: "Follower",
+        cost: 2,
+        attack: 1,
+        defense: 1,
+      },
       "deck",
       "first",
     );
@@ -249,6 +273,7 @@ describe("zone stat routes — BN6 shared filter reader (honour)", () => {
       "first",
     );
     getDeck(state, "first").push(follower, spell);
+    const spellAttackBefore = Number(spell.attack ?? 0);
 
     whenRunEffects(
       [
@@ -266,7 +291,8 @@ describe("zone stat routes — BN6 shared filter reader (honour)", () => {
 
     expect(Number(follower.attack)).toBe(2);
     expect(Number(follower.defense)).toBe(2);
-    expect(spell.attack).toBeUndefined();
+    expect(Number(spell.attack ?? 0)).toBe(spellAttackBefore);
+    expect(spell.buffs?.attack ?? 0).toBe(0);
   });
 });
 
@@ -296,5 +322,98 @@ describe("zone stat routes — BN7 last_added filter (reject)", () => {
       ),
     ).toThrow(/filter.*not supported on route last_added_to_hand/i);
     expect(Number(card.attack)).toBe(1);
+  });
+});
+
+describe("zone stat routes — gate sabotage", () => {
+  const badCards = [
+    {
+      id: "99999996",
+      name: "ZoneStat Duration Gate",
+      type: "Spell",
+      class: "Neutral",
+      cost: "0",
+      spell: [
+        {
+          op: "stat",
+          action: "give",
+          target: "hand",
+          attack: 1,
+          until_end_of_turn: true,
+        },
+      ],
+    },
+    {
+      id: "99999995",
+      name: "ZoneStat Keyword Gate",
+      type: "Spell",
+      class: "Neutral",
+      cost: "0",
+      spell: [
+        {
+          op: "stat",
+          action: "give",
+          target: "hand",
+          keywords: ["Rush"],
+        },
+      ],
+    },
+    {
+      id: "99999994",
+      name: "ZoneStat Set Gate",
+      type: "Spell",
+      class: "Neutral",
+      cost: "0",
+      spell: [
+        {
+          op: "stat",
+          action: "set",
+          target: "hand",
+          attack: 1,
+        },
+      ],
+    },
+    {
+      id: "99999993",
+      name: "ZoneStat LastAdded Filter Gate",
+      type: "Spell",
+      class: "Neutral",
+      cost: "0",
+      spell: [
+        {
+          op: "stat",
+          action: "give",
+          target: "last_added_to_hand",
+          filter: { type: "Follower" },
+          attack: 1,
+        },
+      ],
+    },
+  ];
+
+  it.each(badCards)("checkZoneStatRouteGuards flags $name", (badCard) => {
+    const hits = checkZoneStatRouteGuards(badCard);
+    expect(hits.some((h) => h.id === badCard.id)).toBe(true);
+  });
+
+  it("gate subprocess exits 1 when bad card is injected into sets", () => {
+    const setPath = path.join(ROOT, "cards/sets/__zone_stat_gate_test__.json");
+    fs.writeFileSync(setPath, JSON.stringify([badCards[0]], null, 2));
+    try {
+      expect(() =>
+        execSync(
+          "npx tsx scripts/check-canonical-form.ts --gate=op-key-shape --fail",
+          { cwd: ROOT, stdio: "pipe", encoding: "utf-8" },
+        ),
+      ).toThrow();
+      const out = execSync(
+        "npx tsx scripts/check-canonical-form.ts --gate=op-key-shape --fail 2>&1 || true",
+        { cwd: ROOT, encoding: "utf-8" },
+      );
+      expect(out).toContain("99999996");
+      expect(out).toContain("ZoneStat Duration Gate");
+    } finally {
+      fs.unlinkSync(setPath);
+    }
   });
 });

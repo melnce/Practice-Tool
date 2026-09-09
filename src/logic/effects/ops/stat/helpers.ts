@@ -7,6 +7,7 @@ import type { CardInstance, Player } from "../../../../core/types/index.js";
 import type { StatOp } from "./types.js";
 import { STAT_ACTION_VALUES } from "./types.js";
 import { isDev } from "../../../../core/env.js";
+import { readEnv } from "../../../../core/env.js";
 import { logEvent } from "../../../../core/logger.js";
 import {
   getPlaysThisTurn,
@@ -17,6 +18,14 @@ import {
   getMaxHP,
   setMaxHP,
 } from "../../../../core/playerHelpers.js";
+import { mergeEffectPoolCondition } from "../../../core/targeting/poolCondition.js";
+import {
+  evaluateCardCondition,
+  assertKnownCardConditionKeys,
+} from "../../../core/conditions/evaluator.js";
+import { normalizeStatSpec, statOpHasKeywordOrAttacksGrant } from "./spec.js";
+import { resolveStatDuration } from "./duration.js";
+import { applyStatBuff } from "./core.js";
 
 // -----------------------------------------------------------------------------
 // Validation
@@ -112,99 +121,192 @@ export function applyLeaderStat(
 }
 
 // -----------------------------------------------------------------------------
+// Zone route guards (BN3–BN5, BN7)
+// -----------------------------------------------------------------------------
+
+const warnedZoneStatKeywords = new Set<string>();
+const warnedZoneStatDuration = new Set<string>();
+const warnedZoneStatSet = new Set<string>();
+const warnedZoneStatLastAddedFilter = new Set<string>();
+
+export type ZoneStatRouteLabel = "hand" | "deck" | "last_added_to_hand";
+
+function rejectZoneStatFeature(
+  active: boolean,
+  warned: Set<string>,
+  warnKey: string,
+  msg: string,
+): void {
+  if (!active) return;
+  if (readEnv("NODE_ENV") === "test") {
+    throw new Error(msg);
+  }
+  if (!warned.has(warnKey)) {
+    console.warn(msg);
+    warned.add(warnKey);
+  }
+}
+
+/** BN3: keyword grants are not supported on zone stat routes. */
+export function rejectZoneStatKeywords(
+  eff: StatOp,
+  routeLabel: ZoneStatRouteLabel,
+): void {
+  if (!statOpHasKeywordOrAttacksGrant(eff)) return;
+  rejectZoneStatFeature(
+    true,
+    warnedZoneStatKeywords,
+    `${routeLabel}:keywords`,
+    `[stat] keywords/attacks_per_turn are not supported on route ${routeLabel}. ` +
+      `Effect: ${JSON.stringify(eff)}`,
+  );
+}
+
+/**
+ * BN4: temporary stat duration is not supported on zone routes — clearTemporaryBuffs
+ * only runs for board cards at end-of-turn (turnBoundary.ts), never for hand/deck.
+ */
+export function rejectZoneStatDuration(
+  eff: StatOp,
+  routeLabel: ZoneStatRouteLabel,
+): void {
+  if (resolveStatDuration(eff) === "permanent") return;
+  rejectZoneStatFeature(
+    true,
+    warnedZoneStatDuration,
+    `${routeLabel}:duration`,
+    `[stat] duration keys are not supported on route ${routeLabel}. ` +
+      `Effect: ${JSON.stringify(eff)}`,
+  );
+}
+
+/** BN5: action:"set" would silently add on zone routes — reject loudly. */
+export function rejectZoneStatSet(
+  eff: StatOp,
+  routeLabel: ZoneStatRouteLabel,
+): void {
+  if (eff.action !== "set") return;
+  rejectZoneStatFeature(
+    true,
+    warnedZoneStatSet,
+    `${routeLabel}:set`,
+    `[stat] action:"set" is not supported on route ${routeLabel}. ` +
+      `Effect: ${JSON.stringify(eff)}`,
+  );
+}
+
+/** BN7: last_added_to_hand already names its target — filter/condition is misleading. */
+export function rejectZoneStatLastAddedFilter(eff: StatOp): void {
+  const merged = mergeEffectPoolCondition(eff);
+  if (Object.keys(merged).length === 0) return;
+  rejectZoneStatFeature(
+    true,
+    warnedZoneStatLastAddedFilter,
+    "last_added_to_hand:filter",
+    `[stat] filter/condition is not supported on route last_added_to_hand. ` +
+      `Effect: ${JSON.stringify(eff)}`,
+  );
+}
+
+function guardZoneStatOp(eff: StatOp, routeLabel: ZoneStatRouteLabel): void {
+  rejectZoneStatKeywords(eff, routeLabel);
+  rejectZoneStatDuration(eff, routeLabel);
+  rejectZoneStatSet(eff, routeLabel);
+  if (routeLabel === "last_added_to_hand") {
+    rejectZoneStatLastAddedFilter(eff);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Zone filter matching (BN6)
+// -----------------------------------------------------------------------------
+
+function matchesZoneStatFilter(card: CardInstance, eff: StatOp): boolean {
+  if (card.type !== "Follower") return false;
+  const merged = mergeEffectPoolCondition(eff);
+  if (Object.keys(merged).length === 0) return true;
+  assertKnownCardConditionKeys(merged, "zone-stat-filter");
+  return evaluateCardCondition(card, merged);
+}
+
+function applyZoneStatDelta(
+  card: CardInstance,
+  a: number,
+  d: number,
+  owner: Player,
+  logKind: "buffHand" | "buffDeck" | "buffLastAddedToHand",
+): void {
+  applyStatBuff(card, a, d, owner);
+  if (logKind === "buffLastAddedToHand") {
+    logEvent(logKind, { owner, name: card.name, uid: card.uid, a, d });
+  } else {
+    logEvent(logKind, { owner, target: card.name, uid: card.uid, a, d });
+  }
+}
+
+// -----------------------------------------------------------------------------
 // Hand Buff Handling
 // -----------------------------------------------------------------------------
 
-export function applyHandBuff(owner: Player, eff: StatOp): void {
+export function applyHandBuff(
+  owner: Player,
+  eff: StatOp,
+  sourceCard: CardInstance | null = null,
+): void {
+  guardZoneStatOp(eff, "hand");
+  const { attack: a, defense: d } = normalizeStatSpec(eff, {
+    owner,
+    sourceCard,
+  });
+  if (a === 0 && d === 0) return;
+
   const hand = getHand(state, owner);
-  const a = parseInt((eff.attack as any) ?? 0) || 0;
-  const d = parseInt((eff.defense as any) ?? 0) || 0;
-
   for (const card of hand) {
-    if (!matchesHandFilter(card, eff)) continue;
-
-    if (!card.buffs) card.buffs = { attack: 0, defense: 0 };
-    card.buffs.attack = Number(card.buffs.attack ?? 0) + a;
-    card.buffs.defense = Number(card.buffs.defense ?? 0) + d;
-    card.attack = (parseInt(String(card.attack)) || 0) + a;
-    card.defense = (parseInt(String(card.defense)) || 0) + d;
-
-    logEvent("buffHand", { owner, target: card.name, uid: card.uid, a, d });
+    if (!matchesZoneStatFilter(card, eff)) continue;
+    applyZoneStatDelta(card, a, d, owner, "buffHand");
   }
 }
 
 /** Buff follower instances in the owner's deck (Thestae crest). Persists on draw. */
-export function applyDeckBuff(owner: Player, eff: StatOp): void {
+export function applyDeckBuff(
+  owner: Player,
+  eff: StatOp,
+  sourceCard: CardInstance | null = null,
+): void {
+  guardZoneStatOp(eff, "deck");
+  const { attack: a, defense: d } = normalizeStatSpec(eff, {
+    owner,
+    sourceCard,
+  });
+  if (a === 0 && d === 0) return;
+
   const deck = getDeck(state, owner);
-  const a = parseInt((eff.attack as any) ?? 0) || 0;
-  const d = parseInt((eff.defense as any) ?? 0) || 0;
-
   for (const card of deck) {
-    if (!matchesHandFilter(card, eff)) continue;
-
-    if (!card.buffs) card.buffs = { attack: 0, defense: 0 };
-    card.buffs.attack = Number(card.buffs.attack ?? 0) + a;
-    card.buffs.defense = Number(card.buffs.defense ?? 0) + d;
-    card.attack = (parseInt(String(card.attack)) || 0) + a;
-    card.defense = (parseInt(String(card.defense)) || 0) + d;
-    if (typeof card.peak_defense === "number") {
-      card.peak_defense = Math.max(
-        card.peak_defense,
-        Number(card.defense) || 0,
-      );
-    } else {
-      card.peak_defense = Number(card.defense) || 0;
-    }
-
-    logEvent("buffDeck", { owner, target: card.name, uid: card.uid, a, d });
+    if (!matchesZoneStatFilter(card, eff)) continue;
+    applyZoneStatDelta(card, a, d, owner, "buffDeck");
   }
-}
-
-function matchesHandFilter(card: CardInstance, eff: StatOp): boolean {
-  if (card.type !== "Follower") return false;
-  const filter = (eff as any).filter;
-  const typeFilter = filter?.type ?? (eff as any).type;
-  if (typeFilter && String(typeFilter).toLowerCase() !== "follower") {
-    // Explicit non-follower filter → no match (deck/hand buffs are follower-only today)
-    if (String(typeFilter).toLowerCase() !== "card") return false;
-  }
-  const classFilter =
-    filter?.class ?? (eff as any).class ?? eff.condition?.class;
-  if (classFilter && card.class !== classFilter) return false;
-  const tribeFilter =
-    filter?.tribe ?? (eff as any).tribe ?? eff.condition?.tribe;
-  if (
-    tribeFilter &&
-    (!Array.isArray(card.tribes) || !card.tribes.includes(tribeFilter))
-  )
-    return false;
-  return true;
 }
 
 // -----------------------------------------------------------------------------
 // Last Added To Hand Buff
 // -----------------------------------------------------------------------------
 
-export function applyLastAddedToHandBuff(owner: Player, eff: StatOp): void {
+export function applyLastAddedToHandBuff(
+  owner: Player,
+  eff: StatOp,
+  sourceCard: CardInstance | null = null,
+): void {
+  guardZoneStatOp(eff, "last_added_to_hand");
   const card = state.lastAddedToHand;
   if (!card) return;
 
-  const a = parseInt((eff.attack as any) ?? 0) || 0;
-  const d = parseInt((eff.defense as any) ?? 0) || 0;
-
-  if (!card.buffs) card.buffs = { attack: 0, defense: 0 };
-  card.buffs.attack = Number(card.buffs.attack ?? 0) + a;
-  card.buffs.defense = Number(card.buffs.defense ?? 0) + d;
-  card.attack = (parseInt(String(card.attack)) || 0) + a;
-  card.defense = (parseInt(String(card.defense)) || 0) + d;
-
-  logEvent("buffLastAddedToHand", {
+  const { attack: a, defense: d } = normalizeStatSpec(eff, {
     owner,
-    name: card.name,
-    uid: card.uid,
-    a,
-    d,
+    sourceCard,
   });
+  if (a === 0 && d === 0) return;
+
+  applyZoneStatDelta(card, a, d, owner, "buffLastAddedToHand");
 }
 
 // -----------------------------------------------------------------------------
