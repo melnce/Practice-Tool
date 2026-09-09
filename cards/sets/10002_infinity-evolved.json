@@ -27,7 +27,8 @@
             "amount": 4,
             "select": 1
           }
-        ]
+        ],
+        "printed": "Fanfare: If there's a super-evolved allied follower on the field, select an enemy follower on the field and deal it 4 damage."
       }
     ],
     "keywords": [],
@@ -57,7 +58,8 @@
         "target": "all:follower",
         "select": 1,
         "attack": 2,
-        "defense": -2
+        "defense": -2,
+        "printed": "Select a follower on the field and give it +2/-2."
       }
     ],
     "keywords": [],
@@ -92,7 +94,8 @@
             "attack": 0,
             "defense": 3
           }
-        ]
+        ],
+        "printed": "Fanfare: If you've unlocked super-evolution, give this follower +0/+3."
       }
     ],
     "keywords": ["Ward"],
@@ -116,7 +119,8 @@
     "evolve": [
       {
         "op": "evolve",
-        "target": "all_allies"
+        "target": "all_allies",
+        "printed": "Evolve: Evolve all unevolved allied followers on the field."
       }
     ],
     "superevolve": [],
@@ -195,7 +199,8 @@
       {
         "op": "banish",
         "target": "enemy:card",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy card on the field and banish it."
       }
     ],
     "keywords": ["Storm"],
@@ -246,7 +251,8 @@
               "whose_turn": "owner"
             }
           }
-        ]
+        ],
+        "printed": "Fanfare: Gain Crest: Grimnir, Heavenly Gale."
       }
     ],
     "keywords": ["Ward"],
@@ -345,7 +351,8 @@
         "op": "summon",
         "source": "named",
         "name": "Gentle Treant",
-        "count": 3
+        "count": 3,
+        "printed": "Summon 3 copies of Gentle Treant."
       }
     ],
     "keywords": [],
@@ -373,7 +380,8 @@
         "op": "summon",
         "source": "named",
         "name": "Baby Carbuncle",
-        "count": 2
+        "count": 2,
+        "printed": "Fanfare: Summon 2 copies of Baby Carbuncle."
       }
     ],
     "keywords": ["Ward"],
@@ -458,7 +466,8 @@
             "distribution": "random_hits",
             "count": 1
           }
-        ]
+        ],
+        "printed": "Do this 1 time: \"Deal 2 damage to a random enemy follower.\" Combo (3) - Do it 2 times instead."
       }
     ],
     "keywords": [],
@@ -793,7 +802,8 @@
                   "include_self": true
                 }
               }
-            ]
+            ],
+            "printed": "At the end of your turn, if there's a super-evolved allied follower on the field, give all allied followers on the field +1/+1."
           }
         ],
         "event": "end_of_turn",
@@ -1647,7 +1657,8 @@
             "source": "deck",
             "count": 1
           }
-        ]
+        ],
+        "printed": "Fanfare: If you're in Overflow, draw a card."
       }
     ],
     "keywords": ["Rush"],
@@ -1722,7 +1733,8 @@
             "source": "deck",
             "count": 2
           }
-        ]
+        ],
+        "printed": "Fanfare: If there's a super-evolved allied follower on the field, draw 2 cards."
       }
     ],
     "keywords": [],
@@ -1987,7 +1999,8 @@
       {
         "op": "deck",
         "action": "cost",
-        "mode": "halve"
+        "mode": "halve",
+        "printed": "Fanfare: Halve the cost of all cards in your deck."
       }
     ],
     "keywords": [],
@@ -2050,7 +2063,8 @@
           {
             "op": "add_to_hand",
             "name": "Ghost",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Add a Ghost to your hand."
           }
         ]
       }
@@ -2162,7 +2176,8 @@
         "op": "summon",
         "source": "named",
         "name": "Rotting Zombie",
-        "count": 2
+        "count": 2,
+        "printed": "Fanfare: Summon 2 copies of Rotting Zombie."
       }
     ],
     "keywords": [],
@@ -2190,7 +2205,8 @@
         "op": "summon",
         "source": "named",
         "name": "Bat",
-        "count": 2
+        "count": 2,
+        "printed": "Summon 2 copies of Bat."
       }
     ],
     "keywords": [],
@@ -2435,7 +2451,8 @@
         "select": 1,
         "filter": {
           "is_super_evolved": true
-        }
+        },
+        "printed": "Evolve: Select a super-evolved enemy follower on the field and destroy it."
       }
     ],
     "superevolve": [],
@@ -2481,7 +2498,8 @@
               "whose_turn": "owner"
             }
           }
-        ]
+        ],
+        "printed": "Fanfare: Select an enemy follower on the field and give it \"At the end of your turn, destroy this card.\""
       }
     ],
     "keywords": [],
@@ -2562,7 +2580,8 @@
             "count": 1,
             "distribution": "random_hits"
           }
-        ]
+        ],
+        "printed": "Fanfare: Do this 1 time: \"Deal 2 damage to a random enemy follower.\" If there are at least 2 allied amulets on the field, do it 2 times instead."
       }
     ],
     "keywords": [],
@@ -2589,7 +2608,8 @@
       {
         "op": "banish",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and banish it."
       }
     ],
     "keywords": [],
@@ -2677,7 +2697,8 @@
                 "target": "enemy:follower",
                 "exclude": ["context.defender"]
               }
-            ]
+            ],
+            "printed": "Strike: If there are at least 2 allied amulets on the field, destroy a random enemy follower other than the opposing one."
           }
         ]
       }
@@ -2922,7 +2943,8 @@
             "attack": 3,
             "defense": 0
           }
-        ]
+        ],
+        "printed": "Fanfare: If there's a super-evolved allied follower on the field, add a Puppet to your hand and give it +3/+0."
       }
     ],
     "keywords": ["Rush"],
@@ -3006,7 +3028,8 @@
           "tribe": "Puppetry"
         },
         "select": 1,
-        "into": "Doll Slayer"
+        "into": "Doll Slayer",
+        "printed": "Fanfare: Select a Puppetry follower in your hand and transform it into a Doll Slayer."
       }
     ],
     "keywords": ["Bane"],
@@ -3045,7 +3068,8 @@
             "target": "selected:follower"
           }
         ],
-        "select": 1
+        "select": 1,
+        "printed": "Evolve: Select an enemy follower on the field with 4 attack or less, banish it, and summon an exact copy of it."
       }
     ],
     "superevolve": [],
@@ -3092,7 +3116,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select an Artifact follower in your hand and give it Rush and \"Last Words: Draw a card.\""
       }
     ],
     "keywords": [],

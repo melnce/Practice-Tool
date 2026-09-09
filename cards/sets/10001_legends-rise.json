@@ -58,7 +58,8 @@
           {
             "op": "add_to_hand",
             "name": "Detective's Lens",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Add a Detective's Lens to your hand."
           }
         ]
       }
@@ -87,7 +88,8 @@
         "op": "summon",
         "source": "named",
         "name": "Goblin",
-        "count": 5
+        "count": 5,
+        "printed": "Summon 5 copies of Goblin."
       }
     ],
     "keywords": [],
@@ -146,7 +148,8 @@
       {
         "op": "draw",
         "source": "deck",
-        "count": 2
+        "count": 2,
+        "printed": "Draw 2 cards."
       }
     ],
     "keywords": [],
@@ -171,7 +174,8 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Evolve: Select an enemy follower on the field and destroy it."
       }
     ],
     "superevolve": [],
@@ -303,7 +307,8 @@
             "name": "Servant of Cocytus",
             "count": 3
           }
-        ]
+        ],
+        "printed": "Fanfare: Replace your deck with the Apocalypse Deck."
       }
     ],
     "keywords": [],
@@ -339,7 +344,8 @@
             "attack": 1,
             "defense": 1
           }
-        ]
+        ],
+        "printed": "Fanfare: Combo (3) - Give all other allied followers on the field +1/+1."
       }
     ],
     "keywords": [],
@@ -512,7 +518,8 @@
       {
         "op": "add_to_hand",
         "name": "Fairy",
-        "count": 2
+        "count": 2,
+        "printed": "Add 2 copies of Fairy to your hand."
       }
     ],
     "keywords": [],
@@ -576,7 +583,8 @@
           {
             "op": "add_to_hand",
             "name": "Fairy",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Add a Fairy to your hand."
           }
         ]
       }
@@ -1088,7 +1096,8 @@
         "target": "ally:follower",
         "select": 1,
         "attack": 1,
-        "defense": 1
+        "defense": 1,
+        "printed": "Fanfare: Select another allied follower on the field and give it +1/+1."
       }
     ],
     "keywords": ["Ward"],
@@ -1201,7 +1210,8 @@
             "op": "summon",
             "source": "named",
             "name": "Hound of War",
-            "count": 2
+            "count": 2,
+            "printed": "Enhance (6): Summon 2 copies of Hound of War."
           }
         ]
       }
@@ -1236,7 +1246,8 @@
             "target": "self",
             "keywords": ["Bane"]
           }
-        ]
+        ],
+        "printed": "Fanfare: If you've unlocked super-evolution, give this follower Bane."
       }
     ],
     "keywords": ["Rush"],
@@ -1434,7 +1445,8 @@
         "op": "summon",
         "source": "named",
         "name": "Shinobi Squirrel",
-        "count": 1
+        "count": 1,
+        "printed": "Evolve: Summon a Shinobi Squirrel."
       }
     ],
     "superevolve": [],
@@ -2744,7 +2756,8 @@
             "op": "summon",
             "source": "named",
             "name": "Vastwing Dragon",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Summon a Vastwing Dragon."
           }
         ]
       }
@@ -2779,7 +2792,8 @@
             "target": "self",
             "keywords": ["Storm"]
           }
-        ]
+        ],
+        "printed": "Fanfare: If you're in Overflow, give this follower Storm."
       }
     ],
     "keywords": [],
@@ -2806,7 +2820,8 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and destroy it."
       }
     ],
     "keywords": [],
@@ -2873,7 +2888,8 @@
             "player": "self",
             "amount": 4
           }
-        ]
+        ],
+        "printed": "Fanfare: If you're in Overflow, restore 4 defense to your leader."
       }
     ],
     "keywords": [],
@@ -2900,7 +2916,8 @@
       {
         "op": "damage",
         "target": "all:follower",
-        "amount": 5
+        "amount": 5,
+        "printed": "Deal 5 damage to all followers."
       }
     ],
     "keywords": [],
@@ -2973,7 +2990,8 @@
         "attack": 1,
         "defense": 0,
         "select": 1,
-        "select_mode": "random"
+        "select_mode": "random",
+        "printed": "When this card is discarded, give a random allied follower on the field +1/+0."
       }
     ],
     "triggers": []
@@ -3006,7 +3024,8 @@
             "target": "self",
             "keywords": ["Intimidate"]
           }
-        ]
+        ],
+        "printed": "Fanfare: If you're in Overflow, give this follower Intimidate."
       }
     ],
     "keywords": ["Storm"],
@@ -3038,7 +3057,8 @@
           {
             "name": "Storm"
           }
-        ]
+        ],
+        "printed": "Super-Evolve: Select another allied follower on the field and give it Storm."
       }
     ],
     "fanfare": [],
@@ -3218,7 +3238,8 @@
         "op": "summon",
         "source": "named",
         "name": "Vastwing Dragon",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Vastwing Dragon."
       }
     ],
     "keywords": ["Ward"],
@@ -3482,7 +3503,8 @@
         "op": "summon",
         "source": "named",
         "name": "Bat",
-        "count": 2
+        "count": 2,
+        "printed": "Evolve: Summon 2 copies of Bat."
       }
     ],
     "superevolve": [],
@@ -3516,7 +3538,8 @@
             "op": "summon",
             "source": "named",
             "name": "Skeleton",
-            "count": 2
+            "count": 2,
+            "printed": "Last Words: Summon 2 copies of Skeleton."
           }
         ]
       }
@@ -3544,7 +3567,8 @@
       {
         "op": "summon",
         "source": "graveyard",
-        "max_cost": 4
+        "max_cost": 4,
+        "printed": "Fanfare: Reanimate (4)."
       }
     ],
     "keywords": [],
@@ -4020,7 +4044,8 @@
               "whose_turn": "owner"
             }
           }
-        ]
+        ],
+        "printed": "Fanfare: Gain Crest: Balto, Dusk Bounty Hunter."
       }
     ],
     "keywords": [],
@@ -4326,7 +4351,8 @@
             "target": "self",
             "attack": 1,
             "defense": 0,
-            "duration": "turn_end"
+            "duration": "turn_end",
+            "printed": "Whenever you Engage an amulet, give this follower +1/+0 until the end of the turn."
           }
         ]
       }
@@ -4526,7 +4552,8 @@
             "filter": {
               "type": "Amulet"
             },
-            "sort": "cost_desc"
+            "sort": "cost_desc",
+            "printed": "Last Words: Summon a copy of a random allied amulet destroyed this match with the highest base cost."
           }
         ]
       }
@@ -4668,7 +4695,8 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Evolve: Select an enemy follower on the field and destroy it."
       }
     ],
     "superevolve": [],
@@ -4719,7 +4747,8 @@
                 "target": "ally:last_summoned",
                 "keywords": ["Storm"]
               }
-            ]
+            ],
+            "printed": "Last Words: Gain Crest: Lapis, Shining Seraph."
           }
         ]
       }
@@ -4808,7 +4837,8 @@
           {
             "op": "destroy",
             "distribution": "all",
-            "target": "any:follower"
+            "target": "any:follower",
+            "printed": "Engage: Destroy this card and all followers."
           }
         ]
       }
@@ -4958,7 +4988,8 @@
           {
             "op": "add_to_hand",
             "name": "Gear of Remembrance",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Add a Gear of Remembrance to your hand."
           }
         ]
       }
@@ -4987,7 +5018,8 @@
         "op": "summon",
         "source": "named",
         "name": "Fortifier Artifact",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Fortifier Artifact."
       }
     ],
     "keywords": [],
@@ -5093,7 +5125,8 @@
         "op": "summon",
         "source": "named",
         "name": "Enhanced Puppet",
-        "count": 2
+        "count": 2,
+        "printed": "Summon 2 copies of Enhanced Puppet."
       }
     ],
     "keywords": [],
@@ -5300,7 +5333,8 @@
         "eot_destroy": true,
         "select": 2,
         "count": 2,
-        "max_cost": 5
+        "max_cost": 5,
+        "printed": "Select 2 Artifact followers in your hand that cost 5 or less, summon an exact copy of each, and give the exact copies \"At the end of your opponent's turn, destroy this card.\""
       }
     ],
     "keywords": [],

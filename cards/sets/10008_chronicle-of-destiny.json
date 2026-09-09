@@ -20,7 +20,8 @@
         "action": "give",
         "target": "self",
         "attack": 5,
-        "defense": 5
+        "defense": 5,
+        "printed": "Evolve: Give this follower +5/+5."
       }
     ],
     "superevolve": [],
@@ -51,7 +52,8 @@
       {
         "op": "ep",
         "action": "recover",
-        "amount": 1
+        "amount": 1,
+        "printed": "Fanfare: Recover 1 evolution point."
       }
     ]
   },
@@ -312,7 +314,8 @@
       {
         "op": "ep",
         "action": "recover_super",
-        "amount": 2
+        "amount": 2,
+        "printed": "Fanfare: Recover 2 super-evolution points."
       }
     ]
   },
@@ -484,7 +487,8 @@
         "op": "summon",
         "source": "named",
         "name": "Michelle, Kind Mindreader",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Michelle, Kind Mindreader."
       }
     ]
   },
@@ -746,7 +750,8 @@
         "target": "enemy:follower",
         "select": 1,
         "keywords": ["Can't Attack"],
-        "duration": "opponent_turn_end"
+        "duration": "opponent_turn_end",
+        "printed": "Evolve: Select an enemy follower on the field and give it \"Can't attack followers or leaders\" until the end of your opponent's turn."
       }
     ],
     "superevolve": [],
@@ -859,7 +864,8 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount": 6
+        "amount": 6,
+        "printed": "Fanfare: Deal 6 damage to all enemy followers."
       }
     ]
   },
@@ -1196,7 +1202,8 @@
       {
         "op": "add_to_hand",
         "name": "Mysterian Missile",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Add a Mysterian Missile to your hand."
       }
     ]
   },
@@ -1610,7 +1617,8 @@
             "op": "evolve",
             "target": "self"
           }
-        ]
+        ],
+        "printed": "Fanfare: If your leader's defense is 10 or less, evolve this follower."
       }
     ]
   },
@@ -1639,7 +1647,8 @@
           {
             "op": "draw",
             "source": "deck",
-            "count": 3
+            "count": 3,
+            "printed": "Last Words: Draw 3 cards."
           }
         ]
       }
@@ -3151,7 +3160,8 @@
         "keywords": ["Ambush"],
         "condition": {
           "not_self": true
-        }
+        },
+        "printed": "Super-Evolve: Select another allied follower on the field and give it Ambush."
       }
     ],
     "keywords": ["Ward"],
@@ -3186,7 +3196,8 @@
           "type": "Follower",
           "tribe": "Artifact"
         },
-        "distribution": "random"
+        "distribution": "random",
+        "printed": "Fanfare: Add a copy of a random allied Artifact follower destroyed this match to your hand without revealing it."
       }
     ],
     "spell": []
@@ -3216,7 +3227,8 @@
           {
             "op": "add_to_hand",
             "name": "Ancient Artifact",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Add an Ancient Artifact to your hand."
           }
         ]
       }
@@ -3247,7 +3259,8 @@
       {
         "op": "add_to_hand",
         "name": "Radiant Artifact",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Add a Radiant Artifact to your hand."
       }
     ]
   },

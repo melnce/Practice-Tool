@@ -23,7 +23,8 @@
         "target": "all:follower",
         "select": 1,
         "attack": 4,
-        "defense": -4
+        "defense": -4,
+        "printed": "Fanfare: Select another follower on the field and give it +4/-4."
       }
     ],
     "keywords": [],
@@ -371,7 +372,8 @@
             "action": "give",
             "target": "self",
             "attack": 1,
-            "defense": 0
+            "defense": 0,
+            "printed": "Whenever an allied Pixie follower enters the field, give this follower +1/+0."
           }
         ]
       }
@@ -576,7 +578,8 @@
                 "attack": 0,
                 "defense": -1
               }
-            ]
+            ],
+            "printed": "When this card enters the field, summon an exact copy of it and give the exact copy -0/-1."
           }
         ]
       }
@@ -613,7 +616,8 @@
             "defense": -1,
             "select_mode": "random"
           }
-        ]
+        ],
+        "printed": "Do this X times: \"Give a random enemy follower on the field -0/-1.\" X is your Combo."
       }
     ],
     "keywords": [],
@@ -1287,7 +1291,8 @@
             "amount": 3,
             "player": "self"
           }
-        ]
+        ],
+        "printed": "Fanfare: If this card's cost isn't 2, restore 3 defense to your leader."
       }
     ],
     "keywords": [],
@@ -1363,7 +1368,8 @@
             "target": "enemy:follower",
             "amount": 4
           }
-        ]
+        ],
+        "printed": "Gain Crest: Crystal Gazing."
       }
     ],
     "keywords": [],
@@ -1735,7 +1741,8 @@
             "filter": {
               "type": "follower",
               "class": "Dragoncraft"
-            }
+            },
+            "printed": "During your turn, whenever this follower takes damage but isn't destroyed, draw a Dragoncraft follower."
           }
         ]
       }
@@ -1765,7 +1772,8 @@
         "target": "enemy:follower",
         "filter": {
           "damaged": true
-        }
+        },
+        "printed": "Fanfare: Destroy all damaged enemy followers."
       }
     ],
     "keywords": [],
@@ -1946,7 +1954,8 @@
           {
             "op": "damage",
             "target": "all:follower",
-            "amount": 1
+            "amount": 1,
+            "printed": "Engage (1): Deal 1 damage to all followers."
           }
         ]
       }
@@ -2913,7 +2922,8 @@
               "whose_turn": "owner"
             }
           }
-        ]
+        ],
+        "printed": "Fanfare: Gain Crest: Devotee of Repose."
       }
     ],
     "keywords": [],
@@ -2956,7 +2966,8 @@
             "op": "restore",
             "target": "leader",
             "player": "self",
-            "amount": 1
+            "amount": 1,
+            "printed": "Whenever this follower is given + attack or defense on the field, restore 1 defense to your leader."
           }
         ]
       }
@@ -3053,7 +3064,8 @@
               "whose_turn": "owner"
             }
           }
-        ]
+        ],
+        "printed": "Fanfare: Gain Crest: Supplicant of Repose."
       }
     ],
     "keywords": ["Ward"],

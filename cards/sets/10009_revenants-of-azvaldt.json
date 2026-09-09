@@ -123,7 +123,8 @@
         "target": "ally:follower",
         "select": 2,
         "attack": 3,
-        "defense": 3
+        "defense": 3,
+        "printed": "Fanfare: Select 2 other allied followers on the field and give them +3/+3."
       }
     ]
   },
@@ -295,7 +296,8 @@
             "source": "deck",
             "count": 1
           }
-        ]
+        ],
+        "printed": "Fanfare: Combo (3) - Draw a card."
       }
     ]
   },
@@ -1154,7 +1156,8 @@
                 "attack": 3,
                 "defense": 3
               }
-            ]
+            ],
+            "printed": "When this follower enters the field, if at least 5 other allied copies of Obsessed Test Subject have entered the field this match, give it +3/+3."
           }
         ]
       }
@@ -1233,7 +1236,8 @@
       {
         "op": "add_to_hand",
         "name": "Truth Summons",
-        "count": 3
+        "count": 3,
+        "printed": "Add 3 copies of Truth Summons to your hand."
       }
     ]
   },
@@ -1659,7 +1663,8 @@
             "op": "evolve",
             "target": "self"
           }
-        ]
+        ],
+        "printed": "Fanfare: If you're in Overflow, evolve this follower."
       }
     ]
   },
@@ -1740,7 +1745,8 @@
                 "defense": 0,
                 "duration": "turn_end"
               }
-            ]
+            ],
+            "printed": "Strike: If an allied follower attacked a leader on your last turn, give this follower +1/+0 until the end of the turn."
           }
         ]
       }
@@ -2039,7 +2045,8 @@
       {
         "op": "damage",
         "target": "all:leader",
-        "amount": 2
+        "amount": 2,
+        "printed": "Fanfare: Deal 2 damage to both leaders."
       }
     ]
   },
@@ -2372,7 +2379,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Select an allied follower on the field and give it \"Last Words: Summon a copy of this card.\""
       }
     ]
   },
@@ -2572,7 +2580,8 @@
         "effects": [
           {
             "op": "evolve",
-            "target": "self"
+            "target": "self",
+            "printed": "During your turn, when your leader's defense is restored, evolve this follower."
           }
         ]
       }
@@ -2603,7 +2612,8 @@
         "op": "summon",
         "source": "named",
         "name": "Peryton",
-        "count": 2
+        "count": 2,
+        "printed": "Fanfare: Summon 2 copies of Peryton."
       }
     ]
   },
@@ -3095,7 +3105,8 @@
             "amount": 5,
             "select": 1
           }
-        ]
+        ],
+        "printed": "Fanfare: If there are no duplicates in your deck, select an enemy follower on the field and deal it 5 damage."
       }
     ]
   },
@@ -3216,7 +3227,8 @@
             "player": "self",
             "amount": 4
           }
-        ]
+        ],
+        "printed": "Fanfare: If there are no duplicates in your deck, select an enemy follower on the field, deal it 4 damage, and restore 4 defense to your leader."
       }
     ]
   },

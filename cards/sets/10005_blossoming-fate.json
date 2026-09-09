@@ -34,7 +34,8 @@
             "attack": 1,
             "defense": 1
           }
-        ]
+        ],
+        "printed": "Fanfare: If there's another 1-base-cost card on the field, give this follower +1/+1."
       }
     ],
     "spell": []
@@ -99,7 +100,8 @@
             "target": "enemy:follower",
             "distribution": "all"
           }
-        ]
+        ],
+        "printed": "Evolve: If the sum of the 3 highest base costs in your hand is higher than that of your opponent's, destroy all enemy followers."
       }
     ],
     "superevolve": [],
@@ -297,7 +299,8 @@
       {
         "op": "draw",
         "source": "deck",
-        "count": 1
+        "count": 1,
+        "printed": "Evolve: Draw a card."
       }
     ],
     "superevolve": [],
@@ -426,7 +429,8 @@
             "op": "evolve",
             "target": "self"
           }
-        ]
+        ],
+        "printed": "Fanfare: Combo (5) - Summon a Flowering Friendship and evolve it and this follower."
       }
     ]
   },
@@ -1505,7 +1509,8 @@
           },
           "pick": "random",
           "per_target": true
-        }
+        },
+        "printed": "Transform all allied followers on the field into exact copies of random followers in your deck."
       }
     ],
     "fanfare": []
@@ -2290,7 +2295,8 @@
         "amount": 3,
         "distribution": "by_stat",
         "stat": "defense",
-        "rank": "lowest"
+        "rank": "lowest",
+        "printed": "Deal 3 damage to all leaders with the lowest defense."
       }
     ],
     "fanfare": []
@@ -2419,7 +2425,8 @@
               "whose_turn": "owner"
             }
           }
-        ]
+        ],
+        "printed": "Gain Crest: Rigor of the Nightblossom."
       }
     ],
     "specific_effects": [
@@ -2708,7 +2715,8 @@
         "op": "summon",
         "source": "named",
         "name": "Immovable Paladin",
-        "count": 3
+        "count": 3,
+        "printed": "Fanfare: Summon 3 copies of Immovable Paladin."
       }
     ]
   },
@@ -3228,7 +3236,8 @@
       {
         "op": "draw",
         "source": "deck",
-        "count": 1
+        "count": 1,
+        "printed": "Draw a card."
       }
     ],
     "fanfare": []
@@ -3297,7 +3306,8 @@
         "effects": [
           {
             "op": "evolve",
-            "target": "self"
+            "target": "self",
+            "printed": "When you play a spell, evolve this follower."
           }
         ]
       }
@@ -3406,7 +3416,8 @@
         "op": "transform",
         "target": "any:any",
         "select": 1,
-        "into": "Imari's Little Buddies"
+        "into": "Imari's Little Buddies",
+        "printed": "Select a card on the field and transform it into an Imari's Little Buddies."
       }
     ]
   },
