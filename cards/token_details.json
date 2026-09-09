@@ -116,7 +116,8 @@
         "op": "stat",
         "target": "enemy:leader",
         "action": "set",
-        "defense": 1
+        "defense": 1,
+        "printed": "Set the enemy leader's max defense to 1."
       }
     ],
     "evolve": [],
@@ -144,7 +145,8 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Select an enemy follower on the field and destroy it."
       }
     ],
     "keywords": [],
@@ -233,7 +235,8 @@
         "effects": [
           {
             "op": "evolve",
-            "target": "self"
+            "target": "self",
+            "printed": "At the end of your turn, evolve this follower."
           }
         ]
       }
@@ -260,7 +263,8 @@
         "op": "restore",
         "target": "leader",
         "player": "self",
-        "amount": 1
+        "amount": 1,
+        "printed": "Restore 1 defense to your leader."
       }
     ],
     "evolve": [],
@@ -289,7 +293,8 @@
         "target": "enemy:follower",
         "amount": 3,
         "select": 1,
-        "can_target_leader": true
+        "can_target_leader": true,
+        "printed": "Select an enemy follower on the field or the enemy leader and deal it 3 damage."
       }
     ],
     "evolve": [],
@@ -380,7 +385,8 @@
         "select": 1,
         "condition": {
           "unevolved": true
-        }
+        },
+        "printed": "Select an unevolved allied follower on the field and evolve it."
       }
     ]
   },
@@ -449,7 +455,8 @@
         "target": "enemy:follower",
         "amount": 1,
         "select": 1,
-        "can_target_leader": true
+        "can_target_leader": true,
+        "printed": "Select an enemy follower on the field or the enemy leader and deal it 1 damage."
       }
     ],
     "keywords": [],
@@ -477,7 +484,8 @@
         "op": "restore",
         "target": "leader",
         "player": "self",
-        "amount": 2
+        "amount": 2,
+        "printed": "Restore 2 defense to your leader."
       }
     ],
     "keywords": [],
@@ -519,7 +527,8 @@
             "target": "selected",
             "keywords": ["Rush"]
           }
-        ]
+        ],
+        "printed": "Select an allied follower on the field and give it +1/+0 and Rush."
       }
     ],
     "keywords": [],
@@ -561,7 +570,8 @@
             "target": "selected",
             "keywords": ["Ward"]
           }
-        ]
+        ],
+        "printed": "Select an allied follower on the field and give it +0/+1 and Ward."
       }
     ],
     "keywords": [],
@@ -601,7 +611,8 @@
             "target": "self",
             "keywords": ["Bane"]
           }
-        ]
+        ],
+        "printed": "Fanfare: If there's an allied Prim, Princess's Picnic on the field, give this follower +1/+1 and Bane."
       }
     ],
     "keywords": ["Ward"],
@@ -632,7 +643,8 @@
         "target": "all:enemy",
         "amount": 4,
         "distribution": "split_sequential",
-        "spill_to_leader": true
+        "spill_to_leader": true,
+        "printed": "Deal 4 damage split between all enemies."
       }
     ],
     "keywords": [],
@@ -745,7 +757,8 @@
           {
             "op": "spellboost",
             "target": "ally:hand",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Spellboost your hand."
           }
         ]
       }
@@ -778,7 +791,8 @@
           {
             "op": "spellboost",
             "target": "ally:hand",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Spellboost your hand."
           }
         ]
       }
@@ -854,7 +868,8 @@
           {
             "op": "spellboost",
             "target": "ally:hand",
-            "count": 1
+            "count": 1,
+            "printed": "Strike: Spellboost your hand."
           }
         ]
       }
@@ -920,7 +935,8 @@
           {
             "op": "spellboost",
             "target": "ally:hand",
-            "count": 3
+            "count": 3,
+            "printed": "Last Words: Spellboost your hand 3 times."
           }
         ]
       }
@@ -995,7 +1011,8 @@
         "effects": [
           {
             "op": "destroy",
-            "scope": "self"
+            "scope": "self",
+            "printed": "At the end of your opponent's turn, destroy this card."
           }
         ]
       }
@@ -1340,7 +1357,8 @@
       {
         "op": "damage",
         "target": "all:follower",
-        "amount": 1
+        "amount": 1,
+        "printed": "Deal 1 damage to all followers."
       }
     ],
     "keywords": [],
@@ -1532,7 +1550,8 @@
           {
             "op": "damage",
             "target": "enemy:leader",
-            "amount": 2
+            "amount": 2,
+            "printed": "Last Words: Deal 2 damage to the enemy leader."
           }
         ]
       }
@@ -1566,7 +1585,8 @@
             "op": "restore",
             "target": "leader",
             "player": "self",
-            "amount": 2
+            "amount": 2,
+            "printed": "Last Words: Restore 2 defense to your leader."
           }
         ]
       }
@@ -1605,7 +1625,8 @@
             "defense": 0,
             "name_filter": "Ginsetsu & Yuzuki, Twin Calamities",
             "select_mode": "random",
-            "select": 1
+            "select": 1,
+            "printed": "Last Words: Give a random allied Ginsetsu & Yuzuki, Twin Calamities on the field +1/+0."
           }
         ]
       }
@@ -1638,7 +1659,8 @@
         "source": "named",
         "name": "Rulenye & Valnareik",
         "count": 2,
-        "keywords": ["Rush"]
+        "keywords": ["Rush"],
+        "printed": "Summon 2 copies of Rulenye & Valnareik and give them Rush."
       }
     ],
     "keywords": [],
@@ -1670,7 +1692,8 @@
           "name": "Rulenye & Valnareik"
         },
         "keywords": ["Storm"],
-        "select": 1
+        "select": 1,
+        "printed": "Select an allied Rulenye & Valnareik on the field and give it Storm."
       }
     ],
     "keywords": [],
@@ -1699,7 +1722,8 @@
       {
         "op": "draw",
         "source": "deck",
-        "count": 2
+        "count": 2,
+        "printed": "Draw 2 cards."
       }
     ]
   },
@@ -1899,7 +1923,8 @@
         "effects": [
           {
             "op": "destroy",
-            "scope": "self"
+            "scope": "self",
+            "printed": "At the end of your opponent's turn, destroy this card."
           }
         ]
       }
@@ -1935,7 +1960,8 @@
         "effects": [
           {
             "op": "destroy",
-            "scope": "self"
+            "scope": "self",
+            "printed": "At the end of your opponent's turn, destroy this card."
           }
         ]
       }
@@ -2098,7 +2124,8 @@
             "op": "summon",
             "source": "named",
             "name": "Vier, Heart Slayer",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Summon a Vier, Heart Slayer."
           }
         ]
       }
@@ -2216,7 +2243,8 @@
           {
             "op": "damage",
             "target": "enemy:leader",
-            "amount": 3
+            "amount": 3,
+            "printed": "At the end of your turn, deal 3 damage to the enemy leader."
           }
         ]
       }
@@ -2253,7 +2281,8 @@
           {
             "op": "damage",
             "target": "enemy:follower",
-            "amount": 3
+            "amount": 3,
+            "printed": "At the end of your turn, deal 3 damage to all enemy followers."
           }
         ]
       }
@@ -2508,7 +2537,8 @@
             "mode": "reduce",
             "amount": 3
           }
-        ]
+        ],
+        "printed": "Select an allied follower on the field with a base cost of 5 or more, add a copy of it to your hand without revealing it, and reduce the cost of the copy by 3."
       }
     ]
   },
@@ -2632,7 +2662,8 @@
           {
             "op": "draw",
             "count": 1,
-            "source": "deck"
+            "source": "deck",
+            "printed": "When this card enters the field, draw a card."
           }
         ]
       }
@@ -2723,7 +2754,8 @@
                 "target": "enemy:all",
                 "amount": 3
               }
-            ]
+            ],
+            "printed": "At the end of your turn, if there are at least 3 allied amulets on the field, deal 3 damage to all enemies."
           }
         ]
       }
@@ -2797,7 +2829,8 @@
         "target": "enemy:follower",
         "amount": 3,
         "distribution": "random_hits",
-        "count": 1
+        "count": 1,
+        "printed": "Deal 3 damage to a random enemy follower."
       }
     ]
   },
@@ -2832,7 +2865,8 @@
             "distribution": "random_hits",
             "count": 1
           }
-        ]
+        ],
+        "printed": "Do this 2 times: \"Deal 4 damage to a random enemy follower.\""
       }
     ]
   },
@@ -2859,7 +2893,8 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount": 5
+        "amount": 5,
+        "printed": "Deal 5 damage to all enemy followers."
       }
     ]
   },
@@ -2887,7 +2922,8 @@
         "op": "attacks_per_turn",
         "target": "ally:follower",
         "select": 1,
-        "value": 2
+        "value": 2,
+        "printed": "Select an allied follower on the field and give it \"Can attack 2 times per turn.\""
       }
     ]
   },
@@ -2986,7 +3022,8 @@
             "op": "restore",
             "target": "leader",
             "player": "self",
-            "amount": 2
+            "amount": 2,
+            "printed": "Last Words: Restore 2 defense to your leader."
           }
         ]
       }

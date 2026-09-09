@@ -530,6 +530,15 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
   boost_skybound_art_hand: new Set(["amount"]),
 };
 
+/**
+ * Optional per-op printed effect text (card data). Not to be confused with
+ * `const printed` in test files — see scripts/lib/perEffectPrinted.ts.
+ */
+export const PER_EFFECT_PRINTED_KEY = "printed";
+for (const keys of Object.values(OP_TOP_LEVEL_KEYS)) {
+  keys.add(PER_EFFECT_PRINTED_KEY);
+}
+
 // ---------------------------------------------------------------------------
 // Nested allowlist routing per op
 // ---------------------------------------------------------------------------

@@ -20,7 +20,8 @@
         "count": 1,
         "filter": {
           "class": "Neutral"
-        }
+        },
+        "printed": "Evolve: Draw a Neutral card."
       }
     ],
     "superevolve": [],
@@ -51,7 +52,8 @@
       {
         "op": "banish",
         "target": "enemy:card",
-        "select": 1
+        "select": 1,
+        "printed": "Select an enemy card on the field and banish it."
       }
     ]
   },
@@ -343,7 +345,8 @@
           {
             "op": "draw",
             "source": "deck",
-            "count": 1
+            "count": 1,
+            "printed": "At the end of your turn, draw a card."
           }
         ],
         "event": "end_of_turn",
@@ -487,7 +490,8 @@
             "target": "self",
             "keywords": ["Storm"]
           }
-        ]
+        ],
+        "printed": "Fanfare: Combo (3) - Give this follower Storm."
       }
     ]
   },
@@ -1368,7 +1372,8 @@
             "op": "evolve",
             "target": "self"
           }
-        ]
+        ],
+        "printed": "Fanfare: Earth Rite (1) - Evolve this follower."
       }
     ]
   },
@@ -1529,7 +1534,8 @@
         "op": "summon",
         "source": "named",
         "name": "Magic Sediment",
-        "count": 2
+        "count": 2,
+        "printed": "Fanfare: Gain 2 earth sigils."
       }
     ]
   },
@@ -1844,7 +1850,8 @@
             "op": "summon",
             "source": "named",
             "name": "Dragonewt Promoter",
-            "count": 2
+            "count": 2,
+            "printed": "Enhance (4): Summon 2 copies of Dragonewt Promoter."
           }
         ]
       }
@@ -1961,7 +1968,8 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and destroy it."
       }
     ]
   },
@@ -2319,7 +2327,8 @@
           {
             "op": "add_to_hand",
             "name": "Bat",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Add a Bat to your hand."
           }
         ]
       }
@@ -2916,7 +2925,8 @@
             "select": 1,
             "amount": 5
           }
-        ]
+        ],
+        "printed": "Fanfare: If there are at least 3 allied amulets on the field, select an enemy follower on the field and deal it 5 damage."
       }
     ]
   },

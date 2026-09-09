@@ -399,6 +399,8 @@ export function registryDocumentedTopLevelKeys(): Set<string> {
   keys.add("distribution");
   keys.add("condition");
   keys.add("filter");
+  // Per-op card-data field; not the test-side `const printed` in check-printed-literals.ts.
+  keys.add("printed");
   return keys;
 }
 

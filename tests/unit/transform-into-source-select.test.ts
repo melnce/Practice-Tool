@@ -57,6 +57,8 @@ describe("flat transform into_source enemy:deck + select", () => {
         target: "ally:hand",
         select: 1,
         into_source: "enemy:deck",
+        printed:
+          "Engage: Select a card in your hand and transform it into an exact copy of a random card in your opponent's deck.",
       },
     ]);
   });

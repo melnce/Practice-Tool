@@ -65,7 +65,8 @@
             "op": "evolve",
             "target": "self"
           }
-        ]
+        ],
+        "printed": "Fanfare: If you've unlocked super-evolution, evolve this follower."
       }
     ],
     "evolve": [],
@@ -95,7 +96,8 @@
           {
             "op": "restore",
             "target": "allies",
-            "amount": 1
+            "amount": 1,
+            "printed": "At the end of your turn, restore 1 defense to all allies."
           }
         ],
         "event": "end_of_turn",
@@ -481,7 +483,8 @@
         "keywords": ["Barrier"],
         "condition": {
           "include_self": true
-        }
+        },
+        "printed": "Fanfare: Give all allied followers on the field Barrier."
       }
     ],
     "evolve": [],
@@ -736,7 +739,8 @@
             "action": "recover",
             "amount": 1
           }
-        ]
+        ],
+        "printed": "Fanfare: Skybound Art- Recover 1 evolution point."
       }
     ],
     "evolve": [],
@@ -826,7 +830,8 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": ["Storm"],
+            "printed": "Enhance(5): Give this follower Storm."
           }
         ]
       }
@@ -857,7 +862,8 @@
         "op": "summon",
         "source": "named",
         "name": "Mordred, Illusory Lion",
-        "count": 1
+        "count": 1,
+        "printed": "Evolve: Summon a Mordred, Illusory Lion."
       }
     ],
     "superevolve": [],
@@ -885,7 +891,8 @@
         "op": "summon",
         "source": "named",
         "name": "Arthur, Staunch Dragon",
-        "count": 1
+        "count": 1,
+        "printed": "Evolve: Summon an Arthur, Staunch Dragon."
       }
     ],
     "superevolve": [],
@@ -912,7 +919,8 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount": 3
+        "amount": 3,
+        "printed": "Fanfare: Deal 3 damage to all enemy followers"
       }
     ],
     "evolve": [],
@@ -1245,7 +1253,8 @@
         "count": 1,
         "filter": {
           "type": "Spell"
-        }
+        },
+        "printed": "Fanfare: Draw a spell."
       }
     ],
     "evolve": [],
@@ -1996,7 +2005,8 @@
             "duration": "opponent_turn_end",
             "target": "selected:follower"
           }
-        ]
+        ],
+        "printed": "Select an enemy follower on the field, deal it 3 damage, and give it \"Can't attack followers or leaders\" until the end of your opponent's turn."
       }
     ],
     "evolve": [],
@@ -2086,7 +2096,8 @@
             "target": "selected:any",
             "count": 1
           }
-        ]
+        ],
+        "printed": "Select an enemy card on the field, banish it, and add a copy of it to your hand."
       }
     ],
     "evolve": [],
@@ -2400,7 +2411,8 @@
             "op": "evolve",
             "target": "self"
           }
-        ]
+        ],
+        "printed": "Fanfare: If there's an evolved allied follower on the field, evolve this follower."
       }
     ],
     "evolve": [],
@@ -2744,7 +2756,8 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Drain"]
+            "keywords": ["Drain"],
+            "printed": "Whenever you Engage an amulet, give this follower Drain."
           }
         ]
       }
@@ -3189,7 +3202,8 @@
             "target": "self",
             "keywords": ["Barrier"]
           }
-        ]
+        ],
+        "printed": "Fanfare: If you've unlocked super-evolution, give this follower Barrier."
       }
     ],
     "evolve": [],
@@ -3215,7 +3229,8 @@
     "fanfare": [
       {
         "op": "boost_skybound_art_hand",
-        "amount": 1
+        "amount": 1,
+        "printed": "Fanfare: Increase the Skybound Art gauges of all cards in your hand by 1."
       }
     ],
     "evolve": [],
@@ -3246,7 +3261,8 @@
           {
             "op": "add_to_hand",
             "name": "Striker Artifact",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Add a Striker Artifact to your hand."
           }
         ]
       }
@@ -3377,7 +3393,8 @@
         "target": "enemy:follower",
         "amount": 1,
         "count": 6,
-        "distribution": "random_hits"
+        "distribution": "random_hits",
+        "printed": "Do this 6 times: \"Deal 1 damage to a random enemy follower.\""
       }
     ],
     "evolve": [],
