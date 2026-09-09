@@ -1,4 +1,4 @@
-> **In-repo mirror:** The canonical owner-rulings document lives in the owner's Claude project knowledge base. This file is the copy agents in this repo read. Keep both in sync — edit the Claude knowledge base and this mirror together.
+> **This file is canonical.** Owner rulings are recorded here, in the repo, where they are versioned, reviewable in a PR, readable by every agent, and gated by `npm run check:rulings-absorbed`. A ruling that exists only in a chat transcript, a session document, or a code comment is not recorded. Earlier project-side copies of this document are frozen archives and must not be treated as authoritative.
 
 # Owner rulings — Shadowverse Worlds Beyond Practice Tool
 
@@ -452,6 +452,165 @@ Uniformly at random among the destroyed allied followers that share the highest 
 
 Engine already matched (`pickDestroyedMatchHighestBaseCost` keeps every record at `maxBase`, then `top[state.rng.nextInt(top.length)]`). Behaviour pinned; do not change without a new ruling.
 
+## Alternate and Enhance costs are fixed; only the card's own cost moves — 2026-09-02
+
+<!-- rulebook: absorbed #classmechanic-specific-keywords » **Owner ruling — Alternate and Enhance costs are fixed (2026-09-02):** -->
+
+> "you cant reduce the accelerate cost. you can only reduce (or increase) the cost of the follower itself
+> if thats what you are asking. same thing for enhance or crystallize"
+
+A cost reduction or increase changes the card's own effective play cost. It **never** touches the
+**Accelerate**, **Crystallize** or **Enhance** value N — those are fixed alternate costs as printed.
+
+**The consequence is counter-intuitive and is the part worth testing.** The alternate-form gate compares
+available PP against the card's _effective_ cost, so moving that cost moves the threshold: reducing a
+follower's cost makes its Accelerate/Crystallize form **harder** to reach, not cheaper. Shoddy Plaything
+(`10671110`, base 6 / Accelerate 2) at 5 PP plays via Accelerate; reduce its cost to 4 and the same 5 PP
+plays the printed follower instead.
+
+**Enhance is never declinable, and a reduced cost is not an exception:**
+
+> "huh no you cant choose. i just said you only have those 2 option. cost reduced of l'age d'or to 1pp:
+> either you would be at 1-5pp and play it for 1 but as soon as oyu hit 6pp available it jumps to 6pp
+> cost for the enhance"
+
+The "two options" are the two outcomes decided by your PP, not a player choice. L'Age d'Or (`10923310`,
+printed 4 / Enhance 6) reduced to 1 plays for 1 at 1–5 PP and jumps to 6 and enhances at 6+.
+
+Engine: `resolvePlayCost` (`src/logic/core/playCard/cost.ts`) tries `pickEnhanceTiers` first and falls
+through to the normal cost only when no tier is affordable; `pickAlternateForm`
+(`src/helpers/alternateForm.ts`) compares available PP against the **effective** cost while reading the
+alternate's **printed** N. Both already correct.
+
+## Crest and Faith slots are capped at five; a sixth is ignored — 2026-09-05
+
+<!-- rulebook: absorbed #zones-and-card-locations » **Owner ruling — Crest and Faith slots are capped at five (2026-09-05):** -->
+
+> "the crests / faith slots are capped at 5 yes"
+
+> "6th crest just bounces of (gets ignored). In the past meta maddening benison was abused by crest
+> haven. When you have 5 crests the maddening benison crest effect deal 10 DMG to your leader doesn't
+> happen since the crest had no space."
+
+The crest area holds at most five, and **Faith counts toward the five**. A gain beyond the cap is a
+silent no-op: the crest never exists, so neither do its Countdown or its Last Words.
+
+The worked consequence is a real play pattern: Maddening Benison `10263310` (_Restore 10 defense to your
+leader. Gain Crest: Maddening Benison_ — crest: Countdown (2), Last Words: deal 10 damage to your leader)
+at five crests is a **drawback-free 10 heal** — the restore resolves, the crest gain does nothing, and
+the self-damage never comes.
+
+Engine: implemented — `handleGainCrest` (`src/logic/effects/crest.ts`) refuses past `MAX_CREST_SLOTS`
+with `reason: "slot_cap"`.
+
+## A duplicate crest bounces off the active one — no refresh — 2026-09-05
+
+<!-- rulebook: absorbed #zones-and-card-locations » **Owner ruling — A duplicate crest bounces off the active one (2026-09-05):** -->
+
+> "if you play a duplicate crest the crest doesn't get replaced it bounces of at the active one. Say 1
+> crest has countdown 4 and counts down to 1 and you play it again it will stay at 1 and not go back up
+> to 4."
+
+Re-gaining a crest you already have does nothing at all — it does not replace the instance and does not
+reset its Countdown. A crest at Countdown 1, re-gained, stays at 1, and there is still exactly one.
+
+Note this differs from SWB-RL, whose default **replaces** the instance; do not port that behaviour.
+
+Engine: implemented — `crest.ts:117` returns early when `crests.some((c) => c.name === crestName)`.
+
+## Last Words summons never spawn in place — 2026-09-05
+
+<!-- rulebook: pending — Last Words board-compaction summon placement not written through to rulebook -->
+
+> "When the board is full and a follower with Last Words 'summon another follower' dies, he won't spawn
+> in place. The other older followers to the right of his will shuffle left and the Last Words-summoned
+> follower will be the new rightmost — first in is left and last in is right."
+
+A dead follower's slot is not held open for its own Last Words summon. The board **compacts first** —
+survivors to the right shift left — and the summoned follower is then **appended on the right**, making
+it the newest. Board order is entry order: first in is leftmost, last in is rightmost.
+
+This matters for every position-sensitive effect: "the leftmost allied follower", `distribution:
+"leftmost"`, split damage by board age, and anything that reads entry order.
+
+## Every multi-card summon resolves one card after another — 2026-09-05
+
+<!-- rulebook: pending — sequential multi-summon resolution not written through to rulebook -->
+
+> "they never appear at the same time, it's always one after the other (even if it looks instant by eye)"
+
+A `summon` with `count: N` is **N sequential entries**, never one simultaneous arrival. Each entry raises
+its own enter trigger, and each trigger's condition is judged at its own moment.
+
+The worked case the owner gave: Sephie's Fanfare with exactly four Obsessed Test Subjects already
+entered summons _"a 2/2 and then 5/5"_ — the fifth copy's _"if at least 5 **other** allied copies have
+entered"_ is judged as it enters (four others, no buff), and the sixth's as it enters (five others,
++3/+3). Two copies from one "summon 2" are **not** simultaneous.
+
+## Krulle, Heir to Unkilling (`10314110`) — his own Fanfare satisfies his own heal — 2026-09-07
+
+<!-- rulebook: pending — Krulle self-Fanfare heal rule not written through to rulebook -->
+
+> "Krulle when he comes onto the field and gives enemy followers -0/-2 he heals the leader 1 if he is
+> successful."
+
+Printed: _"Fanfare: Give all enemy followers on the field -0/-2. | Ambush | Once on each of your turns,
+when an enemy follower is given -defense on the field, restore 1 defense to your leader. | Super-Evolve:
+Give your opponent Crest: Krulle, Heir to Unkilling."_
+
+**A card's own Fanfare debuff satisfies its own "when an enemy follower is given -defense" clause.**
+Playing Krulle with at least one enemy follower on the field restores 1 defense to your leader in the
+same resolution.
+
+**The qualifier is load-bearing: "if he is successful."** The heal is conditional on the debuff actually
+landing. With no enemy followers on the field the `-0/-2` does nothing, so there is **no heal** — a fix
+that heals unconditionally on play is wrong, and that negative case is exactly what a naive fix breaks.
+
+`10314110` is the only card in the pool that listens for `enemy_follower_defense_down`.
+
+Engine: the bug reported on 2026-09-07 (no heal, from either route) is **fixed**; three tests in
+`tests/unit/d4a-clause-gap.test.ts` pin it — the self-Fanfare case, an external-debuff discriminator, and
+the no-enemy-followers negative — and all three pass on `main`.
+
+## Beelzebub, Supreme King (`10474120`) — "Takes 1 more damage" is permanent and stacks — 2026-09-07
+
+<!-- rulebook: pending — Beelzebub stacking leader damage bonus not written through to rulebook -->
+
+> "if you play him 3 times in a game every damage instance to the enemy leader will deal +3. realistically
+> you play him once and everything is +1 to the enemy leader attacks or spells."
+
+Printed: _"Fanfare: Select 2 enemy followers on the field, remove all abilities from them, and deal them
+9 damage. **Give the enemy leader 'Takes 1 more damage.'**"_
+
+- **Permanent for the rest of the match** — not per-turn, and it does not expire.
+- **Stacks additively per instance played.** Three Beelzebubs = **+1 each**, so +3 on every damage
+  instance to that leader.
+- **Applies per damage instance, whatever the source.** Five separate 1-damage pings each become 2, not
+  one lump +1.
+- Interacts with the 2026-08-31 ruling: a **0-damage event still takes the bonus** (0 + 1 = 1). Healing
+  does not.
+
+**Confirmed by three official Cygames Q&A**, which settle the general shape beyond the owner's words:
+
+1. Multiple copies _can_ give the debuff multiple times — stacking confirmed by the publisher.
+2. Beryl, Nightmare Incarnate's Fanfare into your own leader carrying the debuff deals **4**, not 3 — the
+   bonus applies to **self-inflicted** damage from your own card.
+3. An enemy super-evolved follower destroying one of your followers deals **2** to your leader — the
+   bonus applies to **trigger** damage, not only attacks and spells.
+
+So the bonus is a property of the **damage pipeline into that leader**, not of any source category.
+
+**"Vulnerable" is not a keyword.** The authored JSON grants `keywords: [{"name": "Vulnerable", "value":
+1}]`; there is no such keyword in this game and the printed text is the quoted string _"Takes 1 more
+damage."_ The name appears in exactly one card's JSON. It is a naming hazard, not a bug — the behaviour
+is correct — and renaming it to read like the printed text is optional cleanup, not part of any fix.
+
+Engine: implemented as leader state — `PlayerState.leaderDamageTakenBonus`, granted with `+=` (so
+stacking is already correct) and consumed in `applyLeaderDamage`, the single centralised leader-damage
+entry point, which is why (2) and (3) hold without special cases. Two defects noted when this was ruled
+are both since fixed: the consumer guard is now `if (mod !== 0)`, and the dead
+`handleModifyLeaderDamageReceived` has been removed.
+
 ## `still_alive` — subject is the damage victim (2026-09-08)
 
 <!-- rulebook: absorbed #damage-events-general » **Owner ruling — `still_alive` subject is the damage victim (2026-09-08):** -->
@@ -578,7 +737,7 @@ Owner's recollection (caveat: "Its been a while so I'm not 100% sure anymore"): 
 
 ## Still open — Chris will test in game
 
-Whether a **cost reduction moves the Accelerate value N**, or only the normal cost. No official text exists in either game; the only material is player speculation reasoning by analogy from Enhance. **This is the only remaining open item.**
+~~Whether a **cost reduction moves the Accelerate value N**, or only the normal cost.~~ **Settled 2026-09-02** — see **Alternate and Enhance costs are fixed; only the card's own cost moves — 2026-09-02** above. Alternate cost N is fixed; only the card's own effective play cost moves.
 
 ~~Related and **unreachable in practice**: whether an Accelerate play triggers Spellboost.~~ **Settled 2026-09-02 — yes.** Accelerate plays trigger Spellboost (and other spell-play mechanics). The earlier "unreachable in practice" reasoning was wrong: it assumed every Accelerate card is Portalcraft or Dragoncraft, but **Jailor of Antiquity (`10901110`) is Neutral**, so any Runecraft deck can contain both. See **Accelerate and spells — 2026-09-02** and **Alternate-form permanence — 2026-09-02** above.
 

@@ -2,9 +2,12 @@
 /**
  * scripts/check-rulings-absorbed.ts
  *
- * Verifies every `## ` heading in docs/owner-rulings.md carries exactly one
- * `<!-- rulebook: … -->` marker. For `absorbed`, verifies a unique locator
- * string appears in the anchored section and exactly once in the rulebook.
+ * Log → rulebook: every `## ` heading in docs/owner-rulings.md carries exactly one
+ * `<!-- rulebook: … -->` marker. For `absorbed`, verifies a unique locator string
+ * appears in the anchored section and exactly once in the rulebook.
+ *
+ * Rulebook → log: every `**Owner ruling — <topic> (<date>):**` block in the rulebook
+ * maps to a dated `## ` heading in docs/owner-rulings.md` (by locator or date+topic).
  */
 
 import * as fs from "fs";
@@ -15,7 +18,7 @@ const RULINGS_PATH = path.join(ROOT, "docs/owner-rulings.md");
 const RULEBOOK_PATH = path.join(ROOT, "docs/svwb_rulebook_formatted.md");
 
 /** Pinned pending population — must match deliberate `pending` markers. */
-const EXPECTED_PENDING_COUNT = 3;
+const EXPECTED_PENDING_COUNT = 7;
 
 const ABSORBED_RE =
   /^<!--\s*rulebook:\s*absorbed\s+#([a-z0-9-]+)\s+»\s+(.+?)\s*-->$/i;
@@ -24,6 +27,16 @@ const ENGINE_INTERNAL_RE =
 const PENDING_RE = /^<!--\s*rulebook:\s*pending\s+—\s+(.+?)\s*-->$/i;
 
 const DATE_RE = /\d{4}-\d{2}-\d{2}/;
+
+const RULEBOOK_OWNER_RULING_RE =
+  /\*\*Owner ruling — (.+?) \((?:PROVISIONAL,\s*)?(\d{4}-\d{2}-\d{2})\):\*\*/g;
+
+interface RulebookOwnerRuling {
+  topic: string;
+  date: string;
+  fullPrefix: string;
+  line: number;
+}
 
 interface Heading {
   line: number;
@@ -114,6 +127,144 @@ function countOccurrences(haystack: string, needle: string): number {
   return count;
 }
 
+function extractHeadingDate(title: string): string | null {
+  const m = title.match(/(\d{4}-\d{2}-\d{2})/);
+  return m ? m[1] : null;
+}
+
+function normalizeTopic(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/\d{8,}/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function topicWords(text: string): Set<string> {
+  const stop = new Set([
+    "owner",
+    "ruling",
+    "the",
+    "and",
+    "for",
+    "with",
+    "not",
+    "are",
+    "is",
+    "a",
+    "an",
+    "to",
+    "of",
+    "in",
+    "on",
+    "at",
+    "by",
+    "or",
+    "as",
+    "if",
+    "it",
+    "its",
+    "this",
+    "that",
+    "when",
+    "from",
+    "has",
+    "have",
+  ]);
+  return new Set(
+    normalizeTopic(text)
+      .split(" ")
+      .filter((w) => w.length > 2 && !stop.has(w)),
+  );
+}
+
+function topicsOverlap(rulebookTopic: string, headingTitle: string): boolean {
+  const headingBody = headingTitle.replace(/\s*—\s*\d{4}-\d{2}-\d{2}.*$/, "");
+  const rt = normalizeTopic(rulebookTopic);
+  const ht = normalizeTopic(headingBody);
+
+  if (rt.includes(ht) || ht.includes(rt)) return true;
+
+  const rw = topicWords(rulebookTopic);
+  const hw = topicWords(headingBody);
+  let overlap = 0;
+  for (const w of rw) {
+    if (hw.has(w)) overlap++;
+  }
+  const minSize = Math.min(rw.size, hw.size);
+  return overlap >= 2 || (minSize > 0 && overlap / minSize >= 0.4);
+}
+
+function parseRulebookOwnerRulings(markdown: string): RulebookOwnerRuling[] {
+  const blocks: RulebookOwnerRuling[] = [];
+  RULEBOOK_OWNER_RULING_RE.lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = RULEBOOK_OWNER_RULING_RE.exec(markdown)) !== null) {
+    blocks.push({
+      topic: match[1],
+      date: match[2],
+      fullPrefix: match[0],
+      line: markdown.slice(0, match.index).split("\n").length,
+    });
+  }
+  return blocks;
+}
+
+function findLoggedCounterpart(
+  block: RulebookOwnerRuling,
+  rulingHeadings: Heading[],
+  locatorToHeading: Map<string, string>,
+): Heading | undefined {
+  for (const [locator, title] of locatorToHeading) {
+    if (
+      locator === block.fullPrefix ||
+      block.fullPrefix.startsWith(locator) ||
+      locator.startsWith(block.fullPrefix)
+    ) {
+      return rulingHeadings.find((h) => h.title === title);
+    }
+  }
+
+  const sameDate = rulingHeadings.filter(
+    (h) => extractHeadingDate(h.title) === block.date,
+  );
+  return sameDate.find((h) => topicsOverlap(block.topic, h.title));
+}
+
+function checkRulebookBlocksLogged(
+  rulebook: string,
+  rulingHeadings: Heading[],
+  locatorToHeading: Map<string, string>,
+): boolean {
+  const blocks = parseRulebookOwnerRulings(rulebook);
+  let failed = false;
+  const unmapped: RulebookOwnerRuling[] = [];
+
+  for (const block of blocks) {
+    const counterpart = findLoggedCounterpart(
+      block,
+      rulingHeadings,
+      locatorToHeading,
+    );
+    if (!counterpart) unmapped.push(block);
+  }
+
+  console.log(
+    `rulebook owner-ruling blocks ${blocks.length}: mapped ${blocks.length - unmapped.length} / unmapped ${unmapped.length}`,
+  );
+
+  if (unmapped.length > 0) {
+    failed = true;
+    console.error("✗ Rulebook owner-ruling blocks with no logged counterpart:");
+    for (const block of unmapped) {
+      console.error(`  line ${block.line}: ${block.fullPrefix}`);
+    }
+  }
+
+  return !failed;
+}
+
 function main(): void {
   const rulings = fs.readFileSync(RULINGS_PATH, "utf-8");
   const rulebook = fs.readFileSync(RULEBOOK_PATH, "utf-8");
@@ -125,6 +276,7 @@ function main(): void {
   let engineInternal = 0;
   let pending = 0;
   const pendingRows: string[] = [];
+  const locatorToHeading = new Map<string, string>();
   let failed = false;
 
   for (const heading of rulingHeadings) {
@@ -203,6 +355,7 @@ function main(): void {
         failed = true;
         continue;
       }
+      locatorToHeading.set(locator, heading.title);
       absorbed++;
     } else if (engineMatch) {
       const reason = engineMatch[1]?.trim();
@@ -249,6 +402,10 @@ function main(): void {
   console.log(
     `rulings ${total}: absorbed ${absorbed} / engine-internal ${engineInternal} / pending ${pending}`,
   );
+
+  if (!checkRulebookBlocksLogged(rulebook, rulingHeadings, locatorToHeading)) {
+    failed = true;
+  }
 
   if (failed) process.exit(1);
 }
