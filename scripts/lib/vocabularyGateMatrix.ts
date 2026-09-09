@@ -86,6 +86,11 @@ export const MATRIX_PROBES: MatrixProbe[] = [
     key: "leftmost",
     effectPatch: { filter: "leftmost" },
   },
+  {
+    field: "filter-string",
+    key: "leftmost+distribution",
+    effectPatch: { filter: "leftmost", distribution: "leftmost" },
+  },
 ];
 
 function minimalEffectForOp(op: string): Record<string, unknown> {
