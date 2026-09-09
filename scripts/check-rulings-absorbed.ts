@@ -15,7 +15,7 @@ const RULINGS_PATH = path.join(ROOT, "docs/owner-rulings.md");
 const RULEBOOK_PATH = path.join(ROOT, "docs/svwb_rulebook_formatted.md");
 
 /** Pinned pending population — must match deliberate `pending` markers. */
-const EXPECTED_PENDING_COUNT = 3;
+const EXPECTED_PENDING_COUNT = 7;
 
 const ABSORBED_RE =
   /^<!--\s*rulebook:\s*absorbed\s+#([a-z0-9-]+)\s+»\s+(.+?)\s*-->$/i;
