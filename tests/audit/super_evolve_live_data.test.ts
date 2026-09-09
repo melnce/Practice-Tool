@@ -137,7 +137,9 @@ describe("Replicate op — live fanfare re-execution", () => {
     winged.hasEvolved = false;
     state.players.first.board = [ally1, ally2, winged];
 
-    expect(winged.evolve).toEqual([{ op: "replicate", zone: "fanfare" }]);
+    expect(winged.evolve).toEqual([
+      expect.objectContaining({ op: "replicate", zone: "fanfare" }),
+    ]);
 
     runEffects([...(winged.fanfare ?? [])], "first", winged);
     expect(state.pendingTargetEffect).toBeDefined();
@@ -168,7 +170,9 @@ describe("Replicate op — live fanfare re-execution", () => {
     apollo.hasEvolved = false;
     state.players.first.board = [apollo];
 
-    expect(apollo.evolve).toEqual([{ op: "replicate", zone: "fanfare" }]);
+    expect(apollo.evolve).toEqual([
+      expect.objectContaining({ op: "replicate", zone: "fanfare" }),
+    ]);
 
     runEffects([...(apollo.fanfare ?? [])], "first", apollo);
     expect(state.pendingTargetEffect).toBeUndefined();

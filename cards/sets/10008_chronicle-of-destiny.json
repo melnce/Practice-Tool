@@ -77,7 +77,8 @@
         "op": "keyword",
         "action": "grant",
         "target": "self",
-        "keywords": ["Storm"]
+        "keywords": ["Storm"],
+        "printed": "Evolve: Give this follower Storm."
       }
     ],
     "superevolve": [],
@@ -88,7 +89,8 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "amount": 4
+        "amount": 4,
+        "printed": "Fanfare: Select an enemy follower on the field and deal it 4 damage."
       }
     ]
   },
@@ -150,7 +152,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -164,7 +167,8 @@
         "filter": {
           "type": "Follower"
         },
-        "distribution": "random"
+        "distribution": "random",
+        "printed": "Fanfare: Add a copy of a random allied follower destroyed this match to your hand without revealing it."
       }
     ],
     "spell": []
@@ -369,7 +373,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -380,7 +385,8 @@
         "op": "summon",
         "source": "named",
         "name": "Fairy",
-        "count": 2
+        "count": 2,
+        "printed": "Fanfare: Summon 2 copies of Fairy."
       }
     ]
   },
@@ -408,12 +414,14 @@
         "op": "return",
         "destination": "deck",
         "select": 1,
-        "target": "ally:hand"
+        "target": "ally:hand",
+        "printed": "Fanfare: Select a card in your hand and return it to deck."
       },
       {
         "op": "draw",
         "source": "deck",
-        "count": 1
+        "count": 1,
+        "printed": "Draw a card."
       }
     ]
   },
@@ -552,7 +560,8 @@
         "op": "summon",
         "source": "named",
         "name": "Lycoris, Barbs of Passion",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Lycoris, Barbs of Passion."
       },
       {
         "op": "stat",
@@ -561,7 +570,8 @@
         "keywords": ["Barrier"],
         "condition": {
           "include_self": true
-        }
+        },
+        "printed": "Give all allied followers on the field Barrier."
       }
     ]
   },
@@ -627,14 +637,16 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and destroy it."
       },
       {
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
         "attack": 1,
-        "defense": 1
+        "defense": 1,
+        "printed": "Give all other allied followers on the field +1/+1."
       }
     ]
   },
@@ -712,7 +724,8 @@
     "superevolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Super-Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "keywords": [],
@@ -722,12 +735,14 @@
         "op": "summon",
         "source": "named",
         "name": "Naht's Henchman",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Naht's Henchman."
       },
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount": 3
+        "amount": 3,
+        "printed": "Deal 3 damage to all enemy followers."
       }
     ]
   },
@@ -783,7 +798,8 @@
         "source": "named",
         "name": "Steelclad Knight",
         "count": 1,
-        "keywords": ["Ward"]
+        "keywords": ["Ward"],
+        "printed": "Evolve: Summon a Steelclad Knight and give it Ward."
       }
     ],
     "superevolve": [],
@@ -795,7 +811,8 @@
         "source": "named",
         "name": "Steelclad Knight",
         "count": 1,
-        "keywords": ["Rush"]
+        "keywords": ["Rush"],
+        "printed": "Fanfare: Summon a Steelclad Knight and give it Rush."
       }
     ]
   },
@@ -1058,7 +1075,8 @@
       {
         "op": "add_to_hand",
         "name": "Desperados' Shot",
-        "count": 1
+        "count": 1,
+        "printed": "Evolve: Add a Desperados' Shot to your hand."
       }
     ],
     "superevolve": [],
@@ -1069,7 +1087,8 @@
         "op": "summon",
         "source": "named",
         "name": "Bunny & Baron, Fate's Bullet",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Bunny & Baron, Fate's Bullet."
       },
       {
         "op": "gate",
@@ -1081,7 +1100,8 @@
             "target": "enemy:leader",
             "amount": 4
           }
-        ]
+        ],
+        "printed": "Rally (20) - Deal 4 damage to the enemy leader."
       }
     ]
   },
@@ -1163,7 +1183,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -1174,12 +1195,14 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "amount": 1
+        "amount": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and deal it 1 damage."
       },
       {
         "op": "spellboost",
         "target": "ally:hand",
-        "count": 1
+        "count": 1,
+        "printed": "Spellboost your hand."
       }
     ]
   },
@@ -1389,7 +1412,8 @@
         "filter": {
           "type": "Spell",
           "tribe": "Mysteria"
-        }
+        },
+        "printed": "Evolve: Reduce the cost of all Mysteria spells in your hand by 1."
       }
     ],
     "superevolve": [
@@ -1413,7 +1437,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Super-Evolve: Gain Crest: Tico, Mysterian Spellcrafter."
       }
     ],
     "keywords": [],
@@ -1422,7 +1447,8 @@
       {
         "op": "add_to_hand",
         "name": "Mysterian Missile",
-        "count": 2
+        "count": 2,
+        "printed": "Fanfare: Add 2 copies of Mysterian Missile to your hand."
       }
     ],
     "specific_effects": [
@@ -1699,7 +1725,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Evolve: Gain Crest: Spirit of Wadatsumi."
       }
     ],
     "superevolve": [],
@@ -1709,7 +1736,8 @@
       {
         "op": "add_to_hand",
         "name": "Majestic Megalorca",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Add a Majestic Megalorca to your hand."
       }
     ],
     "specific_effects": [
@@ -1782,7 +1810,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -1792,18 +1821,21 @@
       {
         "op": "discard",
         "mode": "select",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Select a card in your hand and discard it."
       },
       {
         "op": "draw",
         "source": "deck",
-        "count": 1
+        "count": 1,
+        "printed": "Draw a card."
       },
       {
         "op": "restore",
         "target": "leader",
         "player": "self",
-        "amount": 1
+        "amount": 1,
+        "printed": "Restore 1 defense to your leader."
       }
     ]
   },
@@ -2031,7 +2063,8 @@
       {
         "op": "draw",
         "source": "deck",
-        "count": 3
+        "count": 3,
+        "printed": "Super-Evolve: Draw 3 cards."
       }
     ],
     "keywords": [
@@ -2042,7 +2075,8 @@
           {
             "op": "pp",
             "action": "gain_max",
-            "amount": 1
+            "amount": 1,
+            "printed": "Accelerate (3): Gain 1 max play point."
           }
         ]
       }
@@ -2052,12 +2086,14 @@
       {
         "op": "discard",
         "mode": "select",
-        "count": 2
+        "count": 2,
+        "printed": "Fanfare: Select 2 cards in your hand and discard them."
       },
       {
         "op": "damage",
         "target": "enemy:all",
-        "amount": 4
+        "amount": 4,
+        "printed": "Deal 4 damage to all enemies."
       }
     ],
     "specific_effects": [
@@ -2153,7 +2189,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -2170,7 +2207,8 @@
             "name": "Bat",
             "count": 2
           }
-        ]
+        ],
+        "printed": "Fanfare: If your leader's defense is higher than the enemy leader's defense, summon 2 copies of Bat."
       }
     ]
   },
@@ -2353,7 +2391,8 @@
         },
         "select": 1,
         "attack": 3,
-        "defense": 0
+        "defense": 0,
+        "printed": "Evolve: Select a follower in your hand and give it +3/+0."
       }
     ],
     "superevolve": [],
@@ -2366,7 +2405,8 @@
         "target": "enemy:follower",
         "select": 1,
         "attack": 0,
-        "defense": -3
+        "defense": -3,
+        "printed": "Fanfare: Select an enemy follower on the field and give it -0/-3."
       }
     ]
   },
@@ -2617,7 +2657,8 @@
             "target": "selected:follower",
             "amount": 2
           }
-        ]
+        ],
+        "printed": "Evolve: Select an enemy follower on the field, remove all abilities from it, and deal it 2 damage."
       }
     ],
     "superevolve": [],
@@ -2628,7 +2669,8 @@
           {
             "op": "draw",
             "source": "deck",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Draw a card."
           }
         ]
       }
@@ -2690,7 +2732,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -2700,7 +2743,8 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and destroy it."
       }
     ]
   },
@@ -3333,13 +3377,15 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and destroy it."
       },
       {
         "op": "summon",
         "source": "named",
         "name": "Radiant Artifact",
-        "count": 1
+        "count": 1,
+        "printed": "Summon a Radiant Artifact."
       }
     ]
   },
@@ -3466,7 +3512,8 @@
         },
         "condition": {
           "not_self": true
-        }
+        },
+        "printed": "Evolve: Select another unevolved allied follower on the field and evolve it."
       }
     ],
     "superevolve": [],
@@ -3476,7 +3523,8 @@
       {
         "op": "add_to_hand",
         "name": "Analyzing Artifact",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Add an Analyzing Artifact to your hand."
       }
     ]
   }

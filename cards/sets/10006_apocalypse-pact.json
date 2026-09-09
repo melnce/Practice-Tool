@@ -275,7 +275,8 @@
         "op": "summon",
         "source": "named",
         "name": "Springbloom Fairy",
-        "count": 1
+        "count": 1,
+        "printed": "Evolve: Summon a Springbloom Fairy."
       }
     ],
     "superevolve": [],
@@ -285,7 +286,8 @@
       {
         "op": "add_to_hand",
         "name": "Springbloom Fairy",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Add a Springbloom Fairy to your hand."
       }
     ]
   },
@@ -557,7 +559,8 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Super-Evolve: Select an enemy follower on the field and destroy it."
       }
     ],
     "keywords": [],
@@ -567,7 +570,8 @@
         "op": "summon",
         "source": "named",
         "name": "Springbloom Fairy",
-        "count": 3
+        "count": 3,
+        "printed": "Fanfare: Summon 3 copies of Springbloom Fairy."
       }
     ],
     "attacks_per_turn": 2
@@ -695,7 +699,8 @@
         "op": "return",
         "destination": "deck",
         "select": 1,
-        "target": "ally:hand"
+        "target": "ally:hand",
+        "printed": "Fanfare: Select a card in your hand and return it to deck."
       },
       {
         "op": "search",
@@ -703,7 +708,8 @@
         "filter": {
           "type": "follower",
           "class": "Swordcraft"
-        }
+        },
+        "printed": "Draw 2 Swordcraft followers."
       }
     ]
   },
@@ -770,7 +776,8 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "amount": 3
+        "amount": 3,
+        "printed": "Evolve: Select an enemy follower on the field and deal it 3 damage."
       }
     ],
     "superevolve": [],
@@ -785,7 +792,8 @@
             "action": "give",
             "target": "self",
             "attack": 2,
-            "defense": 2
+            "defense": 2,
+            "printed": "Enhance (4): Give this follower +2/+2."
           }
         ]
       }
@@ -915,12 +923,14 @@
             "op": "pp",
             "action": "recover",
             "player": "self",
-            "amount": 3
+            "amount": 3,
+            "printed": "Enhance (6): Recover 3 play points."
           },
           {
             "op": "add_to_hand",
             "name": "Fearless Soldier",
-            "count": 1
+            "count": 1,
+            "printed": "Add a Fearless Soldier to your hand."
           }
         ]
       }
@@ -930,7 +940,8 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and destroy it."
       }
     ]
   },
@@ -1026,7 +1037,8 @@
         "action": "give",
         "target": "ally:follower",
         "attack": 1,
-        "defense": 1
+        "defense": 1,
+        "printed": "Super-Evolve: Give all other allied followers on the field +1/+1."
       }
     ],
     "keywords": [
@@ -1039,7 +1051,8 @@
             "source": "named",
             "name": "Fearless Soldier",
             "count": 1,
-            "keywords": ["Storm"]
+            "keywords": ["Storm"],
+            "printed": "Enhance (8): Summon a Fearless Soldier and give it Storm."
           }
         ]
       },
@@ -1052,7 +1065,8 @@
             "source": "named",
             "name": "Fearless Soldier",
             "count": 1,
-            "keywords": ["Drain"]
+            "keywords": ["Drain"],
+            "printed": "Enhance (7): Summon a Fearless Soldier and give it Drain."
           }
         ]
       }
@@ -1064,7 +1078,8 @@
         "source": "named",
         "name": "Fearless Soldier",
         "count": 1,
-        "keywords": ["Bane"]
+        "keywords": ["Bane"],
+        "printed": "Fanfare: Summon a Fearless Soldier and give it Bane."
       }
     ]
   },
@@ -1110,7 +1125,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Evolve: Reduce your faith's value by 5 to give it \"Whenever you play an Enhanced card, give all allied followers on the field +1/+1.\""
       }
     ],
     "superevolve": [],
@@ -1120,7 +1136,8 @@
       {
         "op": "add_to_hand",
         "name": "Depths of the Eld Sword",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Add a Depths of the Eld Sword to your hand."
       }
     ],
     "specific_effects": [
@@ -1177,7 +1194,8 @@
         "keywords": ["Rush"],
         "condition": {
           "not_self": true
-        }
+        },
+        "printed": "Super-Evolve: Give all other allied followers on the field Rush."
       }
     ],
     "keywords": [],
@@ -1187,7 +1205,8 @@
         "op": "summon",
         "source": "named",
         "name": "Caravan Mammoth",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Caravan Mammoth."
       }
     ]
   },
@@ -1292,7 +1311,8 @@
             "op": "summon",
             "source": "named",
             "name": "Adventurous Grimoire",
-            "count": 2
+            "count": 2,
+            "printed": "Enhance (6): Summon 2 copies of Adventurous Grimoire."
           }
         ]
       },
@@ -1302,7 +1322,8 @@
           {
             "op": "spellboost",
             "target": "ally:hand",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Spellboost your hand."
           }
         ]
       }
@@ -1368,7 +1389,8 @@
         "target": "ally:follower",
         "name_filter": "Crystalspawn",
         "attack": 1,
-        "defense": 0
+        "defense": 0,
+        "printed": "Evolve: Give all allied copies of Crystalspawn on the field +1/+0."
       }
     ],
     "superevolve": [],
@@ -1379,7 +1401,8 @@
         "op": "summon",
         "source": "named",
         "name": "Crystalspawn",
-        "count": 2
+        "count": 2,
+        "printed": "Fanfare: Summon 2 copies of Crystalspawn."
       }
     ]
   },
@@ -1522,7 +1545,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Super-Evolve: Gain Crest: Shymm, Love Bewitched."
       }
     ],
     "keywords": ["Drain"],
@@ -1532,7 +1556,8 @@
         "op": "summon",
         "source": "named",
         "name": "Crystalspawn",
-        "count": 2
+        "count": 2,
+        "printed": "Fanfare: Summon 2 copies of Crystalspawn."
       }
     ],
     "specific_effects": [
@@ -1628,7 +1653,8 @@
           {
             "op": "draw",
             "source": "deck",
-            "count": 2
+            "count": 2,
+            "printed": "Last Words: Draw 2 cards."
           }
         ]
       }
@@ -1638,7 +1664,8 @@
       {
         "op": "discard",
         "mode": "select",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Select a card in your hand and discard it."
       }
     ]
   },
@@ -1668,7 +1695,8 @@
             "op": "summon",
             "source": "named",
             "name": "Fruitfish",
-            "count": 2
+            "count": 2,
+            "printed": "Enhance (6): Summon 2 copies of Fruitfish."
           }
         ]
       },
@@ -1679,7 +1707,8 @@
             "op": "restore",
             "target": "leader",
             "player": "self",
-            "amount": 1
+            "amount": 1,
+            "printed": "Last Words: Restore 1 defense to your leader."
           }
         ]
       }
@@ -1863,7 +1892,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -1873,14 +1903,16 @@
       {
         "op": "discard",
         "mode": "select",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Select a card in your hand and discard it."
       },
       {
         "op": "damage",
         "target": "enemy:follower",
         "amount": 6,
         "distribution": "random_hits",
-        "count": 1
+        "count": 1,
+        "printed": "Deal 6 damage to a random enemy follower."
       }
     ]
   },
@@ -1973,12 +2005,14 @@
       {
         "op": "discard",
         "mode": "select",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Select a card in your hand and discard it."
       },
       {
         "op": "add_to_hand",
         "name": "Spilling Red",
-        "count": 2
+        "count": 2,
+        "printed": "Add 2 copies of Spilling Red to your hand."
       }
     ]
   },
@@ -2048,12 +2082,14 @@
           {
             "op": "draw",
             "source": "deck",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Draw a card."
           },
           {
             "op": "damage",
             "target": "ally:leader",
-            "amount": 1
+            "amount": 1,
+            "printed": "Deal 1 damage to your leader."
           }
         ]
       }
@@ -2191,7 +2227,8 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "amount": 4
+        "amount": 4,
+        "printed": "Evolve: Select an enemy follower on the field and deal it 4 damage."
       }
     ],
     "superevolve": [],
@@ -2204,7 +2241,8 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": ["Storm"],
+            "printed": "Enhance (7): Give this follower Storm."
           }
         ]
       }
@@ -2524,13 +2562,15 @@
           {
             "op": "draw",
             "source": "deck",
-            "count": 1
+            "count": 1,
+            "printed": "Last Words: Draw a card."
           },
           {
             "op": "destroy",
             "target": "enemy:follower",
             "distribution": "random",
-            "count": 1
+            "count": 1,
+            "printed": "Destroy a random enemy follower."
           }
         ]
       },
@@ -2541,7 +2581,8 @@
           {
             "op": "countdown",
             "action": "advance",
-            "amount": 1
+            "amount": 1,
+            "printed": "Engage (1): Advance this amulet's count by 1."
           }
         ]
       }
@@ -2652,7 +2693,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -2663,7 +2705,8 @@
         "op": "summon",
         "source": "named",
         "name": "Holy Falcon",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Holy Falcon."
       }
     ]
   },
@@ -2695,18 +2738,21 @@
           {
             "op": "draw",
             "source": "deck",
-            "count": 2
+            "count": 2,
+            "printed": "Last Words: Draw 2 cards."
           },
           {
             "op": "damage",
             "target": "enemy:follower",
-            "amount": 2
+            "amount": 2,
+            "printed": "Deal 2 damage to all enemy followers."
           },
           {
             "op": "restore",
             "target": "leader",
             "player": "self",
-            "amount": 2
+            "amount": 2,
+            "printed": "Restore 2 defense to your leader."
           }
         ]
       }
@@ -3004,7 +3050,8 @@
             "op": "summon",
             "source": "named",
             "name": "Shoddy Plaything",
-            "count": 1
+            "count": 1,
+            "printed": "Accelerate (2): Summon a Shoddy Plaything."
           }
         ]
       }
@@ -3014,7 +3061,8 @@
       {
         "op": "draw",
         "source": "deck",
-        "count": 3
+        "count": 3,
+        "printed": "Fanfare: Draw 3 cards."
       }
     ],
     "specific_effects": [

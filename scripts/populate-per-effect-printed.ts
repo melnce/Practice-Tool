@@ -3,6 +3,7 @@
  * Populate per-op `printed` literals mechanically:
  * - Phase 1: free slice (one clause root, one sentence).
  * - Phase 2a: single-root cards — contiguous span of effect lines.
+ * - Phase 2b: multi-root hard-marker cards — marker resolver + site index.
  * Validator is the proof. Rejections are findings, not fixes.
  */
 
@@ -12,12 +13,18 @@ import { SETS_DIR } from "./mergeSets.js";
 import { TOKEN_JSON } from "./lib/loadAllCardData.js";
 import { writeFormattedJson } from "./lib/formatJson.js";
 import {
-  collectClauseRoots,
   checkPerEffectPrintedForCard,
   isFreeSliceCard,
+  isMultiRootUnprintedCard,
   isSingleRootUnprintedCard,
+  isHardMarkerMultiRootCard,
+  measureMultiRootBuckets,
+  multiRootPrintedLiterals,
   singleRootPrintedLiteral,
+  collectClauseRoots,
+  buildKeywordNameMarkerReport,
 } from "./lib/perEffectPrinted.js";
+import { loadCardsForGates } from "./lib/loadCards.js";
 import type { CardJson } from "./lib/loadCards.js";
 
 function resolveOpAtPath(
@@ -95,14 +102,65 @@ function loadEditableCards(): Map<
 }
 
 async function main() {
+  const gateCards = loadCardsForGates().map(({ card }) => card);
+  const buckets = measureMultiRootBuckets(gateCards);
+  const keywordReport = buildKeywordNameMarkerReport(gateCards);
+
   const editable = loadEditableCards();
   let freeSliceCandidates = 0;
   let singleRootCandidates = 0;
+  let multiRootCandidates = 0;
   let populatedCount = 0;
+  let multiRootPopulated = 0;
   const rejected: string[] = [];
   const touchedFiles = new Set<string>();
 
   for (const { card } of editable.values()) {
+    if (isMultiRootUnprintedCard(card) && isHardMarkerMultiRootCard(card)) {
+      multiRootCandidates++;
+      const literals = multiRootPrintedLiterals(card);
+      if (!literals) {
+        rejected.push(
+          `${card.id} ${card.name}: could not derive multi-root literals`,
+        );
+        continue;
+      }
+
+      const entry = editable.get(card.id);
+      if (!entry) continue;
+
+      const draft = structuredClone(entry.card) as CardJson;
+      for (const [rootPath, literal] of literals) {
+        setPrintedAtPath(
+          draft as Record<string, unknown>,
+          rootPath,
+          card.id,
+          literal,
+        );
+      }
+
+      const issues = checkPerEffectPrintedForCard(draft);
+      if (issues.length) {
+        rejected.push(
+          `${card.id} ${card.name}: validator rejected — ${issues.map((i) => i.rule).join(", ")}`,
+        );
+        continue;
+      }
+
+      for (const [rootPath, literal] of literals) {
+        setPrintedAtPath(
+          entry.card as Record<string, unknown>,
+          rootPath,
+          card.id,
+          literal,
+        );
+      }
+      populatedCount += literals.size;
+      multiRootPopulated++;
+      touchedFiles.add(entry.filePath);
+      continue;
+    }
+
     if (!isSingleRootUnprintedCard(card)) continue;
 
     const literal = singleRootPrintedLiteral(card);
@@ -159,8 +217,27 @@ async function main() {
 
   console.log(`Free-slice candidates: ${freeSliceCandidates}`);
   console.log(`Single-root (phase 2a) candidates: ${singleRootCandidates}`);
-  console.log(`Populated: ${populatedCount}`);
+  console.log(
+    `Multi-root hard-marker (phase 2b) candidates: ${multiRootCandidates}`,
+  );
+  console.log(
+    `Multi-root hard-marker populated (cards): ${multiRootPopulated}`,
+  );
+  console.log(`Populated (clause roots): ${populatedCount}`);
   console.log(`Validator rejected: ${rejected.length}`);
+  console.log("\nMulti-root buckets:");
+  console.log(
+    `  all multi-root: ${buckets.multiRootCards} cards; A=${buckets.bucketA.cards}/${buckets.bucketA.roots} B=${buckets.bucketB.cards}/${buckets.bucketB.roots} C=${buckets.bucketC.cards}/${buckets.bucketC.roots}`,
+  );
+  console.log(
+    `  hard-marker bucket A: ${buckets.hardMarkerBucketA.cards} cards / ${buckets.hardMarkerBucketA.roots} roots`,
+  );
+  console.log("\nKeyword name → printed marker map:");
+  for (const row of keywordReport) {
+    console.log(
+      `  ${row.name}: ${row.hasPrintedMarker ? row.printedMarkers.join(", ") : "(no printed marker — out of phase 2b slice)"}`,
+    );
+  }
   if (rejected.length) {
     console.log("\nRejections (findings):");
     for (const line of rejected) console.log(`  ${line}`);

@@ -201,12 +201,14 @@
             "filter": {
               "type": "Follower",
               "cost_gte": 7
-            }
+            },
+            "printed": "Enhance(8): Draw a follower that costs 7 or more."
           },
           {
             "op": "pp",
             "action": "recover",
-            "amount": 7
+            "amount": 7,
+            "printed": "Recover 7 play points"
           }
         ]
       },
@@ -447,12 +449,14 @@
             "filter": {
               "type": "Follower"
             },
-            "select": 1
+            "select": 1,
+            "printed": "Enhance(8): Select a follower in your hand and summon it."
           },
           {
             "op": "return",
             "destination": "hand",
-            "target": "self"
+            "target": "self",
+            "printed": "Return this card to hand."
           }
         ]
       }
@@ -772,7 +776,8 @@
         "target": "enemy:follower",
         "amount": 4,
         "count": 2,
-        "distribution": "random_hits"
+        "distribution": "random_hits",
+        "printed": "Fanfare: Do this 2 times: Deal 4 damage to a random enemy follower."
       }
     ],
     "evolve": [],
@@ -795,7 +800,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Super-Evolve: Gain Crest: Yuel & Societte, Dancing Duo."
       }
     ],
     "keywords": [],
@@ -1363,13 +1369,15 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 2,
-        "amount": 4
+        "amount": 4,
+        "printed": "Fanfare: Select 2 enemy followers on the field and deal them 4 damage."
       },
       {
         "op": "summon",
         "source": "named",
         "name": "Magic Sediment",
-        "count": 2
+        "count": 2,
+        "printed": "Gain 2 earth sigils."
       }
     ],
     "evolve": [],
@@ -1397,7 +1405,8 @@
         "op": "summon",
         "source": "named",
         "name": "Mireille & Risette, Penitent Duo",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Mireille & Risette, Penitent Duo."
       },
       {
         "op": "earth_rite",
@@ -1411,7 +1420,8 @@
             "op": "evolve",
             "target": "self"
           }
-        ]
+        ],
+        "printed": "Earth Rite(2) - Evolve it and this follower."
       }
     ],
     "evolve": [],
@@ -1518,7 +1528,8 @@
             "target": "selected:follower",
             "amount": 3
           }
-        ]
+        ],
+        "printed": "Fanfare: Select an enemy follower on the field, remove all abilities from it, and deal it 3 damage."
       }
     ],
     "evolve": [],
@@ -1543,7 +1554,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Super-Evolve: Gain Crest: Elmott, Remembrance Aflame."
       }
     ],
     "keywords": [],
@@ -1965,7 +1977,8 @@
             "keywords": ["Storm"],
             "target": "self"
           }
-        ]
+        ],
+        "printed": "Fanfare: Super Skybound Art (15)- Give this follower Storm."
       }
     ],
     "evolve": [],
@@ -1973,7 +1986,8 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": 2
+        "select": 2,
+        "printed": "Super-Evolve: Select 2 enemy followers on the field and destroy them."
       }
     ],
     "keywords": [],
@@ -2164,7 +2178,8 @@
       {
         "op": "pp",
         "action": "gain_max",
-        "amount": 1
+        "amount": 1,
+        "printed": "Fanfare: Gain 1 max play point."
       }
     ],
     "keywords": [
@@ -2176,13 +2191,15 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": ["Storm"],
+            "printed": "Enhance(10): Give this follower Storm."
           },
           {
             "op": "stat",
             "target": "ally:leader",
             "action": "set",
-            "defense": 1
+            "defense": 1,
+            "printed": "Set your leader's max defense to 1."
           },
           {
             "op": "keyword",
@@ -2194,7 +2211,8 @@
                 "duration": "opponent_turn_end"
               }
             ],
-            "action": "grant"
+            "action": "grant",
+            "printed": "Give your leader \"Can't take more than 0 damage at a time\" until the end of your opponent's turn."
           }
         ]
       }
@@ -2507,12 +2525,14 @@
     "fanfare": [
       {
         "op": "evolve",
-        "target": "all_allies"
+        "target": "all_allies",
+        "printed": "Fanfare: Evolve all unevolved allied followers on the field."
       },
       {
         "op": "damage",
         "target": "ally:leader",
-        "amount": 2
+        "amount": 2,
+        "printed": "Deal 2 damage to your leader."
       }
     ],
     "evolve": [],
@@ -2889,7 +2909,8 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "defense": 10
+            "defense": 10,
+            "printed": "Enhance(6): Give this follower +0/+10."
           }
         ]
       }
@@ -2902,7 +2923,8 @@
         "select": 1,
         "filter": {
           "damaged": true
-        }
+        },
+        "printed": "Evolve: Select a damaged enemy follower on the field and destroy it."
       }
     ],
     "superevolve": [],
@@ -2932,7 +2954,8 @@
           "type": "follower",
           "class": "Havencraft",
           "cost_lte": 2
-        }
+        },
+        "printed": "Fanfare: Summon a random Havencraft follower that costs 2 or less from your deck."
       }
     ],
     "evolve": [],
@@ -2941,7 +2964,8 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "keywords": ["Barrier"]
+        "keywords": ["Barrier"],
+        "printed": "Super-Evolve: Give all other allied followers on the field Barrier."
       }
     ],
     "keywords": [],
@@ -3615,7 +3639,8 @@
             "target": "selected:follower",
             "amount": 9
           }
-        ]
+        ],
+        "printed": "Fanfare: Select 2 enemy followers on the field, remove all abilities from them, and deal them 9 damage."
       },
       {
         "op": "keyword",
@@ -3626,7 +3651,8 @@
             "value": 1
           }
         ],
-        "action": "grant"
+        "action": "grant",
+        "printed": "Give the enemy leader \"Takes 1 more damage.\""
       }
     ],
     "keywords": [],

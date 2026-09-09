@@ -2319,13 +2319,15 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount": 5
+        "amount": 5,
+        "printed": "Fanfare: Deal 5 damage to all enemy followers."
       },
       {
         "op": "restore",
         "target": "leader",
         "player": "self",
-        "amount": 5
+        "amount": 5,
+        "printed": "Restore 5 defense to your leader."
       }
     ],
     "keywords": ["Storm", "Ward", "Aura"],
@@ -2418,13 +2420,15 @@
             "op": "restore",
             "target": "leader",
             "amount": 1,
-            "player": "self"
+            "player": "self",
+            "printed": "Last Words: Restore 1 defense to your leader."
           },
           {
             "op": "summon",
             "source": "named",
             "name": "Black Psalm, New Revelation",
-            "count": 1
+            "count": 1,
+            "printed": "Summon a Black Psalm, New Revelation."
           }
         ]
       }
@@ -2460,13 +2464,15 @@
           {
             "op": "damage",
             "target": "enemy:leader",
-            "amount": 1
+            "amount": 1,
+            "printed": "Last Words: Deal 1 damage to the enemy leader."
           },
           {
             "op": "summon",
             "source": "named",
             "name": "White Psalm, New Revelation",
-            "count": 1
+            "count": 1,
+            "printed": "Summon a White Psalm, New Revelation."
           }
         ]
       }

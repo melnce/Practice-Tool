@@ -59,14 +59,16 @@
       {
         "op": "discard",
         "mode": "select",
-        "count": 3
+        "count": 3,
+        "printed": "Evolve: Select 3 cards in your hand and discard them."
       },
       {
         "op": "add_to_hand",
         "source": "copy",
         "from": "ally:hand",
         "distribution": "leftmost",
-        "count": 3
+        "count": 3,
+        "printed": "Add an exact copy each of the 3 leftmost cards in your hand to your hand without revealing them."
       }
     ],
     "superevolve": [],
@@ -516,7 +518,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [
@@ -527,7 +530,8 @@
         "filter": {
           "tribe": "Pixie"
         },
-        "keywords": ["Bane"]
+        "keywords": ["Bane"],
+        "printed": "Super-Evolve: Give all allied Pixie followers on the field Bane."
       }
     ],
     "keywords": [],
@@ -537,7 +541,8 @@
         "op": "summon",
         "source": "named",
         "name": "Fairy",
-        "count": 3
+        "count": 3,
+        "printed": "Fanfare: Summon 3 copies of Fairy."
       }
     ]
   },
@@ -750,7 +755,8 @@
       {
         "op": "add_to_hand",
         "name": "Glittering Gold",
-        "count": 1
+        "count": 1,
+        "printed": "Evolve: Add a Glittering Gold to your hand."
       }
     ],
     "superevolve": [],
@@ -771,7 +777,8 @@
             "defense": 1,
             "keywords": ["Ward"]
           }
-        ]
+        ],
+        "printed": "Fanfare: If you have at least 2 spells in your hand, give this follower +1/+1 and Ward."
       }
     ]
   },
@@ -1141,7 +1148,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Super-Evolve: Gain Crest: Unkei, Goldbloom."
       }
     ],
     "keywords": [],
@@ -1150,12 +1158,14 @@
       {
         "op": "banish",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and banish it."
       },
       {
         "op": "add_to_hand",
         "name": "Glittering Gold",
-        "count": 1
+        "count": 1,
+        "printed": "Add a Glittering Gold to your hand."
       }
     ],
     "specific_effects": [
@@ -1188,7 +1198,8 @@
         "op": "summon",
         "source": "named",
         "name": "Guardian Golem",
-        "count": 2
+        "count": 2,
+        "printed": "Super-Evolve: Summon 2 copies of Guardian Golem."
       }
     ],
     "keywords": [],
@@ -1198,7 +1209,8 @@
         "op": "summon",
         "source": "named",
         "name": "Magic Sediment",
-        "count": 2
+        "count": 2,
+        "printed": "Fanfare: Gain 2 earth sigils."
       }
     ]
   },
@@ -1227,12 +1239,14 @@
         "target": "enemy:follower",
         "amount": 3,
         "count": 3,
-        "distribution": "random_distinct"
+        "distribution": "random_distinct",
+        "printed": "Fanfare: Deal 3 damage to 3 random enemy followers."
       },
       {
         "op": "spellboost",
         "target": "ally:hand",
-        "count": 3
+        "count": 3,
+        "printed": "Spellboost your hand 3 times."
       }
     ]
   },
@@ -1288,7 +1302,8 @@
       {
         "op": "crest",
         "action": "destroy",
-        "name": "Insomniac Witch"
+        "name": "Insomniac Witch",
+        "printed": "Evolve: Destroy your Crest: Insomniac Witch."
       }
     ],
     "superevolve": [],
@@ -1309,7 +1324,8 @@
             "target": "all:follower",
             "amount": 3
           }
-        ]
+        ],
+        "printed": "Fanfare: Gain Crest: Insomniac Witch."
       }
     ],
     "specific_effects": [
@@ -1540,7 +1556,8 @@
         "op": "deck",
         "action": "add",
         "name": "Lhynkal, Wandering Fool",
-        "count": 10
+        "count": 10,
+        "printed": "Super-Evolve: Add 10 copies of Lhynkal, Wandering Fool to your deck."
       }
     ],
     "keywords": ["Rush"],
@@ -1567,7 +1584,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Gain Crest: Lhynkal, Wandering Fool."
       }
     ],
     "specific_effects": [
@@ -1640,7 +1658,8 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "amount": 5
+        "amount": 5,
+        "printed": "Evolve: Select an enemy follower on the field and deal it 5 damage."
       }
     ],
     "superevolve": [
@@ -1648,7 +1667,8 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 2,
-        "amount": 5
+        "amount": 5,
+        "printed": "Super-Evolve: Select 2 instead."
       }
     ],
     "keywords": [],
@@ -1760,13 +1780,15 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "amount": 7
+        "amount": 7,
+        "printed": "Fanfare: Select an enemy follower on the field and deal it 7 damage."
       },
       {
         "op": "summon",
         "source": "named",
         "name": "Vastwing Dragon",
-        "count": 1
+        "count": 1,
+        "printed": "Summon a Vastwing Dragon."
       }
     ]
   },
@@ -2016,7 +2038,8 @@
       {
         "op": "discard",
         "mode": "select",
-        "count": 1
+        "count": 1,
+        "printed": "Evolve: Select a card in your hand and discard it."
       },
       {
         "op": "crest",
@@ -2055,7 +2078,8 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Gain Crest: Yube, Crestpetal."
       }
     ],
     "superevolve": [],
@@ -2066,7 +2090,8 @@
         "op": "summon",
         "source": "named",
         "name": "Majestic Megalorca",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Summon a Majestic Megalorca."
       }
     ],
     "specific_effects": [
@@ -2145,7 +2170,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -2155,7 +2181,8 @@
       {
         "op": "summon",
         "source": "graveyard",
-        "max_cost": 2
+        "max_cost": 2,
+        "printed": "Fanfare: Reanimate (2)."
       }
     ]
   },
@@ -2252,7 +2279,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -2265,12 +2293,14 @@
         "keywords": ["Can't Attack"],
         "duration": "opponent_turn_end",
         "target": "enemy:follower",
-        "select": 1
+        "select": 1,
+        "printed": "Fanfare: Select an enemy follower on the field and give it \"Can't attack followers or leaders\" until the end of your opponent's turn."
       },
       {
         "op": "draw",
         "source": "deck",
-        "count": 1
+        "count": 1,
+        "printed": "Draw a card."
       }
     ]
   },
@@ -2590,7 +2620,8 @@
     "evolve": [
       {
         "op": "replicate",
-        "zone": "fanfare"
+        "zone": "fanfare",
+        "printed": "Evolve: Replicate the effects of this card's Fanfare ability."
       }
     ],
     "superevolve": [],
@@ -2601,7 +2632,8 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "amount": 2
+        "amount": 2,
+        "printed": "Fanfare: Select an enemy follower on the field and deal it 2 damage."
       }
     ]
   },
@@ -3102,19 +3134,22 @@
               }
             ]
           }
-        ]
+        ],
+        "printed": "Fanfare: Gain Crest: Kukishiro, Mistbloom."
       },
       {
         "op": "return",
         "destination": "deck",
         "target": "ally:hand",
         "select": 2,
-        "select_mode": "random"
+        "select_mode": "random",
+        "printed": "Return 2 random cards from your hand to deck."
       },
       {
         "op": "draw",
         "source": "deck",
-        "count": 2
+        "count": 2,
+        "printed": "Draw 2 cards."
       }
     ],
     "specific_effects": [
@@ -3274,7 +3309,8 @@
         },
         "select": 1,
         "count": 1,
-        "max_cost": 5
+        "max_cost": 5,
+        "printed": "Super-Evolve: Select an Artifact follower in your hand that costs 5 or less and summon an exact copy of it."
       }
     ],
     "keywords": [],
@@ -3283,7 +3319,8 @@
       {
         "op": "add_to_hand",
         "name": "Ominous Artifact β",
-        "count": 1
+        "count": 1,
+        "printed": "Fanfare: Add an Ominous Artifact β to your hand."
       }
     ]
   },
