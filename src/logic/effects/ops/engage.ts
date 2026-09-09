@@ -10,16 +10,10 @@ import type {
   CardInstance,
   Effect,
 } from "../../../core/types/index.js";
-import {
-  getBoard,
-  getGraveyard,
-  getPP,
-  spendPP,
-  addShadows,
-} from "../../../core/playerHelpers.js";
+import { getBoard, getPP, spendPP } from "../../../core/playerHelpers.js";
 import { clearSelectableFlags } from "../../core/targeting.js";
 import { isPendingTarget } from "../../core/pendingTarget/index.js";
-import { bumpZoneVersion } from "../../core/triggers/utils.js";
+import { destroyTarget } from "./destroy/primitives.js";
 
 // --- Helpers ---
 function boardOf(owner: Player) {
@@ -42,37 +36,6 @@ function effectsNeedSelection(effects: Effect[] = []) {
           e.op === "select"),
     )
   );
-}
-
-function removeWithLastWords(card: CardInstance, owner: Player) {
-  const board = getBoard(state, owner);
-  const grave = getGraveyard(state, owner);
-  // Find by identity at removal time (indices go stale if LW/triggers mutate).
-  const idx = board.indexOf(card);
-  if (idx === -1) {
-    return;
-  }
-  const removed = board.splice(idx, 1)[0];
-  if (!removed) return;
-  bumpZoneVersion();
-
-  if (removed?.hasLastWords && Array.isArray(removed.lastWordsEffects)) {
-    runEffects([...removed.lastWordsEffects], owner, removed);
-  }
-
-  // Single-zone: LW/triggers must not re-seat the corpse on the board.
-  for (let i = board.length - 1; i >= 0; i--) {
-    if (board[i] === removed) board.splice(i, 1);
-  }
-
-  if (!grave.includes(removed)) {
-    removed.zone = "graveyard";
-    removed.cost_mod = 0;
-    grave.push(removed);
-    addShadows(state, owner, 1);
-  } else {
-    removed.zone = "graveyard";
-  }
 }
 
 // --- Main API ---
@@ -135,7 +98,7 @@ export function engageAmulet(owner: Player, index: number) {
             uid: card.uid,
             context: "engage",
           });
-          removeWithLastWords(card, owner);
+          destroyTarget(card, owner, "engage_sacrifice");
           // Render removed - UI layer
           cleanupDead();
         }
@@ -162,7 +125,7 @@ export function engageAmulet(owner: Player, index: number) {
           uid: card.uid,
           context: "engage",
         });
-        removeWithLastWords(card, owner);
+        destroyTarget(card, owner, "engage_sacrifice");
         // Render removed - UI layer
         cleanupDead();
 
@@ -187,7 +150,7 @@ export function engageAmulet(owner: Player, index: number) {
           context: "engage",
         });
         // console.log(`[Engage] Countdown reached 0 for ${card.name} (${owner}) - UID: ${card.uid}`);
-        removeWithLastWords(card, owner);
+        destroyTarget(card, owner, "engage_countdown");
         // Render removed - UI layer
         cleanupDead();
         return;
