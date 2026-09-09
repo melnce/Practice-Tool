@@ -6,6 +6,7 @@
  * 1. Verbatim substring of card.description after whitespace normalisation.
  * 2. Clause roots only (no op ancestor).
  * 3. No overlapping description spans between clause-root claims.
+ * 4. Marker consistency — printed must lie within the clause its JSON location implies.
  *
  * Run: npm run check:per-effect-printed
  */

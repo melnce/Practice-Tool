@@ -10,7 +10,15 @@ import {
   hasContiguousEffectSpan,
   contiguousEffectSpanLiteral,
   singleRootPrintedLiteral,
+  splitNonKeywordSentences,
+  resolveRootMarker,
+  resolveMultiRootPrintedLiteral,
+  isHardMarkerMultiRootCard,
+  multiRootPrintedLiterals,
+  measureMultiRootBuckets,
+  buildKeywordNameMarkerReport,
 } from "../../scripts/lib/perEffectPrinted.js";
+import { loadCardsForGates } from "../../scripts/lib/loadCards.js";
 
 const base = {
   id: "99999999",
@@ -284,5 +292,150 @@ describe("per-effect printed — coverage metric", () => {
     expect(stats.populated).toBe(1);
     expect(stats.clauseRoots).toBe(1);
     expect(stats.cardsWithPrinted).toBe(1);
+  });
+});
+
+describe("per-effect printed — marker consistency (DB1)", () => {
+  const wingedWarrior = {
+    id: "10061130",
+    name: "Winged Warrior",
+    description:
+      "Fanfare: Select another allied follower on the field and give it +1/+1.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    fanfare: [
+      {
+        op: "stat",
+        action: "give",
+        target: "ally:follower",
+        select: 1,
+        attack: 1,
+        defense: 1,
+        printed:
+          "Select another allied follower on the field and give it +1/+1.",
+      },
+    ],
+    evolve: [
+      {
+        op: "replicate",
+        zone: "fanfare",
+        printed: "Replicate the effects of this card's Fanfare ability.",
+      },
+    ],
+  };
+
+  it("accepts literals within each marker clause", () => {
+    const issues = checkPerEffectPrintedForCard({
+      ...wingedWarrior,
+      fanfare: [
+        {
+          ...wingedWarrior.fanfare[0],
+          printed:
+            "Fanfare: Select another allied follower on the field and give it +1/+1.",
+        },
+      ],
+      evolve: [
+        {
+          ...wingedWarrior.evolve[0],
+          printed:
+            "Evolve: Replicate the effects of this card's Fanfare ability.",
+        },
+      ],
+    });
+    expect(issues).toHaveLength(0);
+  });
+
+  it("rejects a verbatim literal attached to the wrong marker clause", () => {
+    const issues = checkPerEffectPrintedForCard({
+      ...wingedWarrior,
+      fanfare: [
+        {
+          ...wingedWarrior.fanfare[0],
+          printed:
+            "Fanfare: Select another allied follower on the field and give it +1/+1.",
+        },
+      ],
+      evolve: [
+        {
+          ...wingedWarrior.evolve[0],
+          printed:
+            "Select another allied follower on the field and give it +1/+1.",
+        },
+      ],
+    });
+    expect(issues.some((i) => i.rule === "marker_consistency")).toBe(true);
+    const mc = issues.find((i) => i.rule === "marker_consistency");
+    expect(mc?.message).toMatch(/Evolve:/i);
+  });
+
+  it("neuter gate: disabledMarkerConsistency skips marker-consistency failures", () => {
+    const issues = checkPerEffectPrintedForCard(
+      {
+        ...wingedWarrior,
+        evolve: [
+          {
+            ...wingedWarrior.evolve[0],
+            printed:
+              "Select another allied follower on the field and give it +1/+1.",
+          },
+        ],
+      },
+      { disabledMarkerConsistency: true },
+    );
+    expect(issues.some((i) => i.rule === "marker_consistency")).toBe(false);
+  });
+});
+
+describe("per-effect printed — multi-root resolver (DB1/DB2)", () => {
+  it("resolves Leah, Bellringer Angel by marker not document order", () => {
+    const leah = {
+      id: "10001120",
+      name: "Leah, Bellringer Angel",
+      description: "Ward\nLast Words: Draw a card.\nEvolve: Draw a card.",
+      evolve: [{ op: "draw", source: "deck", count: 1 }],
+      superevolve: [],
+      fanfare: [],
+      keywords: [
+        "Ward",
+        {
+          name: "LastWords",
+          effects: [{ op: "draw", source: "deck", count: 1 }],
+        },
+      ],
+      triggers: [],
+    };
+    expect(isHardMarkerMultiRootCard(leah)).toBe(true);
+    const literals = multiRootPrintedLiterals(leah);
+    expect(literals?.get("10001120.evolve[0]")).toBe("Evolve: Draw a card.");
+    expect(literals?.get("10001120.keywords[1].effects[0]")).toBe(
+      "Last Words: Draw a card.",
+    );
+  });
+
+  it("maps keyword JSON names to printed markers from data", () => {
+    const cards = loadCardsForGates().map(({ card }) => card);
+    const report = buildKeywordNameMarkerReport(cards);
+    const lastWords = report.find((r) => r.name === "LastWords");
+    expect(lastWords?.printedMarkers).toContain("Last Words:");
+    const spellboost = report.find((r) => r.name === "Spellboost");
+    expect(spellboost?.hasPrintedMarker).toBe(false);
+  });
+
+  it("measures multi-root buckets on gate card pool", () => {
+    const cards = loadCardsForGates().map(({ card }) => card);
+    const buckets = measureMultiRootBuckets(cards);
+    expect(buckets.multiRootCards).toBe(553);
+    expect(buckets.bucketA.cards).toBe(361);
+    expect(buckets.bucketB.cards).toBe(115);
+    expect(buckets.bucketC.cards).toBe(77);
+    // Brief cites 210; measured hard-marker bucket A is 207 (delta −3 — see PR).
+    expect(buckets.hardMarkerBucketA.cards).toBe(207);
+  });
+
+  it("pins bucket C overlap examples called out in the brief", () => {
+    const cards = loadCardsForGates().map(({ card }) => card);
+    const byId = new Map(cards.map((c) => [c.id, c]));
+    const bullet = byId.get("10071310");
+    expect(bullet).toBeDefined();
+    expect(collectClauseRoots(bullet!).length).toBe(3);
+    expect(splitNonKeywordSentences(bullet!.description ?? "").length).toBe(2);
   });
 });
