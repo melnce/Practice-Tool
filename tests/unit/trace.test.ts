@@ -544,6 +544,147 @@ describe("trace emitter", () => {
     });
   }, 180_000);
 
+  it("choose slot carries player when selection pool spans both boards", () => {
+    givenGameState({ seed: 3, activePlayer: "first", roundCount: 10 })
+      .withFirstPP(10, 10)
+      .withSecondPP(10, 10)
+      .build();
+    state.gameStarted = true;
+    state.phase = "main";
+
+    const enemy = createCard("10001110", "board", "second");
+    enemy.uid = "enemy_board";
+    const ally = createCard("10001110", "board", "first");
+    ally.uid = "ally_board";
+    state.players.second.board = [enemy];
+    state.players.first.board = [ally];
+
+    const sincerity = createCard("10573310", "hand", "first");
+    state.pendingTargetEffect = {
+      owner: "first",
+      pool: [enemy, ally],
+      poolUids: [enemy.uid, ally.uid],
+      targetUids: [],
+      selectCount: 1,
+    };
+
+    const legal = getLegalNeutralActions(state);
+    const slotChoices = legal.filter(
+      (action) =>
+        "choose" in action &&
+        typeof action.choose.option === "object" &&
+        "slot" in action.choose.option,
+    );
+    expect(slotChoices).toHaveLength(2);
+    expect(slotChoices).toEqual(
+      expect.arrayContaining([
+        { choose: { player: "a", option: { slot: 0, player: "a" } } },
+        { choose: { player: "a", option: { slot: 0, player: "b" } } },
+      ]),
+    );
+
+    const action = soakActionToNeutral(
+      {
+        type: "CHOOSE_TARGET",
+        player: "first",
+        target: { type: "card", uid: enemy.uid },
+      },
+      state,
+    );
+    expect(action).toEqual({
+      choose: { player: "a", option: { slot: 0, player: "b" } },
+    });
+    state.pendingTargetEffect = undefined;
+  });
+
+  it("choose slot omits player when selection pool is one board", () => {
+    givenGameState({ seed: 3, activePlayer: "first", roundCount: 10 })
+      .withFirstPP(10, 10)
+      .withSecondPP(10, 10)
+      .build();
+    state.gameStarted = true;
+    state.phase = "main";
+
+    const enemyA = createCard("10001110", "board", "second");
+    enemyA.uid = "enemy_a";
+    const enemyB = createCard("10001110", "board", "second");
+    enemyB.uid = "enemy_b";
+    state.players.second.board = [enemyA, enemyB];
+
+    state.pendingTargetEffect = {
+      owner: "first",
+      pool: [enemyA, enemyB],
+      poolUids: [enemyA.uid, enemyB.uid],
+      targetUids: [],
+      selectCount: 1,
+    };
+
+    const legal = getLegalNeutralActions(state);
+    const slotChoices = legal.filter(
+      (action) =>
+        "choose" in action &&
+        typeof action.choose.option === "object" &&
+        "slot" in action.choose.option,
+    );
+    expect(slotChoices).toEqual([
+      { choose: { player: "a", option: { slot: 0 } } },
+      { choose: { player: "a", option: { slot: 1 } } },
+    ]);
+
+    const action = soakActionToNeutral(
+      {
+        type: "CHOOSE_TARGET",
+        player: "first",
+        target: { type: "card", uid: enemyB.uid },
+      },
+      state,
+    );
+    expect(action).toEqual({
+      choose: { player: "a", option: { slot: 1 } },
+    });
+    state.pendingTargetEffect = undefined;
+  });
+
+  it("return-to-deck deferred insert records raw shuffle pick", () => {
+    givenGameState({ seed: 1, activePlayer: "first" }).build();
+    state.players.first.hand = [
+      createCard("10001110", "hand", "first"),
+      createCard("10001120", "hand", "first"),
+    ];
+    state.players.first.deck = [createCard("10001130", "deck", "first")];
+
+    const recorder = installTraceRng(state)!;
+    setDrawRecording(true);
+    try {
+      const before = captureSnapshot();
+      clearActionDraws();
+      whenRunEffects(
+        [
+          {
+            op: "return",
+            destination: "deck",
+            select: 1,
+            select_mode: "random",
+            target: "ally:hand",
+          },
+          { op: "draw", count: 1 },
+        ],
+        "first",
+      );
+      const rawPicks = derivePicks(recorder.getRolls(), before).filter(
+        (p) => p.what === "raw",
+      );
+      expect(rawPicks.length).toBeGreaterThan(0);
+      expect(rawPicks.every((p) => p.kind === "shuffle")).toBe(true);
+      expect(
+        rawPicks.some((p) => p.site.includes("core/utils.ts")),
+      ).toBe(true);
+    } finally {
+      setDrawRecording(false);
+      uninstallTraceRng(state);
+    }
+  });
+
   it("legal dedupes identical choose card options", () => {
     givenGameState({ seed: 1, activePlayer: "first" }).build();
     const a = createCard("10503310", "hand", "first");

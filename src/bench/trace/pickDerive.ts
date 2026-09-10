@@ -40,7 +40,7 @@ function classifyPickRoll(
     if (roll.site.includes("random_split.ts")) {
       return null; // handled by group
     }
-    if (/core\/utils\.ts:(38|39)/.test(roll.site)) {
+    if (roll.site.includes("core/utils.ts")) {
       return {
         what: "raw",
         kind: "shuffle",

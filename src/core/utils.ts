@@ -44,6 +44,12 @@ export function shuffleInPlace<T>(arr: T[]): T[] {
   return arr;
 }
 
+/** Random insertion index when placing a card into a deck (shuffle-equivalent RNG). */
+export function randomDeckInsertIndex(maxExclusive: number): number {
+  if (maxExclusive <= 0) return 0;
+  return state.rng.nextInt(maxExclusive);
+}
+
 // -------- Helpers --------
 function showImageOverlayWithFallback(urls: string[]) {
   if (typeof document === "undefined") return; // headless: noop
