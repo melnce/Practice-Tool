@@ -102,7 +102,8 @@ export async function runTraceGame(
   let actionIndex = 0;
   let appliedActions = 0;
   let pendingFuse: {
-    action: SoakAction;
+    action: Extract<SoakAction, { type: "FUSE" }>;
+    player: "first" | "second";
     hostPos: number;
     handUidsBefore: string[];
     banishUidsBefore: Set<string>;
@@ -176,6 +177,7 @@ export async function runTraceGame(
       appliedActions++;
       pendingFuse = {
         action,
+        player: action.player,
         hostPos: hostPos < 0 ? 0 : hostPos,
         handUidsBefore: handBefore.map((c) => c?.uid ?? ""),
         banishUidsBefore: banishUidSet(before.players[action.player].banish),
@@ -195,12 +197,11 @@ export async function runTraceGame(
       applySoakActionWithOutcome(action);
       appliedActions++;
       const after = snapshot();
-      const fusePlayer = pendingFuse.action.player;
       const partnerPositions = deriveFusePartnerPositions(
         pendingFuse.handUidsBefore,
         pendingFuse.hostPos,
         pendingFuse.banishUidsBefore,
-        banishUidSet(after.players[fusePlayer].banish),
+        banishUidSet(after.players[pendingFuse.player].banish),
       );
       const neutral = soakActionToNeutral(pendingFuse.action, before, {
         fuseHostPos: pendingFuse.hostPos,

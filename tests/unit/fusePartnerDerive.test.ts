@@ -3,7 +3,11 @@
  */
 import { describe, it, expect, beforeEach, beforeAll } from "vitest";
 import { initCardDatabaseNode } from "../../src/data/cardLoaderNode.js";
-import { givenGameState, resetUidCounter, createCard } from "../harness/builders.js";
+import {
+  givenGameState,
+  resetUidCounter,
+  createCard,
+} from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { dispatch } from "../../src/engine.js";
 import { injectAdapter } from "../../src/core/adapter.js";
@@ -87,7 +91,12 @@ describe("fuse.partner_pos integration", () => {
     dispatch(state, { type: "CONFIRM_TARGETS" });
 
     expect(
-      partnerPositionsAfterFuse("first", host.uid, handUidsBefore, banishBefore),
+      partnerPositionsAfterFuse(
+        "first",
+        host.uid,
+        handUidsBefore,
+        banishBefore,
+      ),
     ).toEqual([1]);
   });
 
@@ -122,7 +131,12 @@ describe("fuse.partner_pos integration", () => {
     dispatch(state, { type: "CONFIRM_TARGETS" });
 
     expect(
-      partnerPositionsAfterFuse("first", host.uid, handUidsBefore, banishBefore),
+      partnerPositionsAfterFuse(
+        "first",
+        host.uid,
+        handUidsBefore,
+        banishBefore,
+      ),
     ).toEqual([2]);
   });
 
@@ -157,7 +171,12 @@ describe("fuse.partner_pos integration", () => {
     dispatch(state, { type: "CONFIRM_TARGETS" });
 
     expect(
-      partnerPositionsAfterFuse("first", alpha.uid, handUidsBefore, banishBefore),
+      partnerPositionsAfterFuse(
+        "first",
+        alpha.uid,
+        handUidsBefore,
+        banishBefore,
+      ),
     ).toEqual([2, 4]);
   });
 });
