@@ -1,7 +1,7 @@
 // src/logic/effects/ops/returnHandToDeck.ts
 import { state } from "../../../core/gameState.js";
 import { wantsRandomTargetPick } from "../../core/targeting/randomPick.js";
-import { shuffleInPlace } from "../../../core/utils.js";
+import { randomDeckInsertIndex, shuffleInPlace } from "../../../core/utils.js";
 import { logEvent } from "../../../core/logger.js";
 import type {
   Effect,
@@ -56,9 +56,9 @@ export function countPendingDraws(effectsQueue: any[] = []): number {
 
 function deferredInsertIndex(deckLength: number, pendingDraws: number): number {
   if (deckLength <= 0) return 0;
-  if (pendingDraws <= 0) return state.rng.nextInt(deckLength);
+  if (pendingDraws <= 0) return randomDeckInsertIndex(deckLength);
   const maxIndex = Math.max(0, deckLength - pendingDraws);
-  return state.rng.nextInt(maxIndex + 1);
+  return randomDeckInsertIndex(maxIndex + 1);
 }
 
 function putBack(card: CardInstance, owner: Player, opts: PutBackOpts = {}) {

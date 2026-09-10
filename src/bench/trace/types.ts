@@ -47,7 +47,7 @@ export type NeutralAction =
         player: TracePlayer;
         option:
           | { card: string }
-          | { slot: number }
+          | { slot: number; player?: TracePlayer }
           | "leader"
           | { mode: number };
       };

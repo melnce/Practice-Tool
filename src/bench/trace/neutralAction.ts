@@ -8,8 +8,46 @@ import type {
 import type { SoakAction } from "../soakEnv.js";
 import { getLegalSoakActions, sortSoakActions } from "../soakEnv.js";
 import { getBoard, getHand, opponentOf } from "../../core/playerHelpers.js";
-import type { NeutralAction } from "./types.js";
+import type { NeutralAction, TracePlayer } from "./types.js";
 import { playerToTrace } from "./canonicalState.js";
+
+type BoardChooseOption = { slot: number; player?: TracePlayer };
+
+function pendingPoolUids(state: GameState): string[] {
+  const pending = state.pendingTargetEffect;
+  if (!pending) return [];
+  if (Array.isArray(pending.poolUids)) return pending.poolUids;
+  if (Array.isArray(pending.pool)) {
+    return pending.pool.filter(Boolean).map((c) => c.uid);
+  }
+  return [];
+}
+
+function poolSpansBothBoards(state: GameState): boolean {
+  const owners = new Set<Player>();
+  for (const uid of pendingPoolUids(state)) {
+    const loc = findCardInZones(state, uid);
+    if (loc?.zone === "board") owners.add(loc.player);
+  }
+  return owners.size > 1;
+}
+
+function boardChooseOption(
+  state: GameState,
+  uid: string,
+): BoardChooseOption | null {
+  for (const p of ["first", "second"] as const) {
+    const slot = boardSlot(state, p, uid);
+    if (slot >= 0) {
+      const option: BoardChooseOption = { slot };
+      if (poolSpansBothBoards(state)) {
+        option.player = playerToTrace(p);
+      }
+      return option;
+    }
+  }
+  return null;
+}
 
 function boardSlot(state: GameState, player: Player, uid: string): number {
   const board = getBoard(state, player);
@@ -101,21 +139,19 @@ export function soakActionToNeutral(
           },
         };
       }
-      const enemy = opponentOf(player);
-      const slot = boardSlot(state, enemy, uid);
-      if (slot >= 0) {
+      const boardOption = boardChooseOption(state, uid);
+      if (boardOption) {
         return {
           choose: {
             player: playerToTrace(player),
-            option: { slot },
+            option: boardOption,
           },
         };
       }
-      const selfSlot = boardSlot(state, player, uid);
       return {
         choose: {
           player: playerToTrace(player),
-          option: { slot: selfSlot < 0 ? 0 : selfSlot },
+          option: { slot: 0 },
         },
       };
     }
