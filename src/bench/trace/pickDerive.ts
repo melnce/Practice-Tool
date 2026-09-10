@@ -8,6 +8,8 @@ function isCardChose(chose: unknown): chose is {
   uid: string;
   card: string;
   zone: string;
+  slot?: number;
+  owner?: Player;
 } {
   return (
     chose != null &&
@@ -15,18 +17,6 @@ function isCardChose(chose: unknown): chose is {
     "card" in (chose as object) &&
     "uid" in (chose as object)
   );
-}
-
-function findBoardSlot(
-  state: GameState,
-  uid: string,
-): { player: Player; slot: number } | null {
-  for (const p of ["first", "second"] as const) {
-    const board = state.players[p].board;
-    const idx = board.findIndex((c) => c?.uid === uid);
-    if (idx >= 0) return { player: p, slot: idx };
-  }
-  return null;
 }
 
 function classifyPickRoll(
@@ -74,7 +64,6 @@ function classifyPickRoll(
   }
 
   if (isCardChose(chose)) {
-    const uid = chose.uid;
     const cardId = chose.card;
     const zone = chose.zone;
 
@@ -82,20 +71,15 @@ function classifyPickRoll(
       return { what: "reanimate", chose: cardId };
     }
 
-    const loc = findBoardSlot(before, uid);
-    if (loc || zone === "board") {
-      const slotInfo = loc ?? findBoardSlot(before, uid);
-      if (slotInfo) {
-        const among =
-          slotInfo.player !== activePlayer
-            ? "enemy_followers"
-            : "ally_followers";
-        return {
-          what: "random_target",
-          among,
-          chose: { slot: slotInfo.slot },
-        };
-      }
+    if (zone === "board" && chose.slot != null) {
+      const owner = chose.owner ?? activePlayer;
+      const among =
+        owner !== activePlayer ? "enemy_followers" : "ally_followers";
+      return {
+        what: "random_target",
+        among,
+        chose: { slot: chose.slot },
+      };
     }
 
     if (zone === "hand" || zone === "deck" || zone === "graveyard") {
@@ -110,14 +94,6 @@ function classifyPickRoll(
         what: "multiset_pick",
         among: zone === "graveyard" ? "cemetery" : zone,
         chose: cardId,
-      };
-    }
-
-    const boardLoc = findBoardSlot(before, uid);
-    if (boardLoc) {
-      return {
-        what: "random_target",
-        chose: { slot: boardLoc.slot },
       };
     }
 

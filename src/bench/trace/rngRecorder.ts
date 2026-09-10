@@ -1,7 +1,8 @@
 // src/bench/trace/rngRecorder.ts — roll-identical RNG recording wrapper
 
 import type { RNG } from "../../core/rng.js";
-import type { CardInstance } from "../../core/types/index.js";
+import { getBoard } from "../../core/playerHelpers.js";
+import type { CardInstance, GameState, Player } from "../../core/types/index.js";
 import type { RawRoll } from "./types.js";
 
 const SKIP_STACK_PREFIXES = [
@@ -28,30 +29,79 @@ function captureCallSite(): string {
   return "unknown:0";
 }
 
-function cardPickIdentity(card: CardInstance): {
+function toNum(v: unknown): number {
+  return typeof v === "number" ? v : v == null ? 0 : +v;
+}
+
+/** Matches cleanup.ts pending-death sweep: skip cards about to leave the board. */
+function boardCardSurvives(c: CardInstance): boolean {
+  if (!c || typeof c !== "object") return false;
+  if ((c as { pendingDestruction?: boolean }).pendingDestruction) return false;
+  if (c.type === "Follower" && toNum(c.defense) <= 0) return false;
+  if (c.type === "Amulet" && c.hasCountdown && toNum(c.countdown) <= 0) {
+    return false;
+  }
+  return true;
+}
+
+function liveBoardSlot(
+  gameState: GameState,
+  card: CardInstance,
+): { owner: Player; slot: number } | null {
+  const owner = card.owner;
+  if (!owner) return null;
+  const board = getBoard(gameState, owner);
+  let slot = 0;
+  for (const c of board) {
+    if (!c) continue;
+    if (!boardCardSurvives(c)) continue;
+    if (c.uid === card.uid) return { owner, slot };
+    slot++;
+  }
+  return null;
+}
+
+function cardPickIdentity(
+  card: CardInstance,
+  gameState: GameState | null,
+): {
   uid: string;
   card: string;
   zone: string;
   slot?: number;
+  owner?: Player;
 } {
   const zone = card.zone ?? "unknown";
-  const out: { uid: string; card: string; zone: string; slot?: number } = {
+  const out: {
+    uid: string;
+    card: string;
+    zone: string;
+    slot?: number;
+    owner?: Player;
+  } = {
     uid: card.uid,
     card: String(card.id),
     zone,
   };
-  if (zone === "board" && card.owner) {
-    // slot resolved lazily by consumer if needed
+  if (zone === "board" && gameState) {
+    const loc = liveBoardSlot(gameState, card);
+    if (loc) {
+      out.slot = loc.slot;
+      out.owner = loc.owner;
+    }
   }
   return out;
 }
 
-function pickChoseIdentity(value: unknown): unknown {
+function pickChoseIdentity(
+  value: unknown,
+  gameState: GameState | null,
+): unknown {
   if (value == null) return value;
   if (typeof value !== "object") return value;
   const card = value as CardInstance;
   if (card.uid && card.id != null) {
-    return cardPickIdentity(card);
+    return cardPickIdentity(card, gameState);
   }
   if ("index" in (value as object) && "opt" in (value as object)) {
     const entry = value as { index: number; opt: unknown };
@@ -77,7 +127,10 @@ export type RecordingRng = {
   recordDeckPick: (cardId: string) => void;
 };
 
-export function createRecordingRng(inner: RNG): RecordingRng {
+export function createRecordingRng(
+  inner: RNG,
+  getState?: () => GameState | null,
+): RecordingRng {
   const rolls: RawRoll[] = [];
 
   const rng: RNG = {
@@ -109,7 +162,7 @@ export function createRecordingRng(inner: RNG): RecordingRng {
         n: n < 0 ? 0 : n,
         k,
         site,
-        chose: pickChoseIdentity(chosen),
+        chose: pickChoseIdentity(chosen, getState?.() ?? null),
       });
       return chosen;
     },
@@ -151,13 +204,15 @@ export function createRecordingRng(inner: RNG): RecordingRng {
 }
 
 let installedInner: RNG | null = null;
+let installedState: GameState | null = null;
 let activeRecorder: RecordingRng | null = null;
 
 /** Wrap state.rng for tracing. No-op when disabled. */
-export function installTraceRng(state: { rng: RNG }): RecordingRng | null {
+export function installTraceRng(state: GameState): RecordingRng | null {
   if (activeRecorder) return activeRecorder;
   installedInner = state.rng;
-  activeRecorder = createRecordingRng(installedInner);
+  installedState = state;
+  activeRecorder = createRecordingRng(installedInner, () => installedState);
   state.rng = activeRecorder.rng;
   return activeRecorder;
 }
@@ -166,6 +221,7 @@ export function uninstallTraceRng(state: { rng: RNG }): void {
   if (!activeRecorder || !installedInner) return;
   state.rng = installedInner;
   installedInner = null;
+  installedState = null;
   activeRecorder = null;
 }
 
