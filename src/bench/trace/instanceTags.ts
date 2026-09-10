@@ -105,7 +105,7 @@ export function traitsTags(card: CardInstance): string[] {
   if (card.hasDrain) add("drain");
   if (card.ignoresWard || ks?.ignoresWard) add("ignoresWard");
   if (card.hasIntimidate) add("intimidate");
-  if (card.hasRush || card.isRush) add("rush");
+  if (card.hasRush) add("rush");
   if (card.hasStorm) add("storm");
   if (card.hasWard) add("ward");
 

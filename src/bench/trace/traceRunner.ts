@@ -19,11 +19,7 @@ import { registerSoakDeck } from "../soakDecks.js";
 import type { IdDeckFile } from "./deckResolve.js";
 import { resolveIdDeckFile, idDeckToSortedArray } from "./deckResolve.js";
 import { installTraceRng, uninstallTraceRng } from "./rngRecorder.js";
-import {
-  setDrawRecording,
-  clearActionDraws,
-  consumeActionPicks,
-} from "./drawRecorder.js";
+import { setDrawRecording, clearActionDraws } from "./drawRecorder.js";
 import { toCanonicalState, canonicalJson } from "./canonicalState.js";
 import {
   soakActionToNeutral,
@@ -77,9 +73,9 @@ export async function runTraceGame(
     `trace_b_${opts.seed}_${opts.gameIndex}`,
   );
 
-  prepareSoakReplay({ fuse: true, interactiveModes: false });
-  installSoakAdapter({ interactiveModes: false });
-  (globalThis as any).__SVWB_INTERACTIVE_MODES__ = false;
+  prepareSoakReplay({ fuse: true, interactiveModes: true });
+  installSoakAdapter({ interactiveModes: true });
+  (globalThis as any).__SVWB_INTERACTIVE_MODES__ = true;
   (globalThis as any).HEADLESS = true;
 
   await startNewGame({
@@ -114,8 +110,7 @@ export async function runTraceGame(
   ) => {
     const rolls = recorder.getRolls();
     recorder.clearRolls();
-    const actionPicks = consumeActionPicks();
-    const rng = [...derivePicks(rolls, before, actionPicks), ...extraPicks];
+    const rng = [...derivePicks(rolls, before), ...extraPicks];
     lines.push({
       i: actionIndex++,
       action: neutral,

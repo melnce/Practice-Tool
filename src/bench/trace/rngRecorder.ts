@@ -73,6 +73,8 @@ export type RecordingRng = {
   rng: RNG;
   getRolls: () => RawRoll[];
   clearRolls: () => void;
+  recordDraw: (cardId: string) => void;
+  recordDeckPick: (cardId: string) => void;
 };
 
 export function createRecordingRng(inner: RNG): RecordingRng {
@@ -139,6 +141,12 @@ export function createRecordingRng(inner: RNG): RecordingRng {
     clearRolls: () => {
       rolls.length = 0;
     },
+    recordDraw(cardId: string) {
+      rolls.push({ m: "draw", card: cardId });
+    },
+    recordDeckPick(cardId: string) {
+      rolls.push({ m: "deck_pick", card: cardId });
+    },
   };
 }
 
@@ -163,4 +171,12 @@ export function uninstallTraceRng(state: { rng: RNG }): void {
 
 export function getActiveRecorder(): RecordingRng | null {
   return activeRecorder;
+}
+
+export function recordTraceDrawRoll(cardId: string): void {
+  activeRecorder?.recordDraw(cardId);
+}
+
+export function recordTraceDeckPickRoll(cardId: string): void {
+  activeRecorder?.recordDeckPick(cardId);
 }

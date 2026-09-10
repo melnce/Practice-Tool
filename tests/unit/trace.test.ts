@@ -29,16 +29,18 @@ import {
 import {
   setDrawRecording,
   clearActionDraws,
-  consumeActionPicks,
 } from "../../src/bench/trace/drawRecorder.js";
+import { derivePicks } from "../../src/bench/trace/pickDerive.js";
 import { captureSnapshot } from "../../src/core/history.js";
 import { soakActionToNeutral } from "../../src/bench/trace/neutralAction.js";
 import { toCanonicalState } from "../../src/bench/trace/canonicalState.js";
 import {
   givenGameState,
   whenRunEffects,
+  whenPlayCard,
   createCard,
 } from "../harness/builders.js";
+import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { makeCardFromDB } from "../../src/logic/effects/ops/summon_ops/core.js";
 import { getGlobalCardIndex } from "../../src/data/cardIndex.js";
 import { getBoard } from "../../src/core/playerHelpers.js";
@@ -191,6 +193,7 @@ describe("trace emitter", () => {
       turnCap: 30,
       actionCap: 200,
       fuse: true,
+      interactiveModes: true,
     });
     expect(soak.outcome).toBe("completed");
     const trace = await runTraceGame({
@@ -261,9 +264,11 @@ describe("trace emitter", () => {
         toggleMulliganPickCore("first", card.uid);
       }
       clearActionDraws();
-      captureSnapshot();
+      const before = captureSnapshot();
       confirmMulliganCore("first");
-      const draws = consumeActionPicks();
+      const draws = derivePicks(recorder.getRolls(), before).filter(
+        (p) => p.what === "draw",
+      );
       expect(draws).toHaveLength(4);
       expect(draws.every((p) => p.what === "draw")).toBe(true);
       expect(recorder.getRolls().length).toBeGreaterThan(0);
@@ -320,15 +325,16 @@ describe("trace emitter", () => {
         { name: "TargetB", type: "Follower", attack: 3, defense: 3 },
       ])
       .build();
-    installTraceRng(state)!;
+    const recorder = installTraceRng(state)!;
     setDrawRecording(true);
     try {
+      const before = captureSnapshot();
       clearActionDraws();
       whenRunEffects(
         [{ op: "search", filter: { type: "Follower" }, count: 2 }],
         "first",
       );
-      const picks = consumeActionPicks().filter(
+      const picks = derivePicks(recorder.getRolls(), before).filter(
         (p) => p.what === "multiset_pick",
       );
       expect(picks).toHaveLength(2);
@@ -347,9 +353,10 @@ describe("trace emitter", () => {
       createCard("10121110", "deck", "first"),
       createCard("10001110", "deck", "first"),
     ];
-    installTraceRng(state)!;
+    const recorder = installTraceRng(state)!;
     setDrawRecording(true);
     try {
+      const before = captureSnapshot();
       clearActionDraws();
       whenRunEffects(
         [
@@ -362,7 +369,7 @@ describe("trace emitter", () => {
         ],
         "first",
       );
-      const picks = consumeActionPicks().filter(
+      const picks = derivePicks(recorder.getRolls(), before).filter(
         (p) => p.what === "multiset_pick",
       );
       expect(picks).toHaveLength(1);
@@ -373,6 +380,92 @@ describe("trace emitter", () => {
       uninstallTraceRng(state);
     }
   });
+
+  it("rng picks follow execution order (random target before consequence draw)", () => {
+    givenGameState({ seed: 99, activePlayer: "first" })
+      .withFirstHand(["10012310"])
+      .withFirstPP(10, 10)
+      .build();
+
+    const ally = createCard("10001110", "board", "first");
+    ally.uid = "ally_return";
+    state.players.first.board = [ally];
+
+    const leah = createCard("10001120", "board", "second");
+    leah.defense = 2;
+    leah.peak_defense = 2;
+    state.players.second.board = [leah];
+
+    const before = captureSnapshot();
+    const recorder = installTraceRng(state)!;
+    setDrawRecording(true);
+    try {
+      clearActionDraws();
+      whenPlayCard("first", 0);
+      resolvePendingTarget("ally_return");
+      const picks = derivePicks(recorder.getRolls(), before);
+      const randomIdx = picks.findIndex((p) => p.what === "random_target");
+      const drawIdx = picks.findIndex((p) => p.what === "draw");
+      expect(randomIdx).toBeGreaterThanOrEqual(0);
+      expect(drawIdx).toBeGreaterThanOrEqual(0);
+      expect(randomIdx).toBeLessThan(drawIdx);
+    } finally {
+      setDrawRecording(false);
+      uninstallTraceRng(state);
+    }
+  });
+
+  it("evolved followers do not list rush from isRush combat flag", () => {
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 5 })
+      .withFirstHand(["10011110", "10011110", "10011130"])
+      .withFirstPP(10, 10)
+      .build();
+
+    whenPlayCard("first", 0);
+    whenPlayCard("first", 0);
+    whenPlayCard("first", 0);
+
+    const treant = getBoard(state, "first").find(
+      (c) => c?.name === "Gentle Treant",
+    );
+    expect(treant?.hasEvolved).toBe(true);
+    const slot = getBoard(state, "first").indexOf(treant!);
+    const canon = toCanonicalState(state).players.a.field[slot]!;
+    expect(canon?.traits ?? []).not.toContain("rush");
+  });
+
+  it("Normagdala fanfare exposes mode choice then records choose action", async () => {
+    const result = await runTraceGame({
+      seed: TRACE_SEED,
+      gameIndex: 11,
+      deckA: rampDeck as Record<string, number>,
+      deckB: rampDeck as Record<string, number>,
+      turnCap: 60,
+      actionCap: 800,
+    });
+    const playIdx = result.lines.findIndex(
+      (line) => "play" in line.action && line.action.play.card === "10944120",
+    );
+    expect(playIdx).toBeGreaterThanOrEqual(0);
+    const playLine = result.lines[playIdx]!;
+    expect(playLine.state.phase).toBe("choice");
+    const modeLegals = playLine.legal.filter(
+      (a) =>
+        "choose" in a &&
+        typeof a.choose.option === "object" &&
+        "mode" in a.choose.option,
+    );
+    expect(modeLegals).toHaveLength(2);
+    const chooseLine = result.lines[playIdx + 1];
+    expect(chooseLine).toBeDefined();
+    expect("choose" in chooseLine!.action).toBe(true);
+    expect(chooseLine!.action).toMatchObject({
+      choose: {
+        player: playLine.action.play.player,
+        option: { mode: expect.any(Number) },
+      },
+    });
+  }, 180_000);
 
   it("printed engage and rush are traits/granted, not cross-listed", () => {
     givenGameState({ seed: 1, activePlayer: "first" }).build();

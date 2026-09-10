@@ -38,6 +38,14 @@ function classifyPickRoll(
 
   if (roll.m === "shuffle") return null;
 
+  if (roll.m === "draw") {
+    return { what: "draw", chose: roll.card };
+  }
+
+  if (roll.m === "deck_pick") {
+    return { what: "multiset_pick", among: "deck", chose: roll.card };
+  }
+
   if (roll.m === "nextInt") {
     if (roll.site.includes("random_split.ts")) {
       return null; // handled by group
@@ -123,57 +131,46 @@ function classifyPickRoll(
   return null;
 }
 
-function groupRandomSplit(rolls: RawRoll[]): Pick[] {
-  const picks: Pick[] = [];
-  let i = 0;
-  while (i < rolls.length) {
-    const roll = rolls[i]!;
-    if (roll.m === "nextInt" && roll.site.includes("random_split.ts")) {
-      const k = roll.k;
-      const counts = new Array(k).fill(0);
-      let j = i;
-      while (j < rolls.length) {
-        const r = rolls[j]!;
-        if (r.m !== "nextInt" || !r.site.includes("random_split.ts")) break;
-        if (r.k !== k) break;
-        counts[r.n] = (counts[r.n] ?? 0) + 1;
-        j++;
-      }
-      if (j > i) {
-        picks.push({ what: "random_split", chose: counts });
-        i = j;
-        continue;
-      }
-    }
-    i++;
+function tryConsumeRandomSplit(
+  rolls: RawRoll[],
+  start: number,
+): { pick: Pick; next: number } | null {
+  const roll = rolls[start];
+  if (!roll || roll.m !== "nextInt" || !roll.site.includes("random_split.ts")) {
+    return null;
   }
-  return picks;
+  const k = roll.k;
+  const counts = new Array(k).fill(0);
+  let j = start;
+  while (j < rolls.length) {
+    const r = rolls[j]!;
+    if (r.m !== "nextInt" || !r.site.includes("random_split.ts")) break;
+    if (r.k !== k) break;
+    counts[r.n] = (counts[r.n] ?? 0) + 1;
+    j++;
+  }
+  if (j <= start) return null;
+  return { pick: { what: "random_split", chose: counts }, next: j };
 }
 
-export function derivePicks(
-  rolls: RawRoll[],
-  before: GameState,
-  actionDraws: Pick[],
-): Pick[] {
-  const draws = actionDraws;
-  const splitPicks = groupRandomSplit(rolls);
+export function derivePicks(rolls: RawRoll[], before: GameState): Pick[] {
+  const picks: Pick[] = [];
   const active = before.activePlayer;
-  const semantic: Pick[] = [];
+  let i = 0;
 
-  const splitConsumed = new Set<number>();
-  for (let i = 0; i < rolls.length; i++) {
-    const roll = rolls[i]!;
-    if (roll.m === "nextInt" && roll.site.includes("random_split.ts")) {
-      splitConsumed.add(i);
+  while (i < rolls.length) {
+    const split = tryConsumeRandomSplit(rolls, i);
+    if (split) {
+      picks.push(split.pick);
+      i = split.next;
+      continue;
     }
-  }
 
-  for (let i = 0; i < rolls.length; i++) {
-    if (splitConsumed.has(i)) continue;
     const roll = rolls[i]!;
     const pick = classifyPickRoll(roll, before, active);
-    if (pick) semantic.push(pick);
+    if (pick) picks.push(pick);
+    i++;
   }
 
-  return [...draws, ...splitPicks, ...semantic];
+  return picks;
 }

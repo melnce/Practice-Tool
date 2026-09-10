@@ -143,4 +143,6 @@ export type RawRoll =
       chose: unknown;
     }
   | { m: "shuffle"; n: number; site: string; order: unknown }
-  | { m: "nextFloat"; site: string; v: number };
+  | { m: "nextFloat"; site: string; v: number }
+  | { m: "draw"; card: string }
+  | { m: "deck_pick"; card: string };
