@@ -37,6 +37,7 @@ export function soakActionToNeutral(
   state: GameState,
   ctx?: {
     mulliganSwap?: [boolean, boolean, boolean, boolean];
+    fuseHostPos?: number;
     fusePartners?: number[];
   },
 ): NeutralAction | null {
@@ -151,7 +152,8 @@ export function soakActionToNeutral(
         confirm: { player: playerToTrace(state.activePlayer) },
       };
     case "FUSE": {
-      const hostPos = handPos(state, action.player, action.cardUid);
+      const hostPos =
+        ctx?.fuseHostPos ?? handPos(state, action.player, action.cardUid);
       return {
         fuse: {
           player: playerToTrace(action.player),
@@ -179,7 +181,26 @@ export function sortNeutralActions(actions: NeutralAction[]): NeutralAction[] {
   );
 }
 
+function enumerateMulliganLegal(state: GameState): NeutralAction[] {
+  const stage = state.mulliganStage;
+  if (stage !== "first" && stage !== "second") return [];
+  const player = playerToTrace(stage);
+  const out: NeutralAction[] = [];
+  for (let mask = 0; mask < 16; mask++) {
+    out.push({
+      mulligan: {
+        player,
+        swap: [!!(mask & 1), !!(mask & 2), !!(mask & 4), !!(mask & 8)],
+      },
+    });
+  }
+  return sortNeutralActions(out);
+}
+
 export function getLegalNeutralActions(state: GameState): NeutralAction[] {
+  if (state.phase === "mulligan") {
+    return enumerateMulliganLegal(state);
+  }
   const soak = sortSoakActions(getLegalSoakActions());
   const out: NeutralAction[] = [];
   for (const a of soak) {

@@ -22,7 +22,7 @@ import { installTraceRng, uninstallTraceRng } from "./rngRecorder.js";
 import {
   setDrawRecording,
   clearActionDraws,
-  consumeDrawPicks,
+  consumeActionPicks,
 } from "./drawRecorder.js";
 import { toCanonicalState, canonicalJson } from "./canonicalState.js";
 import {
@@ -102,6 +102,7 @@ export async function runTraceGame(
   let appliedActions = 0;
   let pendingFuse: {
     action: SoakAction;
+    hostPos: number;
     partnerPositions: number[];
   } | null = null;
 
@@ -113,8 +114,8 @@ export async function runTraceGame(
   ) => {
     const rolls = recorder.getRolls();
     recorder.clearRolls();
-    const draws = consumeDrawPicks();
-    const rng = [...derivePicks(rolls, before, draws), ...extraPicks];
+    const actionPicks = consumeActionPicks();
+    const rng = [...derivePicks(rolls, before, actionPicks), ...extraPicks];
     lines.push({
       i: actionIndex++,
       action: neutral,
@@ -157,7 +158,7 @@ export async function runTraceGame(
       applySoakActionWithOutcome(action);
       appliedActions++;
       const after = snapshot();
-      const neutral = soakActionToNeutral(action, after, {
+      const neutral = soakActionToNeutral(action, before, {
         mulliganSwap: swap,
       });
       if (neutral) emitLine(neutral, before, after);
@@ -165,15 +166,21 @@ export async function runTraceGame(
     }
 
     if (action.type === "FUSE") {
+      const handBefore = getHand(before, action.player);
+      const hostPos = handBefore.findIndex((c) => c?.uid === action.cardUid);
       applySoakActionWithOutcome(action);
       appliedActions++;
-      pendingFuse = { action, partnerPositions: [] };
+      pendingFuse = {
+        action,
+        hostPos: hostPos < 0 ? 0 : hostPos,
+        partnerPositions: [],
+      };
       recorder.clearRolls();
       continue;
     }
 
     if (pendingFuse && action.type === "CHOOSE_TARGET") {
-      const hand = getHand(state, action.player);
+      const hand = getHand(before, action.player);
       if (action.target.type === "card") {
         const targetUid = action.target.uid;
         const pos = hand.findIndex((c) => c?.uid === targetUid);
@@ -189,7 +196,8 @@ export async function runTraceGame(
       applySoakActionWithOutcome(action);
       appliedActions++;
       const after = snapshot();
-      const neutral = soakActionToNeutral(pendingFuse.action, after, {
+      const neutral = soakActionToNeutral(pendingFuse.action, before, {
+        fuseHostPos: pendingFuse.hostPos,
         fusePartners: pendingFuse.partnerPositions,
       });
       pendingFuse = null;
@@ -203,14 +211,18 @@ export async function runTraceGame(
     if (action.type === "FORCE_COMPLETE_PENDING") {
       const after = snapshot();
       emitLine(
-        { confirm: { player: state.activePlayer === "first" ? "a" : "b" } },
+        {
+          confirm: {
+            player: before.activePlayer === "first" ? "a" : "b",
+          },
+        },
         before,
         after,
       );
       continue;
     }
 
-    const neutral = soakActionToNeutral(action, state);
+    const neutral = soakActionToNeutral(action, before);
     if (neutral) {
       emitLine(neutral, before, snapshot());
     } else {

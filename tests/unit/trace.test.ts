@@ -29,9 +29,19 @@ import {
 import {
   setDrawRecording,
   clearActionDraws,
-  consumeDrawPicks,
+  consumeActionPicks,
 } from "../../src/bench/trace/drawRecorder.js";
 import { captureSnapshot } from "../../src/core/history.js";
+import { soakActionToNeutral } from "../../src/bench/trace/neutralAction.js";
+import { toCanonicalState } from "../../src/bench/trace/canonicalState.js";
+import {
+  givenGameState,
+  whenRunEffects,
+  createCard,
+} from "../harness/builders.js";
+import { makeCardFromDB } from "../../src/logic/effects/ops/summon_ops/core.js";
+import { getGlobalCardIndex } from "../../src/data/cardIndex.js";
+import { getBoard } from "../../src/core/playerHelpers.js";
 import type {
   TraceHeader,
   TraceActionLine,
@@ -233,7 +243,7 @@ describe("trace emitter", () => {
       clearActionDraws();
       captureSnapshot();
       confirmMulliganCore("first");
-      const draws = consumeDrawPicks();
+      const draws = consumeActionPicks();
       expect(draws).toHaveLength(4);
       expect(draws.every((p) => p.what === "draw")).toBe(true);
       expect(recorder.getRolls().length).toBeGreaterThan(0);
@@ -258,6 +268,146 @@ describe("trace emitter", () => {
     for (const id of result.header.opening_hands.a) {
       expect(typeof id).toBe("string");
     }
+  }, 120_000);
+
+  it("play resolves hand_pos and card id from pre-action state", () => {
+    givenGameState({ seed: 1, activePlayer: "first" }).build();
+    const filler = createCard("10001110", "hand", "first");
+    const spell = createCard("10131320", "hand", "first");
+    state.players.first.hand = [filler, filler, spell];
+    const before = captureSnapshot();
+    const neutral = soakActionToNeutral(
+      { type: "PLAY_CARD", player: "first", cardUid: spell.uid },
+      before,
+    );
+    expect(neutral).toEqual({
+      play: { player: "a", hand_pos: 2, card: "10131320" },
+    });
+  });
+
+  it("end_turn names the active player before the action", () => {
+    givenGameState({ seed: 1, activePlayer: "first" }).build();
+    const before = captureSnapshot();
+    const neutral = soakActionToNeutral({ type: "END_TURN" }, before);
+    expect(neutral).toEqual({ end_turn: { player: "a" } });
+  });
+
+  it("search records multiset_pick per removed deck card", () => {
+    givenGameState({ seed: 1, activePlayer: "first" })
+      .withFirstDeck([
+        { name: "Vanilla", type: "Follower", attack: 1, defense: 1 },
+        { name: "TargetA", type: "Follower", attack: 2, defense: 2 },
+        { name: "TargetB", type: "Follower", attack: 3, defense: 3 },
+      ])
+      .build();
+    installTraceRng(state)!;
+    setDrawRecording(true);
+    try {
+      clearActionDraws();
+      whenRunEffects(
+        [{ op: "search", filter: { type: "Follower" }, count: 2 }],
+        "first",
+      );
+      const picks = consumeActionPicks().filter(
+        (p) => p.what === "multiset_pick",
+      );
+      expect(picks).toHaveLength(2);
+      expect(picks.every((p) => p.among === "deck")).toBe(true);
+      const handIds = state.players.first.hand.map((c) => String(c.id));
+      expect(picks.map((p) => p.chose)).toEqual(handIds);
+    } finally {
+      setDrawRecording(false);
+      uninstallTraceRng(state);
+    }
+  });
+
+  it("summon from deck records one multiset_pick per summoned card", () => {
+    givenGameState({ seed: 1, activePlayer: "first" }).build();
+    state.players.first.deck = [
+      createCard("10121110", "deck", "first"),
+      createCard("10001110", "deck", "first"),
+    ];
+    installTraceRng(state)!;
+    setDrawRecording(true);
+    try {
+      clearActionDraws();
+      whenRunEffects(
+        [
+          {
+            op: "summon",
+            source: "deck",
+            count: 1,
+            filter: { type: "Follower" },
+          },
+        ],
+        "first",
+      );
+      const picks = consumeActionPicks().filter(
+        (p) => p.what === "multiset_pick",
+      );
+      expect(picks).toHaveLength(1);
+      expect(picks[0]?.among).toBe("deck");
+      expect(getBoard(state, "first")).toHaveLength(1);
+    } finally {
+      setDrawRecording(false);
+      uninstallTraceRng(state);
+    }
+  });
+
+  it("printed engage and rush are traits/granted, not cross-listed", () => {
+    givenGameState({ seed: 1, activePlayer: "first" }).build();
+    const index = getGlobalCardIndex();
+    const vanillaTpl = index?.byId.get("10001110");
+    const engageTpl = index?.byId.get("10543310");
+    expect(vanillaTpl).toBeTruthy();
+    expect(engageTpl).toBeTruthy();
+
+    const rushFollower = makeCardFromDB(vanillaTpl!, "first");
+    rushFollower.hasRush = true;
+    rushFollower.zone = "board";
+    state.players.first.board = [rushFollower];
+    const rushCanon = toCanonicalState(state).players.a.field[0]!;
+    expect(rushCanon?.traits).toEqual(["rush"]);
+    expect(rushCanon?.granted).toBeUndefined();
+
+    const engageAmulet = makeCardFromDB(engageTpl!, "first");
+    engageAmulet.zone = "board";
+    state.players.first.board = [engageAmulet];
+    const engageCanon = toCanonicalState(state).players.a.field[0]!;
+    expect(engageCanon?.granted).toBeUndefined();
+    expect(engageCanon?.traits ?? []).not.toContain("engage");
+  });
+
+  it("turn uses roundCount and pp is zero during mulligan", async () => {
+    const result = await runTraceGame({
+      seed: TRACE_SEED,
+      gameIndex: 0,
+      deckA: rampDeck as Record<string, number>,
+      deckB: rampDeck as Record<string, number>,
+      turnCap: 30,
+      actionCap: 200,
+    });
+    const line0 = result.lines[0]!;
+    expect(line0.state.turn).toBe(0);
+    expect(line0.state.players.a.pp).toBe(0);
+    expect(line0.state.players.b.pp).toBe(0);
+    const postMulligan = result.lines.find((l) => l.state.phase === "main");
+    expect(postMulligan?.state.turn).toBe(1);
+  }, 120_000);
+
+  it("mulligan legal lists all 16 swap bitmasks", async () => {
+    const result = await runTraceGame({
+      seed: TRACE_SEED,
+      gameIndex: 0,
+      deckA: rampDeck as Record<string, number>,
+      deckB: rampDeck as Record<string, number>,
+      turnCap: 30,
+      actionCap: 200,
+    });
+    const line0 = result.lines[0]!;
+    expect(line0.state.phase).toBe("mulligan");
+    expect(line0.legal).toHaveLength(16);
+    expect(line0.legal.every((a) => "mulligan" in a)).toBe(true);
   }, 120_000);
 });
 
@@ -287,6 +437,20 @@ describe("committed trace fixtures", () => {
         assertPlayerShape(line.state.players.a);
         assertPlayerShape(line.state.players.b);
         expect(Array.isArray(line.legal)).toBe(true);
+        if ("play" in line.action) {
+          expect(line.action.play.card.startsWith("uid_")).toBe(false);
+        }
+      }
+    }
+  });
+
+  it("no play.card values are uids", () => {
+    for (const file of fixtures) {
+      const { lines } = parseTraceFile(file);
+      for (const line of lines) {
+        if ("play" in line.action) {
+          expect(line.action.play.card).not.toMatch(/^uid_/);
+        }
       }
     }
   });

@@ -22,6 +22,7 @@ import type {
   TracePlayer,
   CanonicalPhase,
 } from "./types.js";
+import { grantedTags, traitsTags } from "./instanceTags.js";
 
 export function playerToTrace(p: Player): TracePlayer {
   return p === "first" ? "a" : "b";
@@ -43,52 +44,6 @@ function sortedMultiset(cards: CardInstance[]): Record<string, number> {
     sorted[key] = counts[key]!;
   }
   return sorted;
-}
-
-function traitTags(card: CardInstance): string[] {
-  const tags = new Set<string>();
-  const add = (name: string) => {
-    const n = name.toLowerCase().replace(/[\s_]/g, "");
-    if (n) tags.add(n === "lastwords" ? "lastwords" : n);
-  };
-  if (card.ambush || card.hasAmbush) add("ambush");
-  if (card.ward || card.hasWard) add("ward");
-  if (card.storm || card.hasStorm) add("storm");
-  if (card.hasRush || card.isRush) add("rush");
-  if (card.hasBane) add("bane");
-  if (card.hasBarrier) add("barrier");
-  if (card.hasIntimidate) add("intimidate");
-  if (card.keywords) {
-    for (const k of card.keywords) {
-      const name = typeof k === "string" ? k : k?.name;
-      if (name) add(name);
-    }
-  }
-  return [...tags].sort();
-}
-
-function grantedTags(card: CardInstance): string[] | undefined {
-  const tags = new Set<string>();
-  const ks = card.keywordState;
-  if (ks?.lastWordsEffects?.length || card.lastWordsEffects?.length) {
-    tags.add("lastWords");
-  }
-  if (ks?.hasFanfare) tags.add("fanfare");
-  if (ks?.hasEngage || card.hasEngage) tags.add("engage");
-  if (ks?.triggers?.length) {
-    for (const t of ks.triggers) {
-      const ev = String(t?.event ?? t?.type ?? "").trim();
-      if (ev) tags.add(ev.replace(/_([a-z])/g, (_, c) => c.toUpperCase()));
-    }
-  }
-  if (card.triggers?.length) {
-    for (const t of card.triggers) {
-      const ev = String(t?.event ?? t?.type ?? "").trim();
-      if (ev) tags.add(ev);
-    }
-  }
-  if (tags.size === 0) return undefined;
-  return [...tags].sort();
 }
 
 function xyzVars(card: CardInstance): Record<string, number> | undefined {
@@ -120,7 +75,7 @@ function fieldSlot(card: CardInstance): FieldSlot {
     evolved: !!(card.hasEvolved || card.evoType),
     max_defense: maxDef,
     super: card.evoType === "super" || !!(card as any).superEvolved,
-    traits: traitTags(card),
+    traits: traitsTags(card),
   };
   const vars = xyzVars(card);
   if (vars) slot.vars = vars;
@@ -169,8 +124,32 @@ function faithSum(state: GameState, player: Player): number {
   return sum;
 }
 
+function projectPp(
+  state: GameState,
+  player: Player,
+  ps: GameState["players"][Player],
+): { pp: number; pp_max: number; pp_bonus: number } {
+  const phase = resolvePhase(state);
+  if (phase === "mulligan") {
+    return { pp: 0, pp_max: 0, pp_bonus: 0 };
+  }
+  const turnNum = state.turnNumber | 0;
+  const firstTurnStarted = turnNum >= 1;
+  const secondTurnStarted = turnNum >= 2;
+  const started = player === "first" ? firstTurnStarted : secondTurnStarted;
+  if (!started) {
+    return { pp: 0, pp_max: 0, pp_bonus: 0 };
+  }
+  return {
+    pp: ps.pp | 0,
+    pp_max: ps.maxPP | 0,
+    pp_bonus: ps.bonusPpOrb | 0,
+  };
+}
+
 function projectPlayer(state: GameState, player: Player): PlayerCanonical {
   const ps = state.players[player];
+  const ppFields = projectPp(state, player, ps);
   const board = getBoard(state, player);
   const field: (FieldSlot | null)[] = [];
   for (let i = 0; i < 5; i++) {
@@ -201,9 +180,9 @@ function projectPlayer(state: GameState, player: Player): PlayerCanonical {
     hand: getHand(state, player).map(handEntry),
     leader_defense: ps.hp | 0,
     leader_max: ps.maxHP | 0,
-    pp: ps.pp | 0,
-    pp_bonus: ps.bonusPpOrb | 0,
-    pp_max: ps.maxPP | 0,
+    pp: ppFields.pp,
+    pp_bonus: ppFields.pp_bonus,
+    pp_max: ppFields.pp_max,
     rally: ps.rally | 0,
     sep: ps.superEvoCharges | 0,
     shadows: ps.shadows | 0,
@@ -218,14 +197,15 @@ function resolvePhase(state: GameState): CanonicalPhase {
 }
 
 export function toCanonicalState(state: GameState): CanonicalState {
+  const phase = resolvePhase(state);
   return {
     active: playerToTrace(state.activePlayer),
-    phase: resolvePhase(state),
+    phase,
     players: {
       a: projectPlayer(state, "first"),
       b: projectPlayer(state, "second"),
     },
-    turn: state.turnNumber | 0,
+    turn: phase === "mulligan" ? 0 : state.roundCount | 0,
     winner: state.winner ? playerToTrace(state.winner) : null,
   };
 }

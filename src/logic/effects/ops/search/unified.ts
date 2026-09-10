@@ -22,6 +22,7 @@ import {
 } from "../../../core/cardFilter/index.js";
 import { applyKeyword } from "../../../core/keywords.js";
 import { MAX_HAND, pushToHand } from "../../../../core/utils.js";
+import { recordTraceDeckPick } from "../../../../bench/trace/drawRecorder.js";
 import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 import {
   getDeck,
@@ -113,6 +114,7 @@ export function handleSearch(
     if (!card) continue;
 
     // Remove from deck
+    recordTraceDeckPick(card);
     deck.splice(idx, 1);
     bumpZoneVersion();
 

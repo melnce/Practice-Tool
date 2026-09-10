@@ -8,6 +8,7 @@ import type {
 } from "../../../../core/types/index.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
 import { makeCardFromDB, pushToBoard } from "./core.js";
+import { recordTraceDeckPick } from "../../../../bench/trace/drawRecorder.js";
 import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 import { boardOf, deckOf } from "./utils.js";
 import { readPoolNarrowFilter } from "../../../core/targeting/poolCondition.js";
@@ -92,6 +93,7 @@ export function summonRandomFromDeck(eff: Effect, owner: Player) {
     // remove the specific deck entry (by uid) so duplicates remain intact in deck
     const idx = deck.indexOf(deckEntry);
     if (idx !== -1) {
+      recordTraceDeckPick(deckEntry);
       deck.splice(idx, 1);
       bumpZoneVersion();
     }
