@@ -152,24 +152,40 @@ async function main(): Promise<void> {
     `trace seed=${config.seed} games=${config.games} deckA=${config.deckA} deckB=${config.deckB} out=${config.out}`,
   );
 
+  let failures = 0;
   for (let i = 0; i < config.games; i++) {
     const gameSeed = config.seed + i * 1_000_003;
-    const result = await runTraceGame({
-      seed: config.seed,
-      gameIndex: i,
-      deckA,
-      deckB,
-      turnCap: config.turnCap,
-      actionCap: config.actionCap,
-    });
-    const outPath = join(
-      resolve(ROOT, config.out),
-      `trace-${config.seed}-${i}.jsonl`,
-    );
-    writeFileSync(outPath, formatTraceJsonl(result.header, result.lines));
-    console.log(
-      `  game ${i} seed=${gameSeed} actions=${result.lines.length} hash=${result.finalHash} → ${outPath}`,
-    );
+    try {
+      const result = await runTraceGame({
+        seed: config.seed,
+        gameIndex: i,
+        deckA,
+        deckB,
+        turnCap: config.turnCap,
+        actionCap: config.actionCap,
+      });
+      if (result.completion !== "terminal") {
+        throw new Error(
+          `game ${i} did not end terminal (completion=${result.completion}, actions=${result.lines.length})`,
+        );
+      }
+      const outPath = join(
+        resolve(ROOT, config.out),
+        `trace-${config.seed}-${i}.jsonl`,
+      );
+      writeFileSync(outPath, formatTraceJsonl(result.header, result.lines));
+      console.log(
+        `  game ${i} seed=${gameSeed} actions=${result.lines.length} hash=${result.finalHash} → ${outPath}`,
+      );
+    } catch (err) {
+      failures++;
+      console.error(`  game ${i} FAILED:`, err);
+    }
+  }
+
+  if (failures > 0) {
+    console.error(`trace: ${failures}/${config.games} game(s) failed`);
+    process.exit(1);
   }
 }
 

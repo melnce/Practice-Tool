@@ -815,16 +815,17 @@ function dispatchSoakHistory(
   dispatchSoakPlayerAction({ type }, dispatchPath);
 }
 
-function countHistoryCommitsDuring(
+export function countHistoryCommitsDuring(
   action: SoakAction,
-  dispatchPath: SoakDispatchPath,
+  dispatchPath: SoakDispatchPath = DEFAULT_SOAK_DISPATCH,
+  opts?: { skipCanonicalize?: boolean },
 ): ActionTelemetry {
   let commits = 0;
   const unsub = onHistoryEvent((ev) => {
     if (ev.type === "commit") commits++;
     if (ev.type === "reset") commits = 0;
   });
-  const telemetry = applySoakActionWithOutcome(action, dispatchPath);
+  const telemetry = applySoakActionWithOutcome(action, dispatchPath, opts);
   unsub();
   telemetry.historyCommits = commits;
   if (commits === 0) {
@@ -840,8 +841,13 @@ function countHistoryCommitsDuring(
 export function applySoakActionWithOutcome(
   action: SoakAction,
   dispatchPath: SoakDispatchPath = DEFAULT_SOAK_DISPATCH,
+  opts?: { skipCanonicalize?: boolean },
 ): ActionTelemetry {
-  action = canonicalizeTraceAction(action, state);
+  if (!opts?.skipCanonicalize) {
+    action = canonicalizeTraceAction(action, state, {
+      legalSoakActions: getLegalSoakActions(),
+    });
+  }
   const telemetry: ActionTelemetry = { historyCommits: 0 };
   if (action.type === "PLAY_CARD") {
     const hand = getHand(state, action.player);

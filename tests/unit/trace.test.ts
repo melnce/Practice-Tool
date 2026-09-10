@@ -571,6 +571,9 @@ describe("committed trace fixtures", () => {
       expect(header.opening_hands.b).toHaveLength(4);
       expect(header.x_final_hash).toBeTruthy();
 
+      const last = lines[lines.length - 1]!;
+      expect(last.state.phase).toBe("terminal");
+
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i]!;
         expect(line.i).toBe(i);
@@ -612,6 +615,7 @@ describe("committed trace fixtures", () => {
         turnCap: 60,
         actionCap: 800,
       });
+      expect(rerun.completion).toBe("terminal");
       expect(rerun.finalHash).toBe(header.x_final_hash);
     }
   }, 300_000);
