@@ -384,6 +384,80 @@ describe("trace emitter", () => {
     }
   });
 
+  it("random_target slot counts surviving followers during a death batch", () => {
+    givenGameState({ seed: 1, activePlayer: "first" }).build();
+    const a = createCard("10001110", "board", "second");
+    a.uid = "board_a";
+    const b = createCard("10001110", "board", "second");
+    b.uid = "board_b";
+    b.defense = 0;
+    const c = createCard("10001110", "board", "second");
+    c.uid = "board_c";
+    state.players.second.board = [a, b, c];
+
+    const recorder = installTraceRng(state)!;
+    try {
+      const before = captureSnapshot();
+      state.rng.pick([c]);
+      const pick = derivePicks(recorder.getRolls(), before).find(
+        (p) => p.what === "random_target",
+      );
+      expect(pick).toEqual({
+        what: "random_target",
+        among: "enemy_followers",
+        chose: { slot: 1 },
+      });
+    } finally {
+      uninstallTraceRng(state);
+    }
+  });
+
+  it("random_target records board pick for card absent from before state", () => {
+    givenGameState({ seed: 1, activePlayer: "first" }).build();
+    state.players.second.board = [];
+
+    const recorder = installTraceRng(state)!;
+    try {
+      const before = captureSnapshot();
+      const skeleton = createCard("90051110", "board", "second");
+      skeleton.uid = "summoned_skeleton";
+      state.players.second.board = [skeleton];
+      state.rng.pick([skeleton]);
+      const picks = derivePicks(recorder.getRolls(), before);
+      expect(picks.some((p) => p.what === "random_target")).toBe(true);
+      expect(picks.some((p) => p.what === "random_card")).toBe(false);
+    } finally {
+      uninstallTraceRng(state);
+    }
+  });
+
+  it("random_target slot unchanged when no pending deaths", () => {
+    givenGameState({ seed: 1, activePlayer: "first" }).build();
+    const a = createCard("10001110", "board", "second");
+    a.uid = "board_a";
+    const b = createCard("10001110", "board", "second");
+    b.uid = "board_b";
+    const c = createCard("10001110", "board", "second");
+    c.uid = "board_c";
+    state.players.second.board = [a, b, c];
+
+    const recorder = installTraceRng(state)!;
+    try {
+      const before = captureSnapshot();
+      state.rng.pick([b]);
+      const pick = derivePicks(recorder.getRolls(), before).find(
+        (p) => p.what === "random_target",
+      );
+      expect(pick).toEqual({
+        what: "random_target",
+        among: "enemy_followers",
+        chose: { slot: 1 },
+      });
+    } finally {
+      uninstallTraceRng(state);
+    }
+  });
+
   it("rng picks follow execution order (random target before consequence draw)", () => {
     givenGameState({ seed: 99, activePlayer: "first" })
       .withFirstHand(["10012310"])

@@ -112,6 +112,8 @@ Every random decision, by outcome.
 
 Do not record RNG as an index into an unstable list.
 
+`random_target.chose.slot` is the position among the *surviving* cards of that board at the moment of the roll (cards already at 0 defense or marked for destruction are skipped, order preserved) — the slot the card has after the pending-death sweep compacts the board. `random_target.among` (`ally_followers` / `enemy_followers`) is informational only, relative to the active player at action start.
+
 ## CanonicalState
 
 Projection both engines can produce. Keys sorted.
@@ -182,7 +184,7 @@ Projection both engines can produce. Keys sorted.
 }
 ```
 
-`hand` is in draw order: `[{card, cost, vars?, skybound?}, …]`. `vars` is Stormy Blast's X (and any other `{X,Y,Z}`). `skybound` is the Skybound Art gauge **per card in hand** (turn + evolves while in hand + Tsubasa boosts) — not a per-player field.
+`hand` is in draw order: `[{card, cost, vars?, skybound?}, …]`. `vars` is Stormy Blast's X (and any other `{X,Y,Z}`). `skybound` is the evolves-witnessed count only (`skyboundArtEvolvesWitnessed`, what `canonicalState.ts` emits), omitted when 0; the turn number is added at evaluation — not a per-player field.
 
 `deck`, `cemetery`, `banished` are **sorted multisets** `{card_id: count}` (JSON object keys sorted).
 
