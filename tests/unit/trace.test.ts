@@ -227,6 +227,26 @@ describe("trace emitter", () => {
     }
   }, 120_000);
 
+  it("every raw rng pick has kind shuffle", async () => {
+    for (let gameIndex = 0; gameIndex < 2; gameIndex++) {
+      const result = await runTraceGame({
+        seed: TRACE_SEED,
+        gameIndex,
+        deckA: rampDeck as Record<string, number>,
+        deckB: rampDeck as Record<string, number>,
+        turnCap: 30,
+        actionCap: 200,
+      });
+      for (const line of result.lines) {
+        for (const pick of line.rng) {
+          if (pick.what === "raw") {
+            expect(pick).toMatchObject({ kind: "shuffle" });
+          }
+        }
+      }
+    }
+  }, 300_000);
+
   it("mulligan with four replacements records four draw picks", async () => {
     prepareSoakReplay({ fuse: true, interactiveModes: false });
     const deckRaw = resolveIdDeckFile(rampDeck as Record<string, number>);

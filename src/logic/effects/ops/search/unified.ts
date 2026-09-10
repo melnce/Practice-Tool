@@ -21,7 +21,11 @@ import {
   buildCardPredicate,
 } from "../../../core/cardFilter/index.js";
 import { applyKeyword } from "../../../core/keywords.js";
-import { MAX_HAND, pushToHand } from "../../../../core/utils.js";
+import {
+  MAX_HAND,
+  pushToHand,
+  shuffleInPlace,
+} from "../../../../core/utils.js";
 import { recordTraceDeckPick } from "../../../../bench/trace/drawRecorder.js";
 import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 import {
@@ -159,10 +163,7 @@ export function handleSearch(
   });
 
   // Shuffle deck after search (standard behavior)
-  for (let i = deck.length - 1; i > 0; i--) {
-    const j = state.rng.nextInt(i + 1);
-    [deck[i], deck[j]] = [deck[j]!, deck[i]!];
-  }
+  shuffleInPlace(deck);
   if (selectedIndices.length > 0) bumpZoneVersion();
 }
 
