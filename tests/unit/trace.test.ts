@@ -412,6 +412,93 @@ describe("trace emitter", () => {
     }
   });
 
+  it("board pick without zone derives random_target from game state", () => {
+    givenGameState({ seed: 1, activePlayer: "first" }).build();
+    const boardCard = createCard("90074140", "board", "second");
+    boardCard.uid = "transformed_buddy";
+    delete (boardCard as { zone?: string }).zone;
+    state.players.second.board = [boardCard];
+
+    const recorder = installTraceRng(state)!;
+    try {
+      const before = captureSnapshot();
+      state.rng.pick([boardCard]);
+      const roll = recorder.getRolls()[0];
+      expect(roll?.m).toBe("pick");
+      expect(roll?.chose).toMatchObject({
+        zone: "board",
+        slot: 0,
+        owner: "second",
+        card: "90074140",
+      });
+      const pick = derivePicks(recorder.getRolls(), before)[0];
+      expect(pick).toEqual({
+        what: "random_target",
+        among: "enemy_followers",
+        chose: { slot: 0 },
+      });
+    } finally {
+      uninstallTraceRng(state);
+    }
+  });
+
+  it("hand pick still derives by zone when card is not on a board", () => {
+    givenGameState({ seed: 1, activePlayer: "first" }).build();
+    const handCard = createCard("10131320", "hand", "first");
+    state.players.first.hand = [handCard];
+
+    const recorder = installTraceRng(state)!;
+    try {
+      const before = captureSnapshot();
+      state.rng.pick([handCard]);
+      const roll = recorder.getRolls()[0];
+      expect(roll?.chose).toMatchObject({
+        zone: "hand",
+        card: "10131320",
+      });
+      const pick = derivePicks(recorder.getRolls(), before)[0];
+      expect(pick).toEqual({
+        what: "multiset_pick",
+        among: "hand",
+        chose: "10131320",
+      });
+    } finally {
+      uninstallTraceRng(state);
+    }
+  });
+
+  it("board pick without zone skips zero-defense cards in slot numbering", () => {
+    givenGameState({ seed: 1, activePlayer: "first" }).build();
+    const dead = createCard("10001110", "board", "second");
+    dead.uid = "board_dead";
+    dead.defense = 0;
+    delete (dead as { zone?: string }).zone;
+    const live = createCard("90074140", "board", "second");
+    live.uid = "transformed_buddy";
+    delete (live as { zone?: string }).zone;
+    state.players.second.board = [dead, live];
+
+    const recorder = installTraceRng(state)!;
+    try {
+      const before = captureSnapshot();
+      state.rng.pick([live]);
+      const roll = recorder.getRolls()[0];
+      expect(roll?.chose).toMatchObject({
+        zone: "board",
+        slot: 0,
+        owner: "second",
+      });
+      const pick = derivePicks(recorder.getRolls(), before)[0];
+      expect(pick).toEqual({
+        what: "random_target",
+        among: "enemy_followers",
+        chose: { slot: 0 },
+      });
+    } finally {
+      uninstallTraceRng(state);
+    }
+  });
+
   it("random_target records board pick for card absent from before state", () => {
     givenGameState({ seed: 1, activePlayer: "first" }).build();
     state.players.second.board = [];
