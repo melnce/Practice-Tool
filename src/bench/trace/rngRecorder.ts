@@ -48,15 +48,17 @@ function liveBoardSlot(
   gameState: GameState,
   card: CardInstance,
 ): { owner: Player; slot: number } | null {
-  const owner = card.owner;
-  if (!owner) return null;
-  const board = getBoard(gameState, owner);
-  let slot = 0;
-  for (const c of board) {
-    if (!c) continue;
-    if (!boardCardSurvives(c)) continue;
-    if (c.uid === card.uid) return { owner, slot };
-    slot++;
+  const uid = card.uid;
+  if (!uid) return null;
+  for (const owner of ["first", "second"] as const) {
+    const board = getBoard(gameState, owner);
+    let slot = 0;
+    for (const c of board) {
+      if (!c) continue;
+      if (!boardCardSurvives(c)) continue;
+      if (c.uid === uid) return { owner, slot };
+      slot++;
+    }
   }
   return null;
 }
@@ -71,26 +73,25 @@ function cardPickIdentity(
   slot?: number;
   owner?: Player;
 } {
+  if (gameState) {
+    const loc = liveBoardSlot(gameState, card);
+    if (loc) {
+      return {
+        uid: card.uid,
+        card: String(card.id),
+        zone: "board",
+        slot: loc.slot,
+        owner: loc.owner,
+      };
+    }
+  }
+
   const zone = card.zone ?? "unknown";
-  const out: {
-    uid: string;
-    card: string;
-    zone: string;
-    slot?: number;
-    owner?: Player;
-  } = {
+  return {
     uid: card.uid,
     card: String(card.id),
     zone,
   };
-  if (zone === "board" && gameState) {
-    const loc = liveBoardSlot(gameState, card);
-    if (loc) {
-      out.slot = loc.slot;
-      out.owner = loc.owner;
-    }
-  }
-  return out;
 }
 
 function pickChoseIdentity(
