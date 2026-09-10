@@ -32,7 +32,10 @@ import {
 } from "../../src/bench/trace/drawRecorder.js";
 import { derivePicks } from "../../src/bench/trace/pickDerive.js";
 import { captureSnapshot } from "../../src/core/history.js";
-import { soakActionToNeutral } from "../../src/bench/trace/neutralAction.js";
+import {
+  getLegalNeutralActions,
+  soakActionToNeutral,
+} from "../../src/bench/trace/neutralAction.js";
 import { toCanonicalState } from "../../src/bench/trace/canonicalState.js";
 import {
   givenGameState,
@@ -466,6 +469,33 @@ describe("trace emitter", () => {
       },
     });
   }, 180_000);
+
+  it("legal dedupes identical choose card options", () => {
+    givenGameState({ seed: 1, activePlayer: "first" }).build();
+    const a = createCard("10503310", "hand", "first");
+    const b = createCard("10503310", "hand", "first");
+    state.players.first.hand = [a, b];
+    state.pendingTargetEffect = {
+      owner: "first",
+      pool: [a, b],
+      poolUids: [a.uid, b.uid],
+      targetUids: [],
+      selectCount: 1,
+    };
+
+    const legal = getLegalNeutralActions(state);
+    const cardChoices = legal.filter(
+      (action) =>
+        "choose" in action &&
+        typeof action.choose.option === "object" &&
+        "card" in action.choose.option,
+    );
+    expect(cardChoices).toHaveLength(1);
+    expect(cardChoices[0]).toEqual({
+      choose: { player: "a", option: { card: "10503310" } },
+    });
+    state.pendingTargetEffect = undefined;
+  });
 
   it("printed engage and rush are traits/granted, not cross-listed", () => {
     givenGameState({ seed: 1, activePlayer: "first" }).build();

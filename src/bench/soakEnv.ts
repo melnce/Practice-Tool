@@ -50,6 +50,11 @@ import { resolvePlayCost } from "../logic/core/playCard/cost.js";
 import { canEvolve } from "../logic/evolveUtils.js";
 import { canToggleSecondPlayerBonusPp } from "../core/bonusPp.js";
 import { canFuse } from "../logic/core/fuseFromHand.js";
+import {
+  canAttackFollowerTarget,
+  canAttackLeaderTarget,
+  effectiveAttackEligibility,
+} from "../logic/core/combat.js";
 import { applyPendingModePickIndex } from "../logic/effects/ops/mode.js";
 import {
   getBoard,
@@ -278,60 +283,6 @@ export function installSoakAdapter(opts?: {
   });
 }
 
-function hasStorm(card: CardInstance): boolean {
-  if (card.storm || card.hasStorm) return true;
-  if (!card.keywords) return false;
-  return card.keywords.some((k: any) => {
-    const name = typeof k === "string" ? k : k?.name;
-    return name?.toLowerCase() === "storm";
-  });
-}
-
-function hasWard(card: CardInstance): boolean {
-  if (card.ward || card.hasWard) return true;
-  if (!card.keywords) return false;
-  return card.keywords.some((k: any) => {
-    const name = typeof k === "string" ? k : k?.name;
-    return name?.toLowerCase() === "ward";
-  });
-}
-
-function ignoresWard(card: CardInstance): boolean {
-  if (card.ignoresWard || card.keywordState?.ignoresWard) return true;
-  if (!card.keywords) return false;
-  return card.keywords.some((k: any) => {
-    const name = typeof k === "string" ? k : k?.name;
-    const normalized = name?.toLowerCase().replace(/[\s_]/g, "");
-    return normalized === "ignoresward";
-  });
-}
-
-function hasAmbush(card: CardInstance): boolean {
-  if (card.ambush || card.hasAmbush) return true;
-  if (!card.keywords) return false;
-  return card.keywords.some((k: any) => {
-    const name = typeof k === "string" ? k : k?.name;
-    return name?.toLowerCase() === "ambush";
-  });
-}
-
-function canAttackFollower(card: CardInstance): boolean {
-  if (card.type !== "Follower") return false;
-  if (card.cant_attack) return false;
-  if (!card.can_attack) return false;
-  if (card.hasAttacked) return false;
-  if (card.justPlayed && !hasStorm(card) && !card.hasRush) return false;
-  return true;
-}
-
-function canAttackLeader(card: CardInstance): boolean {
-  if (!canAttackFollower(card)) return false;
-  if (card.justPlayed && card.hasRush && !hasStorm(card) && !card.hasStorm) {
-    return false;
-  }
-  return true;
-}
-
 function canEngage(card: CardInstance, player: Player): boolean {
   if (card.type !== "Amulet" || !card.hasEngage) return false;
   const ks = card.keywordState;
@@ -471,18 +422,14 @@ export function getLegalSoakActions(): SoakAction[] {
     }
   }
 
-  // Attacks
-  const hasEnemyWard = enemyBoard.some(
-    (c) => c && c.type === "Follower" && hasWard(c),
-  );
+  // Attacks — use combat module predicates (can_attack + ward/ambush/rush-evolve rules).
   for (const attacker of myBoard) {
-    if (!attacker || !canAttackFollower(attacker)) continue;
-    const ignore = ignoresWard(attacker);
+    if (!attacker || attacker.type !== "Follower") continue;
+    if (!effectiveAttackEligibility(attacker)) continue;
 
     for (const defender of enemyBoard) {
       if (!defender || defender.type !== "Follower") continue;
-      if (hasAmbush(defender)) continue;
-      if (hasEnemyWard && !ignore && !hasWard(defender)) continue;
+      if (!canAttackFollowerTarget(defender, enemyBoard, attacker)) continue;
       actions.push({
         type: "ATTACK",
         player,
@@ -491,7 +438,7 @@ export function getLegalSoakActions(): SoakAction[] {
       });
     }
 
-    if (canAttackLeader(attacker) && (!hasEnemyWard || ignore)) {
+    if (canAttackLeaderTarget(attacker, enemyBoard)) {
       actions.push({
         type: "ATTACK",
         player,

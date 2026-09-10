@@ -181,6 +181,18 @@ export function sortNeutralActions(actions: NeutralAction[]): NeutralAction[] {
   );
 }
 
+function dedupeNeutralActions(actions: NeutralAction[]): NeutralAction[] {
+  const seen = new Set<string>();
+  const out: NeutralAction[] = [];
+  for (const action of actions) {
+    const key = neutralSortKey(action);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(action);
+  }
+  return out;
+}
+
 function enumerateMulliganLegal(state: GameState): NeutralAction[] {
   const stage = state.mulliganStage;
   if (stage !== "first" && stage !== "second") return [];
@@ -207,7 +219,7 @@ export function getLegalNeutralActions(state: GameState): NeutralAction[] {
     const n = soakActionToNeutral(a, state);
     if (n) out.push(n);
   }
-  return sortNeutralActions(out);
+  return dedupeNeutralActions(sortNeutralActions(out));
 }
 
 export function findCardInZones(

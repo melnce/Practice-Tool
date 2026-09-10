@@ -104,6 +104,23 @@ export function canAttackLeaderWhileWardActive(
 ): boolean {
   return attackerIgnoresWard(attacker) || !hasActiveWardOn(defenderBoard);
 }
+
+/** Whether a follower may attack the enemy leader (mirrors _attackLeaderCore guards). */
+export function canAttackLeaderTarget(
+  attacker: CardInstance,
+  defenderBoard: CardInstance[],
+): boolean {
+  if (!attacker || attacker.type !== "Follower") return false;
+  if (
+    attacker.justPlayed &&
+    (attacker.hasRush || attacker.hasEvolved) &&
+    !attacker.hasStorm
+  ) {
+    return false;
+  }
+  if (!effectiveAttackEligibility(attacker)) return false;
+  return canAttackLeaderWhileWardActive(defenderBoard, attacker);
+}
 function effectiveAtk(card: CardInstance) {
   return Math.max(0, parseInt(card?.attack as any, 10) || 0);
 }
