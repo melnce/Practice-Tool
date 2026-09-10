@@ -172,7 +172,7 @@ Projection both engines can produce. Keys sorted.
 ```jsonc
 {
   "attack": 3,
-  "attacks_left": 1,
+  "attacks_left": 1, // attacks remaining this turn; before a follower's first attack the engine has not materialised the counter, and the emitter reports its attacks_per_turn (printed "Can attack N times per turn"), else 1
   "can_attack": true,
   "card": "10574110",
   "countdown": null,
@@ -262,7 +262,7 @@ Pinned 2026-09-10 from the first differential run. Both emitters follow these; a
 | `field[].attack`          | `card.attack` (number)                                        |                                                                                                                                                                                                                                                                       |
 | `field[].defense`         | `card.defense`                                                |                                                                                                                                                                                                                                                                       |
 | `field[].max_defense`     | `card.peak_defense` or `card.base_defense` or current defense |                                                                                                                                                                                                                                                                       |
-| `field[].attacks_left`    | `card.attacks_left` or derived                                |                                                                                                                                                                                                                                                                       |
+| `field[].attacks_left`    | `card.attacks_left` or derived                                | attacks remaining this turn; before a follower's first attack the engine has not materialised the counter, and the emitter reports its `attacks_per_turn` (printed "Can attack N times per turn"), else 1                                                                 |
 | `field[].can_attack`      | `card.can_attack`                                             |                                                                                                                                                                                                                                                                       |
 | `field[].card`            | `card.id`                                                     | Cygames id string                                                                                                                                                                                                                                                     |
 | `field[].countdown`       | `card.countdown` when amulet                                  | `null` for followers                                                                                                                                                                                                                                                  |

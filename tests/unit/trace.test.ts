@@ -799,6 +799,46 @@ describe("trace emitter", () => {
     state.pendingTargetEffect = undefined;
   });
 
+  it("field attacks_left falls back to attacks_per_turn before first attack", () => {
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 10 })
+      .withFirstHand(["10924120"])
+      .withFirstPP(10, 10)
+      .build();
+    whenPlayCard("first", 0);
+    const bel = getBoard(state, "first").find((c) => c?.id === "10924120");
+    expect(bel).toBeTruthy();
+    expect(bel!.attacks_left).toBeUndefined();
+    const slot = getBoard(state, "first").indexOf(bel!);
+    const canon = toCanonicalState(state).players.a.field[slot]!;
+    expect(canon.attacks_left).toBe(3);
+  });
+
+  it("field attacks_left uses explicit zero over attacks_per_turn", () => {
+    givenGameState({ seed: 1, activePlayer: "first" }).build();
+    const vanillaTpl = getGlobalCardIndex()?.byId.get("10001110");
+    expect(vanillaTpl).toBeTruthy();
+    const follower = makeCardFromDB(vanillaTpl!, "first");
+    follower.attacks_per_turn = 3;
+    follower.attacks_left = 0;
+    follower.zone = "board";
+    state.players.first.board = [follower];
+    const canon = toCanonicalState(state).players.a.field[0]!;
+    expect(canon.attacks_left).toBe(0);
+  });
+
+  it("field attacks_left defaults to 1 without attacks_per_turn", () => {
+    givenGameState({ seed: 1, activePlayer: "first" }).build();
+    const vanillaTpl = getGlobalCardIndex()?.byId.get("10001110");
+    expect(vanillaTpl).toBeTruthy();
+    const follower = makeCardFromDB(vanillaTpl!, "first");
+    delete follower.attacks_left;
+    delete follower.attacks_per_turn;
+    follower.zone = "board";
+    state.players.first.board = [follower];
+    const canon = toCanonicalState(state).players.a.field[0]!;
+    expect(canon.attacks_left).toBe(1);
+  });
+
   it("printed engage and rush are traits/granted, not cross-listed", () => {
     givenGameState({ seed: 1, activePlayer: "first" }).build();
     const index = getGlobalCardIndex();
