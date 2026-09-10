@@ -220,6 +220,7 @@ Pinned 2026-09-10 from the first differential run. Both emitters follow these; a
 - `evolves_used` counts every allied follower evolution this match — EP, SEP or effect.
 - `leader_defense` is clamped at 0.
 - A crest entry carries `countdown` only when it has one.
+- At a line whose `phase` is `terminal`, only `phase` and `winner` are compared; the rest of the state is post-mortem and engine-private.
 
 ## Diff procedure
 
