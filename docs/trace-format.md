@@ -215,8 +215,8 @@ Pinned 2026-09-10 from the first differential run. Both emitters follow these; a
 - **Header extensions.** Header keys prefixed `x_` are engine-private and ignored by readers (`x_final_hash`); every other header key is the format.
 - **Cemetery.** `cemetery` holds every card that went there — destroyed followers and amulets and played spells alike; `shadows` is the separate counter the rules spend.
 - **`legal` is a set** — identical NeutralActions appear once.
-- A card chosen from hand, deck or cemetery is `choose {card: "<id>"}`; copies of one id collapse to one option; the engine picks any copy.
-- When a `choose {card}` names an id with several copies in the zone, the copy at the lowest position is taken.
+- A card chosen from hand, deck or cemetery is `choose {card: "<id>"}`; copies of one id collapse to one option among the offered options; the engine picks any copy.
+- When a `choose {card}` names an id with several copies among the offered options, the copy at the lowest position among the offered options is taken.
 - `evolves_used` counts every allied follower evolution this match — EP, SEP or effect.
 - `leader_defense` is clamped at 0.
 - A crest entry carries `countdown` only when it has one.

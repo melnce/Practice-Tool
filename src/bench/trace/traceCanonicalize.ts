@@ -7,6 +7,11 @@ import { findCardInZones } from "./neutralAction.js";
 
 type ContentZone = "hand" | "deck" | "cemetery";
 
+export type CanonicalizeCtx = {
+  /** Soak legality list for the current state (offered CHOOSE_TARGET uids). */
+  legalSoakActions?: SoakAction[];
+};
+
 function zoneCards(gameState: GameState, player: Player, zone: ContentZone) {
   switch (zone) {
     case "hand":
@@ -18,14 +23,29 @@ function zoneCards(gameState: GameState, player: Player, zone: ContentZone) {
   }
 }
 
+function offeredChooseTargetUids(ctx?: CanonicalizeCtx): Set<string> | null {
+  const legal = ctx?.legalSoakActions;
+  if (!legal) return null;
+  const out = new Set<string>();
+  for (const action of legal) {
+    if (action.type === "CHOOSE_TARGET" && action.target.type === "card") {
+      out.add(action.target.uid);
+    }
+  }
+  return out;
+}
+
 function firstUidByCardId(
   gameState: GameState,
   player: Player,
   zone: ContentZone,
   cardId: string,
+  allowedUids: Set<string> | null,
 ): string | null {
   for (const card of zoneCards(gameState, player, zone)) {
-    if (card && String(card.id) === cardId) return card.uid;
+    if (!card || String(card.id) !== cardId) continue;
+    if (allowedUids && !allowedUids.has(card.uid)) continue;
+    return card.uid;
   }
   return null;
 }
@@ -33,6 +53,7 @@ function firstUidByCardId(
 function canonicalizeChooseTarget(
   action: Extract<SoakAction, { type: "CHOOSE_TARGET" }>,
   gameState: GameState,
+  ctx?: CanonicalizeCtx,
 ): SoakAction {
   if (action.target.type !== "card") return action;
   const loc = findCardInZones(gameState, action.target.uid);
@@ -41,11 +62,13 @@ function canonicalizeChooseTarget(
   if (zone !== "hand" && zone !== "deck" && zone !== "cemetery") {
     return action;
   }
+  const offered = offeredChooseTargetUids(ctx);
   const firstUid = firstUidByCardId(
     gameState,
     loc.player,
     zone,
     String(loc.card.id),
+    offered,
   );
   if (!firstUid || firstUid === action.target.uid) return action;
   return {
@@ -54,13 +77,14 @@ function canonicalizeChooseTarget(
   };
 }
 
-/** Map uid-based card picks to the lowest-position copy in hand/deck/cemetery. */
+/** Map uid-based card picks to the lowest-position offered copy in hand/deck/cemetery. */
 export function canonicalizeTraceAction(
   action: SoakAction,
   gameState: GameState,
+  ctx?: CanonicalizeCtx,
 ): SoakAction {
   if (action.type === "CHOOSE_TARGET") {
-    return canonicalizeChooseTarget(action, gameState);
+    return canonicalizeChooseTarget(action, gameState, ctx);
   }
   return action;
 }
