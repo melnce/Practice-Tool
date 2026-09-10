@@ -27,6 +27,10 @@ import {
 } from "./neutralAction.js";
 import { derivePicks } from "./pickDerive.js";
 import { canonicalizeTraceAction } from "./traceCanonicalize.js";
+import {
+  banishUidSet,
+  deriveFusePartnerPositions,
+} from "./fusePartnerDerive.js";
 import type {
   TraceHeader,
   TraceActionLine,
@@ -100,7 +104,8 @@ export async function runTraceGame(
   let pendingFuse: {
     action: SoakAction;
     hostPos: number;
-    partnerPositions: number[];
+    handUidsBefore: string[];
+    banishUidsBefore: Set<string>;
   } | null = null;
 
   const emitLine = (
@@ -172,19 +177,14 @@ export async function runTraceGame(
       pendingFuse = {
         action,
         hostPos: hostPos < 0 ? 0 : hostPos,
-        partnerPositions: [],
+        handUidsBefore: handBefore.map((c) => c?.uid ?? ""),
+        banishUidsBefore: banishUidSet(before.players[action.player].banish),
       };
       recorder.clearRolls();
       continue;
     }
 
     if (pendingFuse && action.type === "CHOOSE_TARGET") {
-      const hand = getHand(before, action.player);
-      if (action.target.type === "card") {
-        const targetUid = action.target.uid;
-        const pos = hand.findIndex((c) => c?.uid === targetUid);
-        if (pos >= 0) pendingFuse.partnerPositions.push(pos);
-      }
       applySoakActionWithOutcome(action);
       appliedActions++;
       recorder.clearRolls();
@@ -195,9 +195,16 @@ export async function runTraceGame(
       applySoakActionWithOutcome(action);
       appliedActions++;
       const after = snapshot();
+      const fusePlayer = pendingFuse.action.player;
+      const partnerPositions = deriveFusePartnerPositions(
+        pendingFuse.handUidsBefore,
+        pendingFuse.hostPos,
+        pendingFuse.banishUidsBefore,
+        banishUidSet(after.players[fusePlayer].banish),
+      );
       const neutral = soakActionToNeutral(pendingFuse.action, before, {
         fuseHostPos: pendingFuse.hostPos,
-        fusePartners: pendingFuse.partnerPositions,
+        fusePartners: partnerPositions,
       });
       pendingFuse = null;
       if (neutral) emitLine(neutral, before, after);
