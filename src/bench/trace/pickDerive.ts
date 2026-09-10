@@ -3,23 +3,6 @@
 import type { GameState, Player } from "../../core/types/index.js";
 import type { RawRoll } from "./types.js";
 import type { Pick } from "./types.js";
-import { getHand, getDeck } from "../../core/playerHelpers.js";
-
-/** Cards that moved deck → hand during the action, per player, in draw order. */
-export function computeDrawPicks(before: GameState, after: GameState): Pick[] {
-  const picks: Pick[] = [];
-  for (const player of ["first", "second"] as const) {
-    const beforeDeckUids = new Set(getDeck(before, player).map((c) => c.uid));
-    const beforeHandUids = new Set(getHand(before, player).map((c) => c.uid));
-    for (const card of getHand(after, player)) {
-      if (!card?.uid || beforeHandUids.has(card.uid)) continue;
-      if (beforeDeckUids.has(card.uid)) {
-        picks.push({ what: "draw", chose: String(card.id) });
-      }
-    }
-  }
-  return picks;
-}
 
 function isCardChose(chose: unknown): chose is {
   uid: string;
@@ -58,6 +41,15 @@ function classifyPickRoll(
   if (roll.m === "nextInt") {
     if (roll.site.includes("random_split.ts")) {
       return null; // handled by group
+    }
+    if (/core\/utils\.ts:(38|39)/.test(roll.site)) {
+      return {
+        what: "raw",
+        kind: "shuffle",
+        site: roll.site,
+        n: roll.n,
+        k: roll.k,
+      };
     }
     return { what: "raw", site: roll.site, n: roll.n, k: roll.k };
   }
@@ -161,9 +153,9 @@ function groupRandomSplit(rolls: RawRoll[]): Pick[] {
 export function derivePicks(
   rolls: RawRoll[],
   before: GameState,
-  after: GameState,
+  actionDraws: Pick[],
 ): Pick[] {
-  const draws = computeDrawPicks(before, after);
+  const draws = actionDraws;
   const splitPicks = groupRandomSplit(rolls);
   const active = before.activePlayer;
   const semantic: Pick[] = [];

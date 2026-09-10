@@ -12,9 +12,26 @@ import {
 } from "../../src/bench/trace/traceRunner.js";
 import { createRecordingRng } from "../../src/bench/trace/rngRecorder.js";
 import { createRng } from "../../src/core/rng.js";
-import { runSoakGame } from "../../src/bench/soakEnv.js";
+import { runSoakGame, prepareSoakReplay } from "../../src/bench/soakEnv.js";
 import { registerSoakDeck } from "../../src/bench/soakDecks.js";
 import { resolveIdDeckFile } from "../../src/bench/trace/deckResolve.js";
+import { startNewGame } from "../../src/engine.js";
+import { state } from "../../src/core/gameState.js";
+import { getHand } from "../../src/core/playerHelpers.js";
+import {
+  confirmMulliganCore,
+  toggleMulliganPickCore,
+} from "../../src/logic/core/mulliganCore.js";
+import {
+  installTraceRng,
+  uninstallTraceRng,
+} from "../../src/bench/trace/rngRecorder.js";
+import {
+  setDrawRecording,
+  clearActionDraws,
+  consumeDrawPicks,
+} from "../../src/bench/trace/drawRecorder.js";
+import { captureSnapshot } from "../../src/core/history.js";
 import type {
   TraceHeader,
   TraceActionLine,
@@ -177,7 +194,7 @@ describe("trace emitter", () => {
     expect(trace.finalHash).toBe(soak.finalHash);
   }, 180_000);
 
-  it("draw picks match deck→hand diff", async () => {
+  it("draw picks are recorded in engine draw order", async () => {
     const result = await runTraceGame({
       seed: TRACE_SEED,
       gameIndex: 0,
@@ -199,6 +216,49 @@ describe("trace emitter", () => {
       }
     }
   }, 120_000);
+
+  it("mulligan with four replacements records four draw picks", async () => {
+    prepareSoakReplay({ fuse: true, interactiveModes: false });
+    const deckRaw = resolveIdDeckFile(rampDeck as Record<string, number>);
+    const deckAId = registerSoakDeck(deckRaw, "trace_mull_a");
+    const deckBId = registerSoakDeck(deckRaw, "trace_mull_b");
+    await startNewGame({ deckAId, deckBId, seed: TRACE_SEED });
+    const recorder = installTraceRng(state)!;
+    setDrawRecording(true);
+    try {
+      const hand = getHand(state, "first");
+      for (const card of hand) {
+        toggleMulliganPickCore("first", card.uid);
+      }
+      clearActionDraws();
+      captureSnapshot();
+      confirmMulliganCore("first");
+      const draws = consumeDrawPicks();
+      expect(draws).toHaveLength(4);
+      expect(draws.every((p) => p.what === "draw")).toBe(true);
+      expect(recorder.getRolls().length).toBeGreaterThan(0);
+    } finally {
+      setDrawRecording(false);
+      uninstallTraceRng(state);
+      prepareSoakReplay({ fuse: false, interactiveModes: false });
+    }
+  }, 120_000);
+
+  it("header includes opening hands before mulligan", async () => {
+    const result = await runTraceGame({
+      seed: TRACE_SEED,
+      gameIndex: 0,
+      deckA: rampDeck as Record<string, number>,
+      deckB: rampDeck as Record<string, number>,
+      turnCap: 5,
+      actionCap: 10,
+    });
+    expect(result.header.opening_hands.a).toHaveLength(4);
+    expect(result.header.opening_hands.b).toHaveLength(4);
+    for (const id of result.header.opening_hands.a) {
+      expect(typeof id).toBe("string");
+    }
+  }, 120_000);
 });
 
 describe("committed trace fixtures", () => {
@@ -214,6 +274,8 @@ describe("committed trace fixtures", () => {
       expect(header.engine).toBe("practice-tool");
       expect(header.deck_a).toHaveLength(40);
       expect(header.deck_b).toHaveLength(40);
+      expect(header.opening_hands.a).toHaveLength(4);
+      expect(header.opening_hands.b).toHaveLength(4);
       expect(header.x_final_hash).toBeTruthy();
 
       for (let i = 0; i < lines.length; i++) {

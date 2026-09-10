@@ -12,6 +12,7 @@ import { bumpZoneVersion } from "../logic/core/triggers/utils.js";
 
 // Import types
 import type { CardInstance, Player } from "./types/index.js";
+import { recordTraceDraw } from "../bench/trace/drawRecorder.js";
 
 // Constants
 export const MAX_HAND = 9;
@@ -221,6 +222,7 @@ export function drawCard(
   if (top) {
     // Log the normal draw
     logEvent("draw", { owner, card: top.name, uid: top.uid });
+    recordTraceDraw(top);
   }
 
   const drawn = pushToHand(hand, top);

@@ -15,9 +15,12 @@ One object per line. Keys sorted on `CanonicalState`. No floats, no uids, no eng
   "seed": 0,
   "first": "a",
   "deck_a": ["10001110", "…"],
-  "deck_b": ["…"]
+  "deck_b": ["…"],
+  "opening_hands": { "a": ["…", "…", "…", "…"], "b": ["…", "…", "…", "…"] }
 }
 ```
+
+Line 1 also carries `opening_hands`: the four cards each player holds before the mulligan, in draw order. A replayer removes them from the decklist multisets to form the pre-mulligan state. Every later draw — mulligan replacements, turn draws, effect draws — is a per-line `draw` pick.
 
 - `engine`: `"arena"` or `"practice-tool"` (or any stable name).
 - `seed`: `u64`.
@@ -102,6 +105,7 @@ Every random decision, by outcome.
 {"what":"random_unused","chose":{"mode":1}}
 {"what":"reanimate","chose":"90051140"}
 {"what":"multiset_pick","among":"deck","chose":"10001110"}
+{"what":"raw","kind":"shuffle","site":"src/core/utils.ts:38","n":3,"k":40}
 ```
 
 `ScriptedRng` matches `chose` against its candidate list. If `chose` is not a candidate, the run fails with `oracle picked X; not legal here`.

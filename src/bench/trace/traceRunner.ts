@@ -19,6 +19,11 @@ import { registerSoakDeck } from "../soakDecks.js";
 import type { IdDeckFile } from "./deckResolve.js";
 import { resolveIdDeckFile, idDeckToSortedArray } from "./deckResolve.js";
 import { installTraceRng, uninstallTraceRng } from "./rngRecorder.js";
+import {
+  setDrawRecording,
+  clearActionDraws,
+  consumeDrawPicks,
+} from "./drawRecorder.js";
 import { toCanonicalState, canonicalJson } from "./canonicalState.js";
 import {
   soakActionToNeutral,
@@ -83,13 +88,18 @@ export async function runTraceGame(
     seed: gameSeed,
   });
 
+  const openingHands = {
+    a: getHand(state, "first").map((c) => String(c.id)),
+    b: getHand(state, "second").map((c) => String(c.id)),
+  };
+
   const recorder = installTraceRng(state)!;
+  setDrawRecording(true);
   const policyRng = createRng(`soak-policy-${opts.seed}-${opts.gameIndex}`);
 
   const lines: TraceActionLine[] = [];
   let actionIndex = 0;
   let appliedActions = 0;
-  let mulliganToggles: Map<string, boolean> | null = null;
   let pendingFuse: {
     action: SoakAction;
     partnerPositions: number[];
@@ -103,7 +113,8 @@ export async function runTraceGame(
   ) => {
     const rolls = recorder.getRolls();
     recorder.clearRolls();
-    const rng = [...derivePicks(rolls, before, after), ...extraPicks];
+    const draws = consumeDrawPicks();
+    const rng = [...derivePicks(rolls, before, draws), ...extraPicks];
     lines.push({
       i: actionIndex++,
       action: neutral,
@@ -122,14 +133,9 @@ export async function runTraceGame(
 
     const action = pickSoakAction(legal, policyRng);
     const before = snapshot();
+    clearActionDraws();
 
     if (action.type === "TOGGLE_MULLIGAN") {
-      if (!mulliganToggles) mulliganToggles = new Map();
-      const hand = getHand(state, action.player);
-      const pos = hand.findIndex((c) => c.uid === action.cardUid);
-      if (pos >= 0 && pos < 4) {
-        mulliganToggles.set(`${action.player}:${pos}`, true);
-      }
       applySoakActionWithOutcome(action);
       appliedActions++;
       recorder.clearRolls();
@@ -137,11 +143,16 @@ export async function runTraceGame(
     }
 
     if (action.type === "CONFIRM_MULLIGAN") {
+      const handBefore = getHand(before, action.player);
+      const bag =
+        action.player === "first"
+          ? before.mulliganFirstSelected
+          : before.mulliganSecondSelected;
       const swap: [boolean, boolean, boolean, boolean] = [
-        mulliganToggles?.get(`${action.player}:0`) ?? false,
-        mulliganToggles?.get(`${action.player}:1`) ?? false,
-        mulliganToggles?.get(`${action.player}:2`) ?? false,
-        mulliganToggles?.get(`${action.player}:3`) ?? false,
+        bag?.has(handBefore[0]?.uid ?? "") ?? false,
+        bag?.has(handBefore[1]?.uid ?? "") ?? false,
+        bag?.has(handBefore[2]?.uid ?? "") ?? false,
+        bag?.has(handBefore[3]?.uid ?? "") ?? false,
       ];
       applySoakActionWithOutcome(action);
       appliedActions++;
@@ -150,7 +161,6 @@ export async function runTraceGame(
         mulliganSwap: swap,
       });
       if (neutral) emitLine(neutral, before, after);
-      mulliganToggles = null;
       continue;
     }
 
@@ -208,6 +218,7 @@ export async function runTraceGame(
     }
   }
 
+  setDrawRecording(false);
   uninstallTraceRng(state);
   prepareSoakReplay({ fuse: false, interactiveModes: false });
 
@@ -219,6 +230,7 @@ export async function runTraceGame(
     first: "a",
     deck_a: idDeckToSortedArray(opts.deckA),
     deck_b: idDeckToSortedArray(opts.deckB),
+    opening_hands: openingHands,
     x_final_hash: finalHash,
   };
 

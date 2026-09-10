@@ -15,7 +15,7 @@ export type Pick =
   | { what: "random_unused"; chose: { mode: number } }
   | { what: "reanimate"; chose: string }
   | { what: "multiset_pick"; among: string; chose: string }
-  | { what: "raw"; site: string; n: number; k: number };
+  | { what: "raw"; site: string; n: number; k: number; kind?: "shuffle" };
 
 export type NeutralAction =
   | {
@@ -121,6 +121,7 @@ export type TraceHeader = {
   first: TracePlayer;
   deck_a: string[];
   deck_b: string[];
+  opening_hands: { a: string[]; b: string[] };
   x_final_hash?: string;
 };
 
