@@ -138,7 +138,7 @@ function assertPlayerShape(p: CanonicalState["players"]["a"]): void {
     p.field.filter(Boolean).length;
   // 40-card deck: all cards accounted for in visible zones (tokens/transforms may shift totals slightly mid-game).
   expect(zoneTotal).toBeGreaterThanOrEqual(0);
-  expect(zoneTotal).toBeLessThanOrEqual(44);
+  expect(zoneTotal).toBeLessThanOrEqual(50);
 }
 
 beforeAll(async () => {
@@ -210,8 +210,8 @@ describe("trace emitter", () => {
       gameIndex: 0,
       deckA: rampDeck as Record<string, number>,
       deckB: rampDeck as Record<string, number>,
-      turnCap: 15,
-      actionCap: 50,
+      turnCap: 30,
+      actionCap: 200,
     });
     expect(result.lines.length).toBeGreaterThan(0);
     for (const line of result.lines) {

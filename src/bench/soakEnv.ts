@@ -46,7 +46,7 @@ import { setNodeEnv } from "../core/env.js";
 import type { GameState } from "../core/types/index.js";
 import { startNewGame, dispatch as engineDispatch } from "../engine.js";
 import { canPlayCard } from "../logic/core/playCard/preflight.js";
-import { getEffectiveCost } from "../logic/core/playCard/cost.js";
+import { resolvePlayCost } from "../logic/core/playCard/cost.js";
 import { canEvolve } from "../logic/evolveUtils.js";
 import { canToggleSecondPlayerBonusPp } from "../core/bonusPp.js";
 import { canFuse } from "../logic/core/fuseFromHand.js";
@@ -451,15 +451,18 @@ export function getLegalSoakActions(): SoakAction[] {
   const enemyBoard = getBoard(s, opponentOf(player));
   const availablePP = getPP(s, player);
 
-  // Play cards
+  // Play cards — use resolvePlayCost so Accelerate/Crystallize/Enhance match engine.
   for (const card of hand) {
     if (!card) continue;
-    const cost = getEffectiveCost(card);
-    if (cost > availablePP) continue;
-    if (
-      (card.type === "Follower" || card.type === "Amulet") &&
-      myBoard.length >= 5
-    ) {
+    const plan = resolvePlayCost(card, availablePP);
+    if (plan.cost > availablePP) continue;
+    const playsAsPermanent =
+      plan.mode === "accelerate"
+        ? false
+        : plan.mode === "crystallize"
+          ? true
+          : card.type === "Follower" || card.type === "Amulet";
+    if (playsAsPermanent && myBoard.length >= 5) {
       continue;
     }
     const check = canPlayCard(card, player);
