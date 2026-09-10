@@ -26,6 +26,7 @@ import {
   getLegalNeutralActions,
 } from "./neutralAction.js";
 import { derivePicks } from "./pickDerive.js";
+import { canonicalizeTraceAction } from "./traceCanonicalize.js";
 import type {
   TraceHeader,
   TraceActionLine,
@@ -127,7 +128,10 @@ export async function runTraceGame(
     const legal = getLegalSoakActions();
     if (legal.length === 0) break;
 
-    const action = pickSoakAction(legal, policyRng);
+    const action = canonicalizeTraceAction(
+      pickSoakAction(legal, policyRng),
+      state,
+    );
     const before = snapshot();
     clearActionDraws();
 

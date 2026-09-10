@@ -55,6 +55,7 @@ import {
   canAttackLeaderTarget,
   effectiveAttackEligibility,
 } from "../logic/core/combat.js";
+import { canonicalizeTraceAction } from "./trace/traceCanonicalize.js";
 import { applyPendingModePickIndex } from "../logic/effects/ops/mode.js";
 import {
   getBoard,
@@ -840,6 +841,7 @@ export function applySoakActionWithOutcome(
   action: SoakAction,
   dispatchPath: SoakDispatchPath = DEFAULT_SOAK_DISPATCH,
 ): ActionTelemetry {
+  action = canonicalizeTraceAction(action, state);
   const telemetry: ActionTelemetry = { historyCommits: 0 };
   if (action.type === "PLAY_CARD") {
     const hand = getHand(state, action.player);
