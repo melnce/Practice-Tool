@@ -57,6 +57,17 @@ function xyzVars(card: CardInstance): Record<string, number> | undefined {
   return Object.keys(out).length ? out : undefined;
 }
 
+/** Same precedence as combat.ts when attacks_left is not yet materialised on play. */
+function snapshotAttacksLeft(card: CardInstance): number {
+  if (card.attacks_left != null && Number.isFinite(card.attacks_left)) {
+    return Number(card.attacks_left) | 0;
+  }
+  if (Number.isFinite(card.attacks_per_turn)) {
+    return Number(card.attacks_per_turn) | 0;
+  }
+  return 1;
+}
+
 function fieldSlot(card: CardInstance): FieldSlot {
   const atk = Number(card.attack ?? 0) | 0;
   const def = Number(card.defense ?? 0) | 0;
@@ -64,7 +75,7 @@ function fieldSlot(card: CardInstance): FieldSlot {
     Number(card.peak_defense ?? card.base_defense ?? card.defense ?? 0) | 0;
   const slot: FieldSlot = {
     attack: atk,
-    attacks_left: Number(card.attacks_left ?? 1) | 0,
+    attacks_left: snapshotAttacksLeft(card),
     can_attack: !!card.can_attack,
     card: String(card.id),
     countdown:
