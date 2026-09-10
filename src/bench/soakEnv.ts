@@ -46,10 +46,16 @@ import { setNodeEnv } from "../core/env.js";
 import type { GameState } from "../core/types/index.js";
 import { startNewGame, dispatch as engineDispatch } from "../engine.js";
 import { canPlayCard } from "../logic/core/playCard/preflight.js";
-import { getEffectiveCost } from "../logic/core/playCard/cost.js";
+import { resolvePlayCost } from "../logic/core/playCard/cost.js";
 import { canEvolve } from "../logic/evolveUtils.js";
 import { canToggleSecondPlayerBonusPp } from "../core/bonusPp.js";
 import { canFuse } from "../logic/core/fuseFromHand.js";
+import {
+  canAttackFollowerTarget,
+  canAttackLeaderTarget,
+  effectiveAttackEligibility,
+} from "../logic/core/combat.js";
+import { canonicalizeTraceAction } from "./trace/traceCanonicalize.js";
 import { applyPendingModePickIndex } from "../logic/effects/ops/mode.js";
 import {
   getBoard,
@@ -278,60 +284,6 @@ export function installSoakAdapter(opts?: {
   });
 }
 
-function hasStorm(card: CardInstance): boolean {
-  if (card.storm || card.hasStorm) return true;
-  if (!card.keywords) return false;
-  return card.keywords.some((k: any) => {
-    const name = typeof k === "string" ? k : k?.name;
-    return name?.toLowerCase() === "storm";
-  });
-}
-
-function hasWard(card: CardInstance): boolean {
-  if (card.ward || card.hasWard) return true;
-  if (!card.keywords) return false;
-  return card.keywords.some((k: any) => {
-    const name = typeof k === "string" ? k : k?.name;
-    return name?.toLowerCase() === "ward";
-  });
-}
-
-function ignoresWard(card: CardInstance): boolean {
-  if (card.ignoresWard || card.keywordState?.ignoresWard) return true;
-  if (!card.keywords) return false;
-  return card.keywords.some((k: any) => {
-    const name = typeof k === "string" ? k : k?.name;
-    const normalized = name?.toLowerCase().replace(/[\s_]/g, "");
-    return normalized === "ignoresward";
-  });
-}
-
-function hasAmbush(card: CardInstance): boolean {
-  if (card.ambush || card.hasAmbush) return true;
-  if (!card.keywords) return false;
-  return card.keywords.some((k: any) => {
-    const name = typeof k === "string" ? k : k?.name;
-    return name?.toLowerCase() === "ambush";
-  });
-}
-
-function canAttackFollower(card: CardInstance): boolean {
-  if (card.type !== "Follower") return false;
-  if (card.cant_attack) return false;
-  if (!card.can_attack) return false;
-  if (card.hasAttacked) return false;
-  if (card.justPlayed && !hasStorm(card) && !card.hasRush) return false;
-  return true;
-}
-
-function canAttackLeader(card: CardInstance): boolean {
-  if (!canAttackFollower(card)) return false;
-  if (card.justPlayed && card.hasRush && !hasStorm(card) && !card.hasStorm) {
-    return false;
-  }
-  return true;
-}
-
 function canEngage(card: CardInstance, player: Player): boolean {
   if (card.type !== "Amulet" || !card.hasEngage) return false;
   const ks = card.keywordState;
@@ -451,15 +403,18 @@ export function getLegalSoakActions(): SoakAction[] {
   const enemyBoard = getBoard(s, opponentOf(player));
   const availablePP = getPP(s, player);
 
-  // Play cards
+  // Play cards — use resolvePlayCost so Accelerate/Crystallize/Enhance match engine.
   for (const card of hand) {
     if (!card) continue;
-    const cost = getEffectiveCost(card);
-    if (cost > availablePP) continue;
-    if (
-      (card.type === "Follower" || card.type === "Amulet") &&
-      myBoard.length >= 5
-    ) {
+    const plan = resolvePlayCost(card, availablePP);
+    if (plan.cost > availablePP) continue;
+    const playsAsPermanent =
+      plan.mode === "accelerate"
+        ? false
+        : plan.mode === "crystallize"
+          ? true
+          : card.type === "Follower" || card.type === "Amulet";
+    if (playsAsPermanent && myBoard.length >= 5) {
       continue;
     }
     const check = canPlayCard(card, player);
@@ -468,18 +423,14 @@ export function getLegalSoakActions(): SoakAction[] {
     }
   }
 
-  // Attacks
-  const hasEnemyWard = enemyBoard.some(
-    (c) => c && c.type === "Follower" && hasWard(c),
-  );
+  // Attacks — use combat module predicates (can_attack + ward/ambush/rush-evolve rules).
   for (const attacker of myBoard) {
-    if (!attacker || !canAttackFollower(attacker)) continue;
-    const ignore = ignoresWard(attacker);
+    if (!attacker || attacker.type !== "Follower") continue;
+    if (!effectiveAttackEligibility(attacker)) continue;
 
     for (const defender of enemyBoard) {
       if (!defender || defender.type !== "Follower") continue;
-      if (hasAmbush(defender)) continue;
-      if (hasEnemyWard && !ignore && !hasWard(defender)) continue;
+      if (!canAttackFollowerTarget(defender, enemyBoard, attacker)) continue;
       actions.push({
         type: "ATTACK",
         player,
@@ -488,7 +439,7 @@ export function getLegalSoakActions(): SoakAction[] {
       });
     }
 
-    if (canAttackLeader(attacker) && (!hasEnemyWard || ignore)) {
+    if (canAttackLeaderTarget(attacker, enemyBoard)) {
       actions.push({
         type: "ATTACK",
         player,
@@ -864,16 +815,17 @@ function dispatchSoakHistory(
   dispatchSoakPlayerAction({ type }, dispatchPath);
 }
 
-function countHistoryCommitsDuring(
+export function countHistoryCommitsDuring(
   action: SoakAction,
-  dispatchPath: SoakDispatchPath,
+  dispatchPath: SoakDispatchPath = DEFAULT_SOAK_DISPATCH,
+  opts?: { skipCanonicalize?: boolean },
 ): ActionTelemetry {
   let commits = 0;
   const unsub = onHistoryEvent((ev) => {
     if (ev.type === "commit") commits++;
     if (ev.type === "reset") commits = 0;
   });
-  const telemetry = applySoakActionWithOutcome(action, dispatchPath);
+  const telemetry = applySoakActionWithOutcome(action, dispatchPath, opts);
   unsub();
   telemetry.historyCommits = commits;
   if (commits === 0) {
@@ -889,7 +841,13 @@ function countHistoryCommitsDuring(
 export function applySoakActionWithOutcome(
   action: SoakAction,
   dispatchPath: SoakDispatchPath = DEFAULT_SOAK_DISPATCH,
+  opts?: { skipCanonicalize?: boolean },
 ): ActionTelemetry {
+  if (!opts?.skipCanonicalize) {
+    action = canonicalizeTraceAction(action, state, {
+      legalSoakActions: getLegalSoakActions(),
+    });
+  }
   const telemetry: ActionTelemetry = { historyCommits: 0 };
   if (action.type === "PLAY_CARD") {
     const hand = getHand(state, action.player);

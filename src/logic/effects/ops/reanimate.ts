@@ -79,7 +79,7 @@ export function handleReanimate(eff: Effect, owner: Player) {
   }
 
   // Randomly select one from the highest available cost group
-  const selected = candidates[state.rng.nextInt(candidates.length)];
+  const selected = state.rng.pick(candidates);
   if (!selected) return;
   logEvent("reanimatePick", {
     owner,

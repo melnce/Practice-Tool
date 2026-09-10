@@ -92,8 +92,10 @@ export function handleEvolve(
       const picks: CardInstance[] = [];
       const bag = pool.slice();
       for (let i = 0; i < selectCount && bag.length; i++) {
-        const j = state.rng.nextInt(bag.length);
-        picks.push(bag.splice(j, 1)[0]!);
+        const picked = state.rng.pick(bag);
+        if (!picked) break;
+        picks.push(picked);
+        bag.splice(bag.indexOf(picked), 1);
       }
       for (const target of picks) {
         applyEvolution(target, owner, spec);

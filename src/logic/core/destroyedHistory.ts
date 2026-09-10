@@ -117,8 +117,10 @@ export function pickDestroyedMatch(
   const pool = [...candidates];
   const picked: DestroyedRecord[] = [];
   while (picked.length < count && pool.length > 0) {
-    const index = state.rng.nextInt(pool.length);
-    picked.push(pool.splice(index, 1)[0]!);
+    const chosen = state.rng.pick(pool);
+    if (!chosen) break;
+    picked.push(chosen);
+    pool.splice(pool.indexOf(chosen), 1);
   }
   return picked;
 }
@@ -172,5 +174,5 @@ export function pickDestroyedMatchHighestBaseCost(
     (r) => finiteNumber(r.baseCost ?? r.cost) === maxBase,
   );
   if (!top.length) return null;
-  return top[state.rng.nextInt(top.length)] ?? null;
+  return state.rng.pick(top);
 }

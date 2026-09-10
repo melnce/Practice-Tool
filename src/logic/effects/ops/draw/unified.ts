@@ -65,8 +65,7 @@ function drawFiltered(
     }
     if (!candidates.length) break;
 
-    const pickPos = state.rng.nextInt(candidates.length);
-    const deckIdx = candidates[pickPos]!;
+    const deckIdx = state.rng.pick(candidates)!;
     const card = deck[deckIdx];
     if (!card) break;
 

@@ -30,6 +30,7 @@
     "soak": "npx tsx scripts/soak.ts",
     "soak:promote": "npx tsx scripts/soak-promote.ts",
     "soak:smoke": "npx tsx scripts/soak.ts --smoke",
+    "trace": "npx tsx scripts/trace.ts",
     "cards:update": "npx tsx scripts/mergeSets.ts",
     "cards:drift": "npx tsx scripts/cards-drift.ts",
     "cards:watch": "npx tsx scripts/watch_cards.ts",

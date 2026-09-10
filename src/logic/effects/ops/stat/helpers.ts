@@ -323,9 +323,10 @@ export function pickRandomFromPool(
   const bag = [...pool];
 
   for (let i = 0; i < count && bag.length; i++) {
-    const idx = state.rng.nextInt(bag.length);
-    const picked = bag.splice(idx, 1)[0];
-    if (picked) chosen.push(picked);
+    const picked = state.rng.pick(bag);
+    if (!picked) break;
+    chosen.push(picked);
+    bag.splice(bag.indexOf(picked), 1);
   }
 
   return chosen;

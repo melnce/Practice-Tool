@@ -286,8 +286,8 @@ function handleDestroyRandom(
   let remaining = spec.count;
 
   while (remaining > 0 && candidates.length > 0) {
-    const idx = state.rng.nextInt(candidates.length);
-    const target = candidates.splice(idx, 1)[0];
+    const target = state.rng.pick(candidates);
+    if (target) candidates.splice(candidates.indexOf(target), 1);
 
     if (target && destroyTarget(target, owner, "random")) {
       destroyed++;
@@ -327,8 +327,8 @@ function handleDestroyHighest(
   let remaining = spec.count;
 
   while (remaining > 0 && candidates.length > 0) {
-    const idx = state.rng.nextInt(candidates.length);
-    const target = candidates.splice(idx, 1)[0];
+    const target = state.rng.pick(candidates);
+    if (target) candidates.splice(candidates.indexOf(target), 1);
 
     if (target && destroyTarget(target, owner, "highest")) {
       destroyed++;

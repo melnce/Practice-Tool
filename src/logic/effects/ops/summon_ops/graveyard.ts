@@ -33,7 +33,7 @@ export function handleSummonDestroyedAmuletHighestBaseCost(owner: Player) {
   if (!candidates.length) return;
 
   // Random one among the highest base cost
-  const choice = candidates[state.rng.nextInt(candidates.length)];
+  const choice = state.rng.pick(candidates);
   if (!choice) return;
   const pick = choice.g;
 

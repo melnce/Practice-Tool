@@ -155,9 +155,10 @@ export function handleReturnHandToDeck(
     const bag = [...hand];
     const chosen: CardInstance[] = [];
     while (chosen.length < Math.min(requested, bag.length) && bag.length) {
-      const index = state.rng.nextInt(bag.length);
-      const card = bag.splice(index, 1)[0];
-      if (card) chosen.push(card);
+      const card = state.rng.pick(bag);
+      if (!card) break;
+      chosen.push(card);
+      bag.splice(bag.indexOf(card), 1);
     }
     for (const card of chosen) putBack(card, owner, putBackOpts);
     (state as any).lastReturnedCount = chosen.length;
