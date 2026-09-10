@@ -231,7 +231,7 @@ export function handleByStatDamage(
     );
     let targets = allFollowers.filter((c) => getValue(c) === extreme);
     if (chooseTiedTarget && targets.length > 1) {
-      targets = [targets[state.rng.nextInt(targets.length)]!];
+      targets = [state.rng.pick(targets)!];
     }
 
     for (const t of targets) {
@@ -269,7 +269,7 @@ export function handleByStatDamage(
     );
     let targets = leaders.filter((leader) => leader.value === extreme);
     if (chooseTiedTarget && targets.length > 1) {
-      targets = [targets[state.rng.nextInt(targets.length)]!];
+      targets = [state.rng.pick(targets)!];
     }
     for (const leader of targets) {
       applyLeaderDamage(leader.owner, amount);

@@ -226,8 +226,8 @@ function handleBanishRandom(
   let count = 0;
 
   for (let i = 0; i < n; i++) {
-    const idx = state.rng.nextInt(pool.length);
-    const target = pool.splice(idx, 1)[0];
+    const target = state.rng.pick(pool);
+    if (target) pool.splice(pool.indexOf(target), 1);
     if (!target) continue;
 
     if (banishCard(target, "random")) {

@@ -174,7 +174,7 @@ TARGETED_OP_HANDLERS.set("transform", (ctx) => {
   if (intoSource === "enemy:deck") {
     const deck = getDeck(state, opponentOf(owner)) || [];
     if (!deck.length) return { kind: "handled" };
-    const src = deck[state.rng.nextInt(deck.length)];
+    const src = state.rng.pick(deck);
     if (!src) return { kind: "handled" };
     const firstHand = getHand(state, "first");
     const secondHand = getHand(state, "second");

@@ -72,8 +72,7 @@ export function pickRandomTargets(
   if (forcedFirstUids.length > 0 && count > 0 && picks.length === 0) {
     const forced = remaining.filter((c) => forcedFirstUids.includes(c.uid));
     if (forced.length > 0) {
-      const idx = rng.nextInt(forced.length);
-      const picked = forced[idx]!;
+      const picked = rng.pick(forced)!;
       picks.push(picked);
       const pickIdx = remaining.findIndex((c) => c.uid === picked.uid);
       if (pickIdx !== -1) remaining.splice(pickIdx, 1);
@@ -81,8 +80,9 @@ export function pickRandomTargets(
   }
 
   while (picks.length < count && remaining.length) {
-    const idx = rng.nextInt(remaining.length);
-    const picked = remaining.splice(idx, 1)[0];
+    const picked = rng.pick(remaining);
+    if (!picked) break;
+    remaining.splice(remaining.indexOf(picked), 1);
     if (picked) picks.push(picked);
   }
 

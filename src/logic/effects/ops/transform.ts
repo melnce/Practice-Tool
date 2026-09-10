@@ -318,7 +318,7 @@ function transformIntoExactFromEnemyDeck(
 ): void {
   const deck = getDeck(state, opponentOf(owner)) || [];
   if (!deck.length || !target) return;
-  const src = deck[state.rng.nextInt(deck.length)];
+  const src = state.rng.pick(deck);
   if (!src) return;
 
   const zone = locateZone(target);
@@ -398,7 +398,7 @@ function transformBoardFromSource(
   if (!candidates.length || !targets.length) return;
 
   if (!perTarget) {
-    const pick = candidates[state.rng.nextInt(candidates.length)];
+    const pick = state.rng.pick(candidates);
     if (!pick) return;
     for (const t of targets) transformTarget(t, String(pick.name));
     return;
@@ -411,7 +411,7 @@ function transformBoardFromSource(
       (c) => c && matchesFilter(c, filter),
     );
     if (!live.length) continue;
-    const pick = live[state.rng.nextInt(live.length)];
+    const pick = state.rng.pick(live);
     if (!pick) continue;
     transformTarget(t, String(pick.name));
   }

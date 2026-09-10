@@ -303,7 +303,10 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
       });
       return;
     }
-    const chosenEntry = remaining[state.rng.nextInt(remaining.length)];
+    const chosenEntry = state.rng.pick(remaining) as {
+      opt: unknown;
+      index: number;
+    } | null;
     if (!chosenEntry) return;
     host.usedModeIndices.push(chosenEntry.index);
     return runAutomaticModePicks(
@@ -322,11 +325,13 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
       (unique ? bag.length : available.length)
     ) {
       const pool = unique ? bag : available;
-      const index = state.rng.nextInt(pool.length);
-      const chosen = pool[index];
+      const chosen = state.rng.pick(pool);
       if (!chosen) break;
       picked.push(chosen);
-      if (unique) bag.splice(index, 1);
+      if (unique) {
+        const index = bag.indexOf(chosen);
+        if (index !== -1) bag.splice(index, 1);
+      }
     }
     return runAutomaticModePicks(picked, owner, sourceCard, ctx, "random");
   }

@@ -193,8 +193,10 @@ function handleBoardAmuletCountdown(
     if (wantsRandomTargetPick(eff as Record<string, unknown>)) {
       const copy = [...pool];
       for (let i = 0; i < need && copy.length; i++) {
-        const idx = state.rng.nextInt(copy.length);
-        picks.push(copy.splice(idx, 1)[0]!);
+        const picked = state.rng.pick(copy);
+        if (!picked) break;
+        picks.push(picked);
+        copy.splice(copy.indexOf(picked), 1);
       }
     } else {
       picks.push(...pool.slice(0, need));

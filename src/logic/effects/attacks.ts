@@ -136,8 +136,10 @@ export function handleAttacksPerTurn(
       const copy = [...pool];
       targets = [];
       for (let i = 0; i < need && copy.length; i++) {
-        const idx = state.rng.nextInt(copy.length);
-        targets.push(copy.splice(idx, 1)[0]!);
+        const picked = state.rng.pick(copy);
+        if (!picked) break;
+        targets.push(picked);
+        copy.splice(copy.indexOf(picked), 1);
       }
     } else if (need > 0) {
       if (!pool.length) {

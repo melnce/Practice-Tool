@@ -123,9 +123,10 @@ function handleGrant(
     const bag = keywordList.slice();
     const chosen: typeof keywordList = [];
     while (chosen.length < Math.min(requested, bag.length) && bag.length) {
-      const index = state.rng.nextInt(bag.length);
-      const keyword = bag.splice(index, 1)[0];
-      if (keyword !== undefined) chosen.push(keyword);
+      const keyword = state.rng.pick(bag);
+      if (keyword === null) break;
+      chosen.push(keyword);
+      bag.splice(bag.indexOf(keyword), 1);
     }
     keywordList = chosen;
   }

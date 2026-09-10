@@ -207,13 +207,12 @@ function addZoneSampleCopies(
     // random with replacement across independent picks (Wolfraud ×5 from deck)
     const bag = sources.slice();
     for (let i = 0; i < spec.count && bag.length; i++) {
-      const idx = state.rng.nextInt(bag.length);
-      const pick = bag[idx];
+      const pick = state.rng.pick(bag);
       if (!pick) break;
       picks.push(pick);
       // Without replacement within one call when sampling distinct slots;
       // deck/hand identity copies of the same card id remain possible via duplicates.
-      bag.splice(idx, 1);
+      bag.splice(bag.indexOf(pick), 1);
     }
   }
 

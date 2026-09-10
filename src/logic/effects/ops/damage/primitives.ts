@@ -255,7 +255,7 @@ export function applyRandomDistinctHits(
       });
       if (!valid.length) break;
 
-      const pick = valid[state.rng.nextInt(valid.length)];
+      const pick = state.rng.pick(valid);
       if (!pick) break;
 
       logEvent("damageRandomDistinct", {
@@ -355,7 +355,7 @@ export function applyRandomHits(
       });
       if (!valid.length) break;
 
-      const pick = valid[state.rng.nextInt(valid.length)];
+      const pick = state.rng.pick(valid);
       if (!pick) break;
 
       logEvent("damageRandom", {
