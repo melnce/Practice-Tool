@@ -200,31 +200,20 @@ Projection both engines can produce. Keys sorted.
 
 ## Conventions
 
-### `granted` vs printed abilities
+Pinned 2026-09-10 from the first differential run. Both emitters follow these; a reader may rely on them.
 
-`granted` is the sorted **set** of trigger tags present on the instance that the **printed card does not carry**; omitted when empty. Compute it as (tags of the instance) − (tags of a fresh instance of the same card id, built the way `makeCardFromDB` builds one). Tag names are the new schema's trigger names: `fanfare`, `lastWords`, `evolve`, `superEvolve`, `anyEvolve`, `anySuperEvolve`, `strike`, `followerStrike`, `clash`, `enter`, `leave`, `discarded`, `invoked`, `fused`, `spellboost`, `engage`, `startOfTurn`, `endOfTurn`, `when`, `enhance`. Map the engine's event strings onto these (`end_of_turn` → `endOfTurn`; `ally_follower_enter` is the _condition_ of a `when` trigger, so its tag is `when`), and drop anything that has no schema name rather than inventing one. A fresh printed Last Words follower that is later granted a second Last Words is invisible under this definition — accepted for M1.
-
-### `traits`
-
-`traits` is exactly the boolean trait flags of the new schema's `Traits` struct that are true on the instance, sorted: `ambush`, `aura`, `bane`, `barrier`, `cantAttackFollowers`, `cantAttackLeader`, `cantBeDestroyedByAbilities`, `cantBePlayed`, `drain`, `ignoresWard`, `intimidate`, `rush`, `storm`, `ward`. Map from the instance's flags and `keywordState` (`hasRush`/`isRush` → `rush`, `cantAttackFollowers`, `cantAttackLeaders` → `cantAttackLeader`, `cannotBeDestroyed` → `cantBeDestroyedByAbilities`, `ignoresWard`, …); nothing from `keywords[].name`.
-
-### `turn` (round counter)
-
-`turn` is the **round** counter, not the per-player turn index. Both players' first turns are turn 1. Emit `turn: phase == "mulligan" ? 0 : state.roundCount`.
-
-### PP before a player's first turn
-
-A player has `pp: 0`, `pp_max: 0`, `pp_bonus: 0` until their first turn has started (during the mulligan: both players). Project it — do not change engine setup. The first turn has started for the first player once `turnNumber >= 1`, for the second player once `turnNumber >= 2`.
-
-### `legal` during the mulligan
-
-While `phase == "mulligan"`, `legal` is the **16** `mulligan` actions of the player whose mulligan is pending (every `swap` bitmask, sorted like every other `legal` list). Do not fold to a single confirm-with-nothing-toggled action.
-
-### Other conventions
-
-`bonus_pp` is a toggle (activate; cancel while the orb is unspent) and appears in `legal` in both states.
-
-The header may carry `x_`-prefixed engine-private keys (`x_final_hash`); readers ignore them. Everything else in the header is the format.
+- **`turn`** is the round number: both players' first turns are turn 1, both second turns are turn 2, and so on (the number the rules text means by "your Nth turn"). It is `0` while `phase` is `mulligan`.
+- **PP before a player's first turn.** A player has `pp: 0, pp_max: 0, pp_bonus: 0` until their first turn has started; during the mulligan that is both players, during the first player's turn 1 it is the second player.
+- **`legal` during the mulligan.** While `phase` is `mulligan`, `legal` is the 16 `mulligan` actions (every `swap` bitmask) of the player whose mulligan is pending, sorted like every other `legal` list. The first player's mulligan is decided first.
+- **Actor.** The `player` of every action is the player who performs it: `end_turn.player` is the player whose turn ends, `mulligan.player` the player deciding, `choose`/`confirm` the player who owns the pending choice.
+- **`play.hand_pos` / `play.card`**, `fuse.host_pos` / `partner_pos` and `choose.option.card` are resolved against the state **before** the action is applied. `play` carries no form: whether the card resolves as Enhance, printed, Accelerate or Crystallize is the engine's decision from the PP available (Enhance when affordable; the printed form when affordable; otherwise the highest payable alternate form).
+- **`bonus_pp`** is a toggle. It activates the second player's current-tier charge, and cancels an activated one while the bonus orb is still unspent (regular orbs are spent first; the orb is spent last). Activate → cancel → activate in one turn is legal; once the orb is spent, `bonus_pp` is not legal again that turn. `legal` lists `bonus_pp` in both the activatable and the cancellable state.
+- **`traits`** is the sorted list of the schema's boolean `Traits` flags that are true on the instance: `ambush, aura, bane, barrier, cantAttackFollowers, cantAttackLeader, cantBeDestroyedByAbilities, cantBePlayed, drain, ignoresWard, intimidate, rush, storm, ward`. Keyword and mechanic names (`lastWords`, `enhance`, `engage`, `countdown`, `spellboost`, `accelerate`, `counter`, …) are never traits.
+- **`granted`** is the sorted **set** of trigger tags present on the instance that the printed card does not carry — runtime grants only — and is omitted when empty. Tags are the schema's trigger names: `fanfare, lastWords, evolve, superEvolve, anyEvolve, anySuperEvolve, strike, followerStrike, clash, enter, leave, discarded, invoked, fused, spellboost, engage, startOfTurn, endOfTurn, when, enhance`. A grant of an ability the card already prints (a second Last Words on a printed Last Words follower) is invisible under this definition; accepted for M1.
+- **Picks for every card that leaves the deck.** A card that leaves the deck by a draw is a `draw` pick; one that leaves by any other effect (a search, a summon from the deck) is `{"what":"multiset_pick","among":"deck","chose":"<card id>"}`, one per card in engine order. Invoke names its card and records nothing. Filtered draws ("draw a follower") are `draw` picks whose `chose` must be among the matching candidates.
+- **`raw` picks** are engine-private (the old engine's shuffles) and are ignored by every reader.
+- **Header extensions.** Header keys prefixed `x_` are engine-private and ignored by readers (`x_final_hash`); every other header key is the format.
+- **Cemetery.** `cemetery` holds every card that went there — destroyed followers and amulets and played spells alike; `shadows` is the separate counter the rules spend.
 
 ## Diff procedure
 
